@@ -16,7 +16,8 @@ function getOpenDay(year: number, month: number, holidaySet: Set<string>): numbe
 
 export async function GET(req: NextRequest) {
   const secret = process.env.CRON_SECRET
-  if (secret && req.headers.get('authorization') !== `Bearer ${secret}`) {
+  const tokenParam = req.nextUrl.searchParams.get('token')
+  if (secret && req.headers.get('authorization') !== `Bearer ${secret}` && tokenParam !== secret) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
