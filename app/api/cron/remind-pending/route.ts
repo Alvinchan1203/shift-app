@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
 
   // 所有需要提交意願的員工
   const employees = await prisma.user.findMany({
-    where: { role: 'EMPLOYEE', preferenceEnabled: true },
+    where: { role: 'EMPLOYEE' },
     select: { id: true, name: true },
   })
 
