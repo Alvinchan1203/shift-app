@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { SHIFTS, ShiftKey } from '@/lib/constants'
+import { SHIFTS, SHIFT_HOURS, ShiftKey } from '@/lib/constants'
 import ShiftBadge from '@/components/ShiftBadge'
 
 type Pref = { id: string; date: string; shift: ShiftKey }
@@ -61,7 +61,7 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
   const actualOpenDay = actualOpenDate.getDate()
   const isWindowOpen = todayDate >= actualOpenDay && todayDate <= 26
   const isViewingTargetMonth = year === targetYear && month === targetMonth
-  const canSubmit = (userName === 'testing-alvinchan' || extraSubmitEnabled) ? isViewingTargetMonth : (isWindowOpen && isViewingTargetMonth)
+  const canSubmit = extraSubmitEnabled || (isWindowOpen && isViewingTargetMonth)
 
   useEffect(() => {
     Promise.all([
@@ -172,18 +172,11 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
         <span className="font-medium">{targetMonthLabel}</span> 排班申請開放中，截止日期：本月 26 日
       </span>
     </div>
-  ) : extraSubmitEnabled && isViewingTargetMonth ? (
+  ) : extraSubmitEnabled ? (
     <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-4">
       <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
       <span className="text-sm text-green-700">
-        額外報更已開啟，可立即提交 <span className="font-medium">{targetMonthLabel}</span> 排班意願
-      </span>
-    </div>
-  ) : extraSubmitEnabled ? (
-    <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-4">
-      <span className="w-2 h-2 rounded-full bg-blue-400 shrink-0" />
-      <span className="text-sm text-blue-700">
-        額外報更已開啟，請切換至 <span className="font-medium">{targetMonthLabel}</span> 以提交排班意願
+        額外報更已開啟，可提交任何月份的排班意願
       </span>
     </div>
   ) : todayDate < actualOpenDay ? (
@@ -347,28 +340,40 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
       </div>
 
       <div className="mt-6">
-        <h3 className="font-medium text-gray-700 mb-3">已選意願摘要</h3>
-        {prefs.filter(p => p.date.startsWith(`${targetYear}-${String(targetMonth + 1).padStart(2, '0')}`)).length === 0 ? (
-          <p className="text-sm text-gray-400">尚未選擇任何班次</p>
-        ) : (
-          <div className="space-y-2">
-            {[...prefs]
-              .filter(p => p.date.startsWith(`${targetYear}-${String(targetMonth + 1).padStart(2, '0')}`))
-              .sort((a, b) => a.date.localeCompare(b.date))
-              .map((p) => (
-                <div key={p.id} className="flex items-center gap-3 text-sm">
-                  <span className="text-gray-600 w-28">
-                    {new Date(p.date + 'T00:00:00').toLocaleDateString('zh-HK', { month: 'short', day: 'numeric', weekday: 'short' })}
-                  </span>
-                  <ShiftBadge shift={p.shift} />
-                  <button
-                    onClick={() => deletePref(p.date, p.shift)}
-                    className="ml-auto text-gray-300 hover:text-red-400 text-base leading-none transition"
-                  >×</button>
+        {(() => {
+          const targetMonthPrefs = prefs.filter(p => p.date.startsWith(`${targetYear}-${String(targetMonth + 1).padStart(2, '0')}`))
+          const totalPrefHours = targetMonthPrefs.reduce((sum, p) => sum + (SHIFT_HOURS[p.shift] ?? 0), 0)
+          return (
+            <>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-medium text-gray-700">已選意願摘要</h3>
+                {totalPrefHours > 0 && (
+                  <span className="text-sm text-blue-600 font-medium">意願總時數：{totalPrefHours} 小時</span>
+                )}
+              </div>
+              {targetMonthPrefs.length === 0 ? (
+                <p className="text-sm text-gray-400">尚未選擇任何班次</p>
+              ) : (
+                <div className="space-y-2">
+                  {[...targetMonthPrefs]
+                    .sort((a, b) => a.date.localeCompare(b.date))
+                    .map((p) => (
+                      <div key={p.id} className="flex items-center gap-3 text-sm">
+                        <span className="text-gray-600 w-28">
+                          {new Date(p.date + 'T00:00:00').toLocaleDateString('zh-HK', { month: 'short', day: 'numeric', weekday: 'short' })}
+                        </span>
+                        <ShiftBadge shift={p.shift} />
+                        <button
+                          onClick={() => deletePref(p.date, p.shift)}
+                          className="ml-auto text-gray-300 hover:text-red-400 text-base leading-none transition"
+                        >×</button>
+                      </div>
+                    ))}
                 </div>
-              ))}
-          </div>
-        )}
+              )}
+            </>
+          )
+        })()}
 
         {canSubmit && (
           <div className="mt-5 border-t pt-4">
