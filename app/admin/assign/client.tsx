@@ -211,7 +211,15 @@ export default function AdminAssignClient() {
             {panelAssignments.map((a) => (
               <div key={a.id} className="flex items-center justify-between mb-2">
                 <span className="text-base text-gray-700">{a.user.name}</span>
-                <ShiftBadge shift={a.shift as ShiftKey} />
+                <div className="flex items-center gap-2">
+                  <ShiftBadge shift={a.shift as ShiftKey} />
+                  <button
+                    onClick={() => toggleAssign(dateStr, a.userId, a.user.name, a.shift as ShiftKey)}
+                    className="text-xs text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg px-2 py-1 transition"
+                  >
+                    刪除
+                  </button>
+                </div>
               </div>
             ))}
           </div>
