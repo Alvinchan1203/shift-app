@@ -91,11 +91,19 @@ export default function AttendanceClient({ isAdmin, users, currentUserId }: Prop
 
   function calcMonthlyMinutes(userId: string): number {
     let total = 0
-    for (const r of records.filter(r => r.userId === userId && r.date.startsWith(monthPrefix))) {
+    const monthRecords = records.filter(r => r.userId === userId && r.date.startsWith(monthPrefix))
+    const recordedDates = new Set(monthRecords.map(r => r.date))
+    for (const r of monthRecords) {
       if (r.type === 'OT' || r.type === 'SPECIAL') {
         total += r.durationMinutes ?? 0
       } else {
         total += SHIFT_DURATIONS[r.type] ?? 0
+      }
+    }
+    // Also count assignment prefill for days with no saved records
+    for (const a of assignments.filter(a => a.userId === userId && a.date.startsWith(monthPrefix))) {
+      if (!recordedDates.has(a.date)) {
+        total += SHIFT_DURATIONS[a.shift as AttendanceTypeKey] ?? 0
       }
     }
     return total
