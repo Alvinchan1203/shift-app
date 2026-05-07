@@ -140,11 +140,11 @@ export default function UsersClient({ currentUserName }: { currentUserName: stri
               {group.length === 0 ? (
                 <p className="text-gray-400 text-sm px-4 py-6 text-center">暫無{role === 'ADMIN' ? '管理員' : 'Bee'}帳號</p>
               ) : group.map(emp => (
-                <div key={emp.id} className="flex items-center justify-between px-4 py-3">
-                  <div>
-                    <p className="font-medium text-gray-800">{emp.name}</p>
+                <div key={emp.id} className="flex items-center justify-between px-4 py-3 gap-3">
+                  <div className="min-w-0">
+                    <p className="font-medium text-gray-800 truncate">{emp.name}</p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
                     {emp.role === 'EMPLOYEE' && (
                       <button
                         onClick={() => toggleExtraSubmit(emp)}
