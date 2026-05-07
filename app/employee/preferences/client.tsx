@@ -49,6 +49,7 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
   const [submission, setSubmission] = useState<{ submittedAt: string } | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const togglingDates = useRef(new Set<string>())
 
   const days = getMonthDays(year, month)
 
@@ -120,6 +121,8 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
 
   async function toggle(dateStr: string, shift: ShiftKey) {
     if (!canSubmit) return
+    if (togglingDates.current.has(dateStr)) return
+    togglingDates.current.add(dateStr)
     if (hasPref(dateStr, shift)) {
       await fetch('/api/preferences', {
         method: 'DELETE',
@@ -143,8 +146,12 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
         body: JSON.stringify({ date: dateStr, shift }),
       })
       const newPref = await res.json()
-      setPrefs((prev) => [...prev, { ...newPref, date: newPref.date.slice(0, 10) }])
+      setPrefs((prev) => {
+        const filtered = prev.filter((p) => !(p.date === newPref.date.slice(0, 10) && p.shift === newPref.shift))
+        return [...filtered, { ...newPref, date: newPref.date.slice(0, 10) }]
+      })
     }
+    togglingDates.current.delete(dateStr)
     setOpenDate(null)
   }
 
