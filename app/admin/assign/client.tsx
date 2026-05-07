@@ -39,19 +39,23 @@ export default function AdminAssignClient() {
   const [publishing, setPublishing] = useState(false)
 
   const days = getMonthDays(year, month)
+  const [refreshing, setRefreshing] = useState(false)
 
-  useEffect(() => {
-    Promise.all([
+  async function fetchData(showSpinner = false) {
+    if (showSpinner) setRefreshing(true)
+    const [p, a, h] = await Promise.all([
       fetch('/api/preferences').then((r) => r.json()),
       fetch('/api/assignments').then((r) => r.json()),
       fetch('/api/holidays').then((r) => r.json()),
-    ]).then(([p, a, h]) => {
-      setPrefs(p.map((x: Pref) => ({ ...x, date: x.date.slice(0, 10) })))
-      setAssignments(a.map((x: Assignment) => ({ ...x, date: x.date.slice(0, 10) })))
-      setHolidays(h.map((x: Holiday) => ({ ...x, date: x.date.slice(0, 10) })))
-      setLoading(false)
-    })
-  }, [])
+    ])
+    setPrefs(p.map((x: Pref) => ({ ...x, date: x.date.slice(0, 10) })))
+    setAssignments(a.map((x: Assignment) => ({ ...x, date: x.date.slice(0, 10) })))
+    setHolidays(h.map((x: Holiday) => ({ ...x, date: x.date.slice(0, 10) })))
+    setLoading(false)
+    if (showSpinner) setRefreshing(false)
+  }
+
+  useEffect(() => { fetchData() }, [])
 
   useEffect(() => {
     fetch(`/api/schedule-publish?year=${year}&month=${month + 1}`)
@@ -222,7 +226,17 @@ export default function AdminAssignClient() {
       <div className="flex items-center justify-between mb-3">
         <button onClick={prevMonth} className="px-3 py-2 rounded-lg border hover:bg-gray-100">‹</button>
         <span className="font-semibold text-gray-800">{monthLabel}</span>
-        <button onClick={nextMonth} className="px-3 py-2 rounded-lg border hover:bg-gray-100">›</button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => fetchData(true)}
+            disabled={refreshing}
+            title="重新整理意願資料"
+            className="px-3 py-2 rounded-lg border hover:bg-gray-100 text-gray-500 disabled:opacity-50 transition"
+          >
+            {refreshing ? '⟳' : '↺'}
+          </button>
+          <button onClick={nextMonth} className="px-3 py-2 rounded-lg border hover:bg-gray-100">›</button>
+        </div>
       </div>
       <div className="flex items-center justify-between mb-4 bg-gray-50 rounded-xl px-4 py-3 border gap-3">
         <div className="flex items-center gap-2 min-w-0">
