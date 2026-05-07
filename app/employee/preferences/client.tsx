@@ -363,6 +363,7 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
                           {new Date(p.date + 'T00:00:00').toLocaleDateString('zh-HK', { month: 'short', day: 'numeric', weekday: 'short' })}
                         </span>
                         <ShiftBadge shift={p.shift} />
+                        <span className="text-xs text-gray-400">{SHIFT_HOURS[p.shift]}h</span>
                         <button
                           onClick={() => deletePref(p.date, p.shift)}
                           className="ml-auto text-gray-300 hover:text-red-400 text-base leading-none transition"

@@ -43,7 +43,10 @@ export default async function EmployeeSchedulePage() {
                       year: 'numeric', month: 'long', day: 'numeric', weekday: 'short',
                     })}
                   </span>
+                  <div className="flex items-center gap-2">
                   <ShiftBadge shift={a.shift as ShiftKey} />
+                  <span className="text-xs text-gray-400">{SHIFT_HOURS[a.shift as ShiftKey]}h</span>
+                </div>
                 </div>
               ))}
             </div>
