@@ -17,6 +17,7 @@ export const ATTENDANCE_TYPES = {
   OB:      { label: 'OB',   desc: 'On-board',   bg: 'bg-sky-100',    text: 'text-sky-800',    border: 'border-sky-200'    },
   SPECIAL: { label: '特',   desc: '特別更時間',  bg: 'bg-orange-100', text: 'text-orange-800', border: 'border-orange-200' },
   QUIZ:    { label: 'Quiz', desc: 'Quiz',       bg: 'bg-cyan-100',   text: 'text-cyan-800',   border: 'border-cyan-200'   },
+  SC:      { label: '調班', desc: '已申請調班', bg: 'bg-rose-100',   text: 'text-rose-700',   border: 'border-rose-200'   },
 } as const
 
 export type AttendanceTypeKey = keyof typeof ATTENDANCE_TYPES
