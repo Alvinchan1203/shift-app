@@ -32,7 +32,13 @@ function nextWorkingDay(startDate: Date, holidaySet: Set<string>): Date {
   }
 }
 
-export default function EmployeePreferencesClient({ userName, extraSubmitEnabled }: { userName: string; extraSubmitEnabled: boolean }) {
+type InitialData = {
+  prefs: { id: string; date: string; shift: string }[]
+  holidays: Holiday[]
+  submission: { submittedAt: string } | null
+}
+
+export default function EmployeePreferencesClient({ userName, extraSubmitEnabled, initialData }: { userName: string; extraSubmitEnabled: boolean; initialData: InitialData }) {
   const today = new Date()
   const todayDate = today.getDate()
 
@@ -42,12 +48,11 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
 
   const [year, setYear] = useState(targetYear)
   const [month, setMonth] = useState(targetMonth)
-  const [prefs, setPrefs] = useState<Pref[]>([])
-  const [confirmedPrefs, setConfirmedPrefs] = useState<Pref[]>([])
-  const [holidays, setHolidays] = useState<Holiday[]>([])
-  const [loading, setLoading] = useState(true)
+  const [prefs, setPrefs] = useState<Pref[]>(initialData.prefs as Pref[])
+  const [confirmedPrefs, setConfirmedPrefs] = useState<Pref[]>(initialData.prefs as Pref[])
+  const [holidays, setHolidays] = useState<Holiday[]>(initialData.holidays)
   const [openDate, setOpenDate] = useState<string | null>(null)
-  const [submission, setSubmission] = useState<{ submittedAt: string } | null>(null)
+  const [submission, setSubmission] = useState<{ submittedAt: string } | null>(initialData.submission)
   const [submitting, setSubmitting] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -63,21 +68,6 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
   const isWindowOpen = todayDate >= actualOpenDay && todayDate <= 26
   const isViewingTargetMonth = year === targetYear && month === targetMonth
   const canSubmit = extraSubmitEnabled || (isWindowOpen && isViewingTargetMonth)
-
-  useEffect(() => {
-    Promise.all([
-      fetch('/api/preferences').then((r) => r.json()),
-      fetch('/api/holidays').then((r) => r.json()),
-      fetch(`/api/preferences/submit?year=${targetYear}&month=${targetMonth + 1}`).then(r => r.json()),
-    ]).then(([prefData, holidayData, submissionData]) => {
-      const mapped = prefData.map((p: Pref) => ({ ...p, date: p.date.slice(0, 10) }))
-      setPrefs(mapped)
-      setConfirmedPrefs(mapped)
-      setHolidays(holidayData.map((h: Holiday) => ({ ...h, date: h.date.slice(0, 10) })))
-      setSubmission(submissionData)
-      setLoading(false)
-    })
-  }, [])
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -162,8 +152,6 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
   const targetMonthLabel = new Date(targetYear, targetMonth).toLocaleDateString('zh-HK', { year: 'numeric', month: 'long' })
   const weekdays = ['日', '一', '二', '三', '四', '五', '六']
   const firstDow = days[0].getDay()
-
-  if (loading) return <p className="text-gray-500">載入中...</p>
 
   // Status banner
   const banner = isWindowOpen ? (

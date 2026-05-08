@@ -8,11 +8,31 @@ export default async function EmployeePreferencesPage() {
   const session = await auth()
   if (!session) redirect('/login')
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { extraSubmitEnabled: true },
-  })
-  const extraSubmitEnabled = user?.extraSubmitEnabled ?? false
+  const today = new Date()
+  const targetDate = new Date(today.getFullYear(), today.getMonth() + 1, 1)
+  const targetYear = targetDate.getFullYear()
+  const targetMonth1 = targetDate.getMonth() + 1
+
+  const [user, prefs, holidays, submission] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { extraSubmitEnabled: true },
+    }),
+    prisma.shiftPreference.findMany({
+      where: { userId: session.user.id },
+      orderBy: [{ date: 'asc' }, { shift: 'asc' }],
+    }),
+    prisma.holiday.findMany(),
+    prisma.preferenceSubmission.findUnique({
+      where: { userId_year_month: { userId: session.user.id, year: targetYear, month: targetMonth1 } },
+    }),
+  ])
+
+  const initialData = {
+    prefs: prefs.map(p => ({ id: p.id, date: p.date.toISOString().slice(0, 10), shift: p.shift as string })),
+    holidays: holidays.map(h => ({ id: h.id, date: h.date.toISOString().slice(0, 10), name: h.name })),
+    submission: submission ? { submittedAt: submission.submittedAt.toISOString() } : null,
+  }
 
   return (
     <div>
@@ -33,7 +53,11 @@ export default async function EmployeePreferencesPage() {
             ))}
           </div>
         </div>
-        <EmployeePreferencesClient userName={session.user.name!} extraSubmitEnabled={extraSubmitEnabled} />
+        <EmployeePreferencesClient
+          userName={session.user.name!}
+          extraSubmitEnabled={user?.extraSubmitEnabled ?? false}
+          initialData={initialData}
+        />
       </main>
     </div>
   )
