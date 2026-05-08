@@ -136,7 +136,7 @@ export default async function AdminPreferencesPage({
                         )
                       })}
                     </div>
-                  ) : submitted ? (
+                  ) : subRecord ? (
                     <p className="text-sm text-gray-400 px-5 py-4">未選擇任何班次</p>
                   ) : (
                     <p className="text-sm text-gray-400 px-5 py-4">—</p>
