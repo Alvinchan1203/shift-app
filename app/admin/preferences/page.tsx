@@ -110,7 +110,7 @@ export default async function AdminPreferencesPage({
                         提交於 {new Date(submitted).toLocaleString('zh-HK', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </span>
                     ) : empPrefs.length > 0 ? (
-                      <span className="text-xs text-amber-600 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">已選擇・未確認提交</span>
+                      <span className="text-xs text-white bg-orange-500 border border-orange-500 px-2.5 py-1 rounded-full font-medium">⚠ 已選班次・未確認提交</span>
                     ) : (
                       <span className="text-xs text-gray-400 bg-gray-50 border border-gray-200 px-2.5 py-1 rounded-full">未提交</span>
                     )}
