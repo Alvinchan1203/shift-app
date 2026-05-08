@@ -67,13 +67,21 @@ export default async function AdminPreferencesPage({
   })
 
   const monthLabel = new Date(year, month - 1).toLocaleDateString('zh-HK', { year: 'numeric', month: 'long' })
+  const submittedCount = allEmployees.filter(e => submissionByUser[e.id]?.confirmedAt != null).length
 
   return (
     <div>
       <Navbar userName={session.user.name!} role={session.user.role} />
       <main className="max-w-4xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-gray-800">Bee上班意願</h2>
+          <div className="flex items-center gap-3">
+            <h2 className="text-xl font-bold text-gray-800">Bee上班意願</h2>
+            {allEmployees.length > 0 && (
+              <span className={`text-xs px-2.5 py-1 rounded-full border font-medium ${submittedCount === allEmployees.length ? 'bg-green-50 text-green-700 border-green-200' : 'bg-gray-100 text-gray-500 border-gray-200'}`}>
+                已提交 {submittedCount} / {allEmployees.length} 人
+              </span>
+            )}
+          </div>
           <div className="flex items-center gap-2">
             <Link
               href={`/admin/preferences?year=${prevYear}&month=${prevMonth}`}

@@ -2,12 +2,21 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const { searchParams } = new URL(req.url)
+  const year = searchParams.get('year') ? parseInt(searchParams.get('year')!) : null
+  const month = searchParams.get('month') ? parseInt(searchParams.get('month')!) : null
+  const dateFilter = year && month ? {
+    gte: new Date(Date.UTC(year, month - 1, 1)),
+    lt: new Date(Date.UTC(year, month, 1)),
+  } : null
+
   if (session.user.role === 'ADMIN') {
     const records = await prisma.attendanceRecord.findMany({
+      where: dateFilter ? { date: dateFilter } : undefined,
       include: { user: { select: { id: true, name: true } } },
       orderBy: [{ date: 'asc' }],
     })
@@ -15,7 +24,7 @@ export async function GET() {
   }
 
   const records = await prisma.attendanceRecord.findMany({
-    where: { userId: session.user.id },
+    where: { userId: session.user.id, ...(dateFilter ? { date: dateFilter } : {}) },
     orderBy: [{ date: 'asc' }],
   })
   return NextResponse.json(records)

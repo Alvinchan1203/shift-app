@@ -21,6 +21,7 @@ export default function UsersClient({ currentUserName, initialData }: { currentU
 
   const [resetModal, setResetModal] = useState<Employee | null>(null)
   const [resetPassword, setResetPassword] = useState('')
+  const [resetNewPassword, setResetNewPassword] = useState('')
   const [resetError, setResetError] = useState('')
   const [resetSuccess, setResetSuccess] = useState(false)
   const [resetSaving, setResetSaving] = useState(false)
@@ -93,13 +94,15 @@ export default function UsersClient({ currentUserName, initialData }: { currentU
   async function resetEmployeePassword() {
     setResetError('')
     setResetSuccess(false)
+    if (!resetNewPassword) { setResetError('請輸入新密碼'); return }
+    if (resetNewPassword.length < 6) { setResetError('新密碼最少需要6個字元'); return }
     if (!resetPassword) { setResetError('請輸入管理員密碼'); return }
     setResetSaving(true)
     try {
       const r = await fetch('/api/admin/users', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: resetModal!.id, adminPassword: resetPassword }),
+        body: JSON.stringify({ userId: resetModal!.id, adminPassword: resetPassword, newPassword: resetNewPassword }),
       })
       const data = await r.json()
       if (!r.ok) { setResetError(data.error ?? '重置失敗'); return }
@@ -150,7 +153,7 @@ export default function UsersClient({ currentUserName, initialData }: { currentU
                       </button>
                     )}
                     <button
-                      onClick={() => { setResetModal(emp); setResetPassword(''); setResetError(''); setResetSuccess(false) }}
+                      onClick={() => { setResetModal(emp); setResetPassword(''); setResetNewPassword(''); setResetError(''); setResetSuccess(false) }}
                       className="text-xs text-amber-600 hover:text-amber-800 border border-amber-200 rounded-lg px-2.5 py-1 hover:bg-amber-50 transition"
                     >
                       重置密碼
@@ -229,22 +232,27 @@ export default function UsersClient({ currentUserName, initialData }: { currentU
               <button onClick={() => setResetModal(null)} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
             </div>
 
-            <p className="text-sm text-gray-600 mb-1">
-              將 <span className="font-semibold text-gray-800">{resetModal.name}</span> 的密碼重置為：
-            </p>
-            <p className="text-sm font-mono font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-4">
-              futuhk123
+            <p className="text-sm text-gray-600 mb-4">
+              重置 <span className="font-semibold text-gray-800">{resetModal.name}</span> 的登入密碼
             </p>
 
-            <div className="mb-4">
-              <p className="text-xs text-gray-500 mb-2">請輸入您的管理員密碼以確認操作</p>
-              <input type="password" placeholder="管理員密碼" value={resetPassword}
-                onChange={e => setResetPassword(e.target.value)}
-                className="w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300" />
+            <div className="space-y-3 mb-4">
+              <div>
+                <p className="text-xs text-gray-500 mb-1.5">新密碼（最少6個字元）</p>
+                <input type="password" placeholder="輸入新密碼" value={resetNewPassword}
+                  onChange={e => setResetNewPassword(e.target.value)}
+                  className="w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 mb-1.5">請輸入您的管理員密碼以確認操作</p>
+                <input type="password" placeholder="管理員密碼" value={resetPassword}
+                  onChange={e => setResetPassword(e.target.value)}
+                  className="w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300" />
+              </div>
             </div>
 
             {resetError && <p className="text-xs text-red-500 mb-3">{resetError}</p>}
-            {resetSuccess && <p className="text-xs text-green-600 mb-3">密碼已成功重置為 futuhk123</p>}
+            {resetSuccess && <p className="text-xs text-green-600 mb-3">密碼已成功重置</p>}
 
             <button onClick={resetEmployeePassword} disabled={resetSaving || resetSuccess}
               className="w-full py-2.5 rounded-xl border border-amber-200 bg-amber-50 text-amber-700 text-sm font-medium hover:bg-amber-100 transition disabled:opacity-50">

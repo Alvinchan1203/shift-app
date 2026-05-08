@@ -8,10 +8,16 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url)
   const date = searchParams.get('date')
+  const year = searchParams.get('year') ? parseInt(searchParams.get('year')!) : null
+  const month = searchParams.get('month') ? parseInt(searchParams.get('month')!) : null
+
+  const dateFilter = year && month
+    ? { gte: new Date(Date.UTC(year, month - 1, 1)), lt: new Date(Date.UTC(year, month, 1)) }
+    : null
 
   if (session.user.role === 'ADMIN') {
     const assignments = await prisma.shiftAssignment.findMany({
-      where: date ? { date: new Date(date) } : undefined,
+      where: dateFilter ? { date: dateFilter } : date ? { date: new Date(date) } : undefined,
       include: { user: { select: { id: true, name: true } } },
       orderBy: [{ date: 'asc' }, { shift: 'asc' }],
     })
@@ -19,7 +25,7 @@ export async function GET(req: NextRequest) {
   }
 
   const assignments = await prisma.shiftAssignment.findMany({
-    where: { userId: session.user.id },
+    where: { userId: session.user.id, ...(dateFilter ? { date: dateFilter } : {}) },
     orderBy: [{ date: 'asc' }, { shift: 'asc' }],
   })
   return NextResponse.json(assignments)

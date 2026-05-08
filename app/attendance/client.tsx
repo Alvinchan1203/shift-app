@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ATTENDANCE_TYPES, AttendanceTypeKey, SHIFT_DURATIONS, formatDuration } from '@/lib/constants'
 
 type User = { id: string; name: string }
@@ -19,6 +19,8 @@ type DurationType = 'OT' | 'SPECIAL'
 const DURATION_TYPES: DurationType[] = ['OT', 'SPECIAL']
 
 type InitialData = {
+  initialYear: number
+  initialMonth: number
   records: { id: string; userId: string; date: string; type: string; note: string | null; durationMinutes: number | null }[]
   assignments: { userId: string; date: string; shift: string }[]
   holidays: { id: string; date: string; name: string }[]
@@ -47,12 +49,13 @@ interface Props {
 }
 
 export default function AttendanceClient({ isAdmin, users, currentUserId, initialData }: Props) {
-  const today = new Date()
-  const [year, setYear] = useState(today.getFullYear())
-  const [month, setMonth] = useState(today.getMonth())
+  const [year, setYear] = useState(initialData.initialYear)
+  const [month, setMonth] = useState(initialData.initialMonth)
   const [records, setRecords] = useState<AttendanceRecord[]>(initialData.records as AttendanceRecord[])
   const [assignments, setAssignments] = useState<Assignment[]>(initialData.assignments)
-  const [holidays, setHolidays] = useState<Holiday[]>(initialData.holidays)
+  const [holidays] = useState<Holiday[]>(initialData.holidays)
+  const [loadingMonth, setLoadingMonth] = useState(false)
+  const isInitialMount = useRef(true)
 
   const [modal, setModal] = useState<{ userId: string; userName: string; dateStr: string; currentTypes: AttendanceTypeKey[] } | null>(null)
   const [selectedTypes, setSelectedTypes] = useState<AttendanceTypeKey[]>([])
@@ -61,6 +64,20 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
   const [saveError, setSaveError] = useState<string | null>(null)
   const [logs, setLogs] = useState<AttendanceLog[]>(initialData.logs as AttendanceLog[])
   const [showLog, setShowLog] = useState(false)
+
+  useEffect(() => {
+    if (isInitialMount.current) { isInitialMount.current = false; return }
+    setLoadingMonth(true)
+    const m1 = month + 1
+    Promise.all([
+      fetch(`/api/attendance?year=${year}&month=${m1}`).then(r => r.json()),
+      fetch(`/api/assignments?year=${year}&month=${m1}`).then(r => r.json()),
+    ]).then(([att, asgn]) => {
+      setRecords(att.map((r: AttendanceRecord) => ({ ...r, date: r.date.slice(0, 10) })))
+      setAssignments(asgn.map((a: Assignment) => ({ ...a, date: a.date.slice(0, 10) })))
+      setLoadingMonth(false)
+    })
+  }, [year, month])
 
   const days = getMonthDays(year, month)
   const monthPrefix = `${year}-${String(month + 1).padStart(2, '0')}`
@@ -309,7 +326,7 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
       </div>
 
       {/* ── Roster 表格（橫向捲動）── */}
-      <div className="overflow-x-auto rounded-2xl border shadow-sm bg-white">
+      <div className={`overflow-x-auto rounded-2xl border shadow-sm bg-white transition-opacity ${loadingMonth ? 'opacity-50 pointer-events-none' : ''}`}>
         <table className="border-collapse min-w-max text-sm">
           <thead>
             <tr className="bg-gray-50 border-b">

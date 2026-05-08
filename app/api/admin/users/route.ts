@@ -72,9 +72,12 @@ export async function PATCH(req: NextRequest) {
   }
 
   try {
-    const { userId, adminPassword } = await req.json()
-    if (!userId || !adminPassword) {
+    const { userId, adminPassword, newPassword } = await req.json()
+    if (!userId || !adminPassword || !newPassword) {
       return NextResponse.json({ error: '缺少資料' }, { status: 400 })
+    }
+    if (newPassword.length < 6) {
+      return NextResponse.json({ error: '新密碼最少需要6個字元' }, { status: 400 })
     }
 
     const admin = await prisma.user.findUnique({ where: { id: session.user.id } })
@@ -83,7 +86,7 @@ export async function PATCH(req: NextRequest) {
     const valid = await bcrypt.compare(adminPassword, admin.password)
     if (!valid) return NextResponse.json({ error: '管理員密碼錯誤' }, { status: 401 })
 
-    const hashed = await bcrypt.hash('futuhk123', 10)
+    const hashed = await bcrypt.hash(newPassword, 10)
     await prisma.user.update({ where: { id: userId }, data: { password: hashed } })
     return NextResponse.json({ ok: true })
   } catch (e: any) {

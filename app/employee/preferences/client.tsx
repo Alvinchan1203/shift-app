@@ -54,6 +54,7 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
   const [openDate, setOpenDate] = useState<string | null>(null)
   const [submission, setSubmission] = useState<{ submittedAt: string } | null>(initialData.submission)
   const [submitting, setSubmitting] = useState(false)
+  const [toast, setToast] = useState<string | null>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   const days = getMonthDays(year, month)
@@ -117,6 +118,8 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
         const mapped = updatedPrefs.map((p: Pref) => ({ ...p, date: p.date.slice(0, 10) }))
         setPrefs(mapped)
         setConfirmedPrefs(mapped)
+        setToast('排班意願已成功提交')
+        setTimeout(() => setToast(null), 3000)
       }
     } finally {
       setSubmitting(false)
@@ -391,5 +394,11 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
         )}
       </div>
     </div>
+
+    {toast && (
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-gray-900 text-white text-sm px-4 py-2.5 rounded-xl shadow-lg whitespace-nowrap">
+        ✓ {toast}
+      </div>
+    )}
   )
 }
