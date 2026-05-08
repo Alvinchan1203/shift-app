@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { SHIFTS, ShiftKey } from '@/lib/constants'
 import ShiftBadge from '@/components/ShiftBadge'
 
@@ -9,6 +9,17 @@ const SHIFT_HOURS: Record<ShiftKey, number> = { A: 5, B: 5, C: 8 }
 type Pref = { id: string; date: string; shift: ShiftKey; user: { id: string; name: string } }
 type Assignment = { id: string; date: string; shift: ShiftKey; userId: string; user: { id: string; name: string } }
 type Holiday = { id: string; date: string; name: string }
+
+type InitialData = {
+  prefs: Pref[]
+  assignments: Assignment[]
+  holidays: Holiday[]
+  submittedUserIds: string[]
+  published: boolean
+  publishedAt: string | null
+  initialYear: number
+  initialMonth: number
+}
 
 function toDateStr(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
@@ -24,23 +35,22 @@ function getMonthDays(year: number, month: number) {
   return days
 }
 
-export default function AdminAssignClient() {
-  const today = new Date()
-  const [year, setYear] = useState(today.getFullYear())
-  const [month, setMonth] = useState(today.getMonth())
+export default function AdminAssignClient({ initialData }: { initialData: InitialData }) {
+  const [year, setYear] = useState(initialData.initialYear)
+  const [month, setMonth] = useState(initialData.initialMonth)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [sheetDate, setSheetDate] = useState<string | null>(null)
-  const [prefs, setPrefs] = useState<Pref[]>([])
-  const [submittedUserIds, setSubmittedUserIds] = useState<Set<string>>(new Set())
-  const [assignments, setAssignments] = useState<Assignment[]>([])
-  const [holidays, setHolidays] = useState<Holiday[]>([])
-  const [loading, setLoading] = useState(true)
-  const [published, setPublished] = useState(false)
-  const [publishedAt, setPublishedAt] = useState<string | null>(null)
+  const [prefs, setPrefs] = useState<Pref[]>(initialData.prefs)
+  const [submittedUserIds, setSubmittedUserIds] = useState<Set<string>>(new Set(initialData.submittedUserIds))
+  const [assignments, setAssignments] = useState<Assignment[]>(initialData.assignments)
+  const [holidays, setHolidays] = useState<Holiday[]>(initialData.holidays)
+  const [published, setPublished] = useState(initialData.published)
+  const [publishedAt, setPublishedAt] = useState<string | null>(initialData.publishedAt)
   const [publishing, setPublishing] = useState(false)
 
   const days = getMonthDays(year, month)
   const [refreshing, setRefreshing] = useState(false)
+  const isInitialMount = useRef(true)
 
   async function fetchData(showSpinner = false, fetchYear = year, fetchMonth = month) {
     if (showSpinner) setRefreshing(true)
@@ -54,13 +64,14 @@ export default function AdminAssignClient() {
     setAssignments(a.map((x: Assignment) => ({ ...x, date: x.date.slice(0, 10) })))
     setHolidays(h.map((x: Holiday) => ({ ...x, date: x.date.slice(0, 10) })))
     setSubmittedUserIds(new Set((Array.isArray(subs) ? subs : []).map((s: { userId: string }) => s.userId)))
-    setLoading(false)
     if (showSpinner) setRefreshing(false)
   }
 
-  useEffect(() => { fetchData() }, [])
-
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false
+      return
+    }
     fetch(`/api/schedule-publish?year=${year}&month=${month + 1}`)
       .then((r) => r.json())
       .then((data) => {
@@ -146,8 +157,6 @@ export default function AdminAssignClient() {
   const monthLabel = new Date(year, month).toLocaleDateString('zh-HK', { year: 'numeric', month: 'long' })
   const weekdays = ['日', '一', '二', '三', '四', '五', '六']
   const firstDow = days[0].getDay()
-
-  if (loading) return <p className="text-gray-500">載入中...</p>
 
   const selectedPrefs = selectedDate ? getDayPrefs(selectedDate) : []
   const selectedAssignments = selectedDate ? getDayAssignments(selectedDate) : []

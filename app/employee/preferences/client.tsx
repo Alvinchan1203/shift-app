@@ -43,13 +43,13 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
   const [year, setYear] = useState(targetYear)
   const [month, setMonth] = useState(targetMonth)
   const [prefs, setPrefs] = useState<Pref[]>([])
+  const [confirmedPrefs, setConfirmedPrefs] = useState<Pref[]>([])
   const [holidays, setHolidays] = useState<Holiday[]>([])
   const [loading, setLoading] = useState(true)
   const [openDate, setOpenDate] = useState<string | null>(null)
   const [submission, setSubmission] = useState<{ submittedAt: string } | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
-  const togglingDates = useRef(new Set<string>())
 
   const days = getMonthDays(year, month)
 
@@ -70,7 +70,9 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
       fetch('/api/holidays').then((r) => r.json()),
       fetch(`/api/preferences/submit?year=${targetYear}&month=${targetMonth + 1}`).then(r => r.json()),
     ]).then(([prefData, holidayData, submissionData]) => {
-      setPrefs(prefData.map((p: Pref) => ({ ...p, date: p.date.slice(0, 10) })))
+      const mapped = prefData.map((p: Pref) => ({ ...p, date: p.date.slice(0, 10) }))
+      setPrefs(mapped)
+      setConfirmedPrefs(mapped)
       setHolidays(holidayData.map((h: Holiday) => ({ ...h, date: h.date.slice(0, 10) })))
       setSubmission(submissionData)
       setLoading(false)
@@ -95,63 +97,55 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
     return prefs.filter((p) => p.date === dateStr)
   }
 
+  const targetMonthPrefix = `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}`
+
+  const hasUnsavedChanges = (() => {
+    const current = prefs.filter(p => p.date.startsWith(targetMonthPrefix))
+    const confirmed = confirmedPrefs.filter(p => p.date.startsWith(targetMonthPrefix))
+    if (current.length !== confirmed.length) return true
+    const confirmedSet = new Set(confirmed.map(p => `${p.date}|${p.shift}`))
+    return current.some(p => !confirmedSet.has(`${p.date}|${p.shift}`))
+  })()
+
   async function submitPreferences() {
     setSubmitting(true)
     try {
+      const targetPrefs = prefs.filter(p => p.date.startsWith(targetMonthPrefix))
       const r = await fetch('/api/preferences/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ year: targetYear, month: targetMonth + 1 }),
+        body: JSON.stringify({
+          year: targetYear,
+          month: targetMonth + 1,
+          preferences: targetPrefs.map(p => ({ date: p.date, shift: p.shift })),
+        }),
       })
       const data = await r.json()
-      if (r.ok) setSubmission(data)
+      if (r.ok) {
+        setSubmission(data)
+        const updatedPrefs = await fetch('/api/preferences').then(r => r.json())
+        const mapped = updatedPrefs.map((p: Pref) => ({ ...p, date: p.date.slice(0, 10) }))
+        setPrefs(mapped)
+        setConfirmedPrefs(mapped)
+      }
     } finally {
       setSubmitting(false)
     }
   }
 
-  async function deletePref(dateStr: string, shift: ShiftKey) {
-    await fetch('/api/preferences', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ date: dateStr, shift }),
-    })
+  function deletePref(dateStr: string, shift: ShiftKey) {
     setPrefs((prev) => prev.filter((p) => !(p.date === dateStr && p.shift === shift)))
   }
 
-  async function toggle(dateStr: string, shift: ShiftKey) {
+  function toggle(dateStr: string, shift: ShiftKey) {
     if (!canSubmit) return
-    if (togglingDates.current.has(dateStr)) return
-    togglingDates.current.add(dateStr)
-    if (hasPref(dateStr, shift)) {
-      await fetch('/api/preferences', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date: dateStr, shift }),
-      })
-      setPrefs((prev) => prev.filter((p) => !(p.date === dateStr && p.shift === shift)))
-    } else {
-      const existing = prefs.find((p) => p.date === dateStr)
-      if (existing) {
-        await fetch('/api/preferences', {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ date: dateStr, shift: existing.shift }),
-        })
-        setPrefs((prev) => prev.filter((p) => p.date !== dateStr))
+    setPrefs((prev) => {
+      if (prev.some(p => p.date === dateStr && p.shift === shift)) {
+        return prev.filter(p => !(p.date === dateStr && p.shift === shift))
       }
-      const res = await fetch('/api/preferences', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date: dateStr, shift }),
-      })
-      const newPref = await res.json()
-      setPrefs((prev) => {
-        const filtered = prev.filter((p) => !(p.date === newPref.date.slice(0, 10) && p.shift === newPref.shift))
-        return [...filtered, { ...newPref, date: newPref.date.slice(0, 10) }]
-      })
-    }
-    togglingDates.current.delete(dateStr)
+      const withoutDate = prev.filter(p => p.date !== dateStr)
+      return [...withoutDate, { id: `local-${dateStr}-${shift}`, date: dateStr, shift }]
+    })
     setOpenDate(null)
   }
 
@@ -391,6 +385,9 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
               <p className="text-xs text-gray-400 mb-2">
                 上次提交：{new Date(submission.submittedAt).toLocaleString('zh-HK', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
               </p>
+            )}
+            {hasUnsavedChanges && (
+              <p className="text-xs text-amber-600 mb-2">意願已更改，請確認後才會儲存</p>
             )}
             <button
               onClick={submitPreferences}

@@ -27,15 +27,35 @@ export async function POST(req: NextRequest) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
-    const { year, month } = await req.json()
+    const { year, month, preferences } = await req.json()
     if (!year || !month) return NextResponse.json({ error: '缺少資料' }, { status: 400 })
 
     const now = new Date()
-    const submission = await prisma.preferenceSubmission.upsert({
-      where: { userId_year_month: { userId: session.user.id, year, month } },
-      update: { submittedAt: now, confirmedAt: now },
-      create: { userId: session.user.id, year, month, confirmedAt: now },
+    const monthStart = new Date(`${year}-${String(month).padStart(2, '0')}-01`)
+    const monthEnd = month === 12
+      ? new Date(`${year + 1}-01-01`)
+      : new Date(`${year}-${String(month + 1).padStart(2, '0')}-01`)
+
+    const submission = await prisma.$transaction(async (tx) => {
+      await tx.shiftPreference.deleteMany({
+        where: { userId: session.user.id, date: { gte: monthStart, lt: monthEnd } },
+      })
+      if (preferences && preferences.length > 0) {
+        await tx.shiftPreference.createMany({
+          data: preferences.map((p: { date: string; shift: string }) => ({
+            userId: session.user.id,
+            date: new Date(p.date),
+            shift: p.shift,
+          })),
+        })
+      }
+      return tx.preferenceSubmission.upsert({
+        where: { userId_year_month: { userId: session.user.id, year, month } },
+        update: { submittedAt: now, confirmedAt: now },
+        create: { userId: session.user.id, year, month, confirmedAt: now },
+      })
     })
+
     return NextResponse.json(submission)
   } catch (e: any) {
     return NextResponse.json({ error: e?.message ?? 'Unknown error' }, { status: 500 })
