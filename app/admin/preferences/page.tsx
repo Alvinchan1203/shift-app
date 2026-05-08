@@ -100,22 +100,15 @@ export default async function AdminPreferencesPage({
             {sortedEmployees.map(emp => {
               const subRecord = submissionByUser[emp.id]
               const empPrefs = prefsByUser[emp.id] ?? []
-              const isConfirmed = subRecord?.confirmedAt != null &&
-                subRecord.confirmedAt >= subRecord.submittedAt
-              const isModifiedAfterConfirm = subRecord?.confirmedAt != null &&
-                subRecord.confirmedAt < subRecord.submittedAt
+              const hasConfirmed = subRecord?.confirmedAt != null
 
               return (
                 <div key={emp.id} className="bg-white rounded-2xl shadow-sm border overflow-hidden">
                   <div className="bg-gray-50 px-5 py-3 border-b flex items-center justify-between">
                     <span className="font-medium text-gray-800">{emp.name}</span>
-                    {isConfirmed ? (
+                    {hasConfirmed ? (
                       <span className="text-xs text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">
-                        確認提交於 {new Date(subRecord.confirmedAt!).toLocaleString('zh-HK', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                      </span>
-                    ) : isModifiedAfterConfirm ? (
-                      <span className="text-xs text-yellow-700 bg-yellow-50 border border-yellow-300 px-2.5 py-1 rounded-full">
-                        已提交・意願有更新（未重新確認）・原確認於 {new Date(subRecord.confirmedAt!).toLocaleString('zh-HK', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        確認提交於 {new Date(subRecord!.confirmedAt!).toLocaleString('zh-HK', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </span>
                     ) : empPrefs.length > 0 ? (
                       <span className="text-xs text-white bg-orange-500 border border-orange-500 px-2.5 py-1 rounded-full font-medium">⚠ 已選班次・未確認提交</span>
