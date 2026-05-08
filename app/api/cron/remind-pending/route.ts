@@ -32,15 +32,19 @@ export async function GET(req: NextRequest) {
     select: { id: true, name: true },
   })
 
-  // 已提交的員工
+  // 已確認提交（且確認後沒有再修改）的員工
   const submitted = await prisma.preferenceSubmission.findMany({
     where: { year: targetYear, month: targetMonth },
-    select: { userId: true },
+    select: { userId: true, submittedAt: true, confirmedAt: true },
   })
-  const submittedIds = new Set(submitted.map(s => s.userId))
+  const confirmedIds = new Set(
+    submitted
+      .filter(s => s.confirmedAt != null && s.confirmedAt >= s.submittedAt)
+      .map(s => s.userId)
+  )
 
-  // 未提交的員工
-  const pending = employees.filter(e => !submittedIds.has(e.id))
+  // 未確認提交的員工（包括：從未提交、已選但未確認、確認後再修改）
+  const pending = employees.filter(e => !confirmedIds.has(e.id))
 
   if (pending.length === 0) {
     return NextResponse.json({ ok: true, message: 'All employees have submitted' })
