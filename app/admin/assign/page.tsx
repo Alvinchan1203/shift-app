@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import Navbar from '@/components/Navbar'
 import AdminAssignClient from './client'
+import { ShiftKey } from '@/lib/constants'
 
 export default async function AdminAssignPage() {
   const session = await auth()
@@ -28,8 +29,8 @@ export default async function AdminAssignPage() {
   ])
 
   const initialData = {
-    prefs: prefs.map(p => ({ id: p.id, date: p.date.toISOString().slice(0, 10), shift: p.shift as string, user: p.user })),
-    assignments: assignments.map(a => ({ id: a.id, date: a.date.toISOString().slice(0, 10), shift: a.shift as string, userId: a.userId, user: a.user })),
+    prefs: prefs.map(p => ({ id: p.id, date: p.date.toISOString().slice(0, 10), shift: p.shift as ShiftKey, user: p.user })),
+    assignments: assignments.map(a => ({ id: a.id, date: a.date.toISOString().slice(0, 10), shift: a.shift as ShiftKey, userId: a.userId, user: a.user })),
     holidays: holidays.map(h => ({ id: h.id, date: h.date.toISOString().slice(0, 10), name: h.name })),
     submittedUserIds: submissions.filter(s => s.confirmedAt != null).map(s => s.userId),
     published: !!publishRecord,
