@@ -18,27 +18,17 @@ function toDateStr(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-export default function AdminHolidaysClient() {
+export default function AdminHolidaysClient({ initialData }: { initialData: Holiday[] }) {
   const today = new Date()
   const [year, setYear] = useState(today.getFullYear())
   const [month, setMonth] = useState(today.getMonth())
-  const [holidays, setHolidays] = useState<Holiday[]>([])
-  const [loading, setLoading] = useState(true)
+  const [holidays, setHolidays] = useState<Holiday[]>(initialData)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [nameInput, setNameInput] = useState('')
   const [saving, setSaving] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const days = getMonthDays(year, month)
-
-  useEffect(() => {
-    fetch('/api/holidays')
-      .then((r) => r.json())
-      .then((data) => {
-        setHolidays(data.map((h: Holiday) => ({ ...h, date: h.date.slice(0, 10) })))
-        setLoading(false)
-      })
-  }, [])
 
   useEffect(() => {
     if (selectedDate) {
@@ -91,8 +81,6 @@ export default function AdminHolidaysClient() {
   const monthLabel = new Date(year, month).toLocaleDateString('zh-HK', { year: 'numeric', month: 'long' })
   const weekdays = ['日', '一', '二', '三', '四', '五', '六']
   const firstDow = days[0].getDay()
-
-  if (loading) return <p className="text-gray-500">載入中...</p>
 
   const monthHolidays = holidays
     .filter((h) => h.date.startsWith(`${year}-${String(month + 1).padStart(2, '0')}`))

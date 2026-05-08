@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { ATTENDANCE_TYPES, AttendanceTypeKey, SHIFT_DURATIONS, formatDuration } from '@/lib/constants'
 
 type User = { id: string; name: string }
@@ -17,6 +17,13 @@ type AttendanceLog = {
 
 type DurationType = 'OT' | 'SPECIAL'
 const DURATION_TYPES: DurationType[] = ['OT', 'SPECIAL']
+
+type InitialData = {
+  records: { id: string; userId: string; date: string; type: string; note: string | null; durationMinutes: number | null }[]
+  assignments: { userId: string; date: string; shift: string }[]
+  holidays: { id: string; date: string; name: string }[]
+  logs: { id: string; userId: string; userName: string; date: string; type: string; action: string; adminId: string; adminName: string; createdAt: string }[]
+}
 
 function getMonthDays(year: number, month: number) {
   const days: Date[] = []
@@ -36,43 +43,27 @@ interface Props {
   isAdmin: boolean
   users: User[]
   currentUserId: string
+  initialData: InitialData
 }
 
-export default function AttendanceClient({ isAdmin, users, currentUserId }: Props) {
+export default function AttendanceClient({ isAdmin, users, currentUserId, initialData }: Props) {
   const today = new Date()
   const [year, setYear] = useState(today.getFullYear())
   const [month, setMonth] = useState(today.getMonth())
-  const [records, setRecords] = useState<AttendanceRecord[]>([])
-  const [assignments, setAssignments] = useState<Assignment[]>([])
-  const [holidays, setHolidays] = useState<Holiday[]>([])
-  const [loading, setLoading] = useState(true)
+  const [records, setRecords] = useState<AttendanceRecord[]>(initialData.records as AttendanceRecord[])
+  const [assignments, setAssignments] = useState<Assignment[]>(initialData.assignments)
+  const [holidays, setHolidays] = useState<Holiday[]>(initialData.holidays)
 
   const [modal, setModal] = useState<{ userId: string; userName: string; dateStr: string; currentTypes: AttendanceTypeKey[] } | null>(null)
   const [selectedTypes, setSelectedTypes] = useState<AttendanceTypeKey[]>([])
   const [durations, setDurations] = useState<Partial<Record<DurationType, { h: string; m: string }>>>({})
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
-  const [logs, setLogs] = useState<AttendanceLog[]>([])
+  const [logs, setLogs] = useState<AttendanceLog[]>(initialData.logs as AttendanceLog[])
   const [showLog, setShowLog] = useState(false)
 
   const days = getMonthDays(year, month)
   const monthPrefix = `${year}-${String(month + 1).padStart(2, '0')}`
-
-  useEffect(() => {
-    const logFetch = isAdmin ? fetch('/api/attendance/log').then(r => r.json()) : Promise.resolve([])
-    Promise.all([
-      fetch('/api/attendance').then(r => r.json()),
-      fetch('/api/holidays').then(r => r.json()),
-      fetch('/api/assignments').then(r => r.json()),
-      logFetch,
-    ]).then(([att, hol, asgn, lg]) => {
-      setRecords(att.map((r: AttendanceRecord) => ({ ...r, date: r.date.slice(0, 10) })))
-      setHolidays(hol.map((h: Holiday) => ({ ...h, date: h.date.slice(0, 10) })))
-      setAssignments(asgn.map((a: Assignment) => ({ ...a, date: a.date.slice(0, 10) })))
-      setLogs(lg)
-      setLoading(false)
-    })
-  }, [])
 
   function getRecords(userId: string, dateStr: string) {
     return records.filter(r => r.userId === userId && r.date === dateStr)
@@ -237,8 +228,6 @@ export default function AttendanceClient({ isAdmin, users, currentUserId }: Prop
   }
 
   const monthLabel = new Date(year, month).toLocaleDateString('zh-HK', { year: 'numeric', month: 'long' })
-
-  if (loading) return <p className="text-gray-500">載入中...</p>
 
   const monthDays = days
 

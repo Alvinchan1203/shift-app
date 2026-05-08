@@ -1,14 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 type Employee = { id: string; name: string; email: string; role: string; extraSubmitEnabled: boolean; createdAt: string }
 
 const inputCls = 'w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300'
 
-export default function UsersClient({ currentUserName }: { currentUserName: string }) {
-  const [employees, setEmployees] = useState<Employee[]>([])
-  const [loading, setLoading] = useState(true)
+export default function UsersClient({ currentUserName, initialData }: { currentUserName: string; initialData: Employee[] }) {
+  const [employees, setEmployees] = useState<Employee[]>(initialData)
 
   const [addModal, setAddModal] = useState(false)
   const [addForm, setAddForm] = useState({ name: '', password: '', confirmPassword: '', adminPassword: '', role: 'EMPLOYEE' })
@@ -25,13 +24,6 @@ export default function UsersClient({ currentUserName }: { currentUserName: stri
   const [resetError, setResetError] = useState('')
   const [resetSuccess, setResetSuccess] = useState(false)
   const [resetSaving, setResetSaving] = useState(false)
-
-  useEffect(() => {
-    fetch('/api/admin/users').then(r => r.json()).then(data => {
-      setEmployees(data)
-      setLoading(false)
-    })
-  }, [])
 
   function openAdd() {
     setAddForm({ name: '', password: '', confirmPassword: '', adminPassword: '', role: 'EMPLOYEE' })
@@ -117,8 +109,6 @@ export default function UsersClient({ currentUserName }: { currentUserName: stri
       setResetSaving(false)
     }
   }
-
-  if (loading) return <p className="text-gray-500">載入中...</p>
 
   return (
     <div>
