@@ -189,6 +189,7 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
   )
 
   return (
+    <>
     <div>
       {banner}
 
@@ -395,10 +396,11 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
       </div>
     </div>
 
-    {toast && (
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-gray-900 text-white text-sm px-4 py-2.5 rounded-xl shadow-lg whitespace-nowrap">
-        ✓ {toast}
-      </div>
-    )}
+      {toast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-gray-900 text-white text-sm px-4 py-2.5 rounded-xl shadow-lg whitespace-nowrap">
+          ✓ {toast}
+        </div>
+      )}
+    </>
   )
 }
