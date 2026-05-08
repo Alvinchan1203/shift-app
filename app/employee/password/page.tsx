@@ -1,4 +1,3 @@
-import { redirect } from 'next/navigation'
 import { requireAuth } from '@/lib/require-auth'
 import Navbar from '@/components/Navbar'
 import PasswordClient from './client'

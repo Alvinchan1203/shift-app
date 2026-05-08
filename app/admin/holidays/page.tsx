@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation'
 import { requireAuth } from '@/lib/require-auth'
 import { prisma } from '@/lib/prisma'
 import Navbar from '@/components/Navbar'
