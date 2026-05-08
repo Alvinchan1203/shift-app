@@ -89,10 +89,11 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
   }
 
   const targetMonthPrefix = `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}`
+  const viewingMonthPrefix = `${year}-${String(month + 1).padStart(2, '0')}`
 
   const hasUnsavedChanges = (() => {
-    const current = prefs.filter(p => p.date.startsWith(targetMonthPrefix))
-    const confirmed = confirmedPrefs.filter(p => p.date.startsWith(targetMonthPrefix))
+    const current = prefs.filter(p => p.date.startsWith(viewingMonthPrefix))
+    const confirmed = confirmedPrefs.filter(p => p.date.startsWith(viewingMonthPrefix))
     if (current.length !== confirmed.length) return true
     const confirmedSet = new Set(confirmed.map(p => `${p.date}|${p.shift}`))
     return current.some(p => !confirmedSet.has(`${p.date}|${p.shift}`))
@@ -101,13 +102,13 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
   async function submitPreferences() {
     setSubmitting(true)
     try {
-      const targetPrefs = prefs.filter(p => p.date.startsWith(targetMonthPrefix))
+      const targetPrefs = prefs.filter(p => p.date.startsWith(viewingMonthPrefix))
       const r = await fetch('/api/preferences/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          year: targetYear,
-          month: targetMonth + 1,
+          year: year,
+          month: month + 1,
           preferences: targetPrefs.map(p => ({ date: p.date, shift: p.shift })),
         }),
       })
@@ -337,7 +338,7 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
 
       <div className="mt-6">
         {(() => {
-          const targetMonthPrefs = prefs.filter(p => p.date.startsWith(`${targetYear}-${String(targetMonth + 1).padStart(2, '0')}`))
+          const targetMonthPrefs = prefs.filter(p => p.date.startsWith(viewingMonthPrefix))
           const totalPrefHours = targetMonthPrefs.reduce((sum, p) => sum + (SHIFT_HOURS[p.shift] ?? 0), 0)
           return (
             <>
@@ -376,7 +377,7 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
 
         {canSubmit && (
           <div className="mt-5 border-t pt-4">
-            {submission && (
+            {isViewingTargetMonth && submission && (
               <p className="text-xs text-gray-400 mb-2">
                 上次提交：{new Date(submission.submittedAt).toLocaleString('zh-HK', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
               </p>
@@ -389,7 +390,7 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
               disabled={submitting}
               className="w-full py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition disabled:opacity-50"
             >
-              {submitting ? '處理中...' : submission ? '確認更新' : '確認提交'}
+              {submitting ? '處理中...' : (isViewingTargetMonth && submission) ? '確認更新' : '確認提交'}
             </button>
           </div>
         )}

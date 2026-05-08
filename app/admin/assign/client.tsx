@@ -72,6 +72,8 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
       isInitialMount.current = false
       return
     }
+    setSelectedDate(null)
+    setSheetDate(null)
     fetch(`/api/schedule-publish?year=${year}&month=${month + 1}`)
       .then((r) => r.json())
       .then((data) => {
