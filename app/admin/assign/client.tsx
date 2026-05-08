@@ -31,6 +31,7 @@ export default function AdminAssignClient() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [sheetDate, setSheetDate] = useState<string | null>(null)
   const [prefs, setPrefs] = useState<Pref[]>([])
+  const [submittedUserIds, setSubmittedUserIds] = useState<Set<string>>(new Set())
   const [assignments, setAssignments] = useState<Assignment[]>([])
   const [holidays, setHolidays] = useState<Holiday[]>([])
   const [loading, setLoading] = useState(true)
@@ -41,16 +42,18 @@ export default function AdminAssignClient() {
   const days = getMonthDays(year, month)
   const [refreshing, setRefreshing] = useState(false)
 
-  async function fetchData(showSpinner = false) {
+  async function fetchData(showSpinner = false, fetchYear = year, fetchMonth = month) {
     if (showSpinner) setRefreshing(true)
-    const [p, a, h] = await Promise.all([
+    const [p, a, h, subs] = await Promise.all([
       fetch('/api/preferences').then((r) => r.json()),
       fetch('/api/assignments').then((r) => r.json()),
       fetch('/api/holidays').then((r) => r.json()),
+      fetch(`/api/preferences/submit?year=${fetchYear}&month=${fetchMonth + 1}`).then((r) => r.json()),
     ])
     setPrefs(p.map((x: Pref) => ({ ...x, date: x.date.slice(0, 10) })))
     setAssignments(a.map((x: Assignment) => ({ ...x, date: x.date.slice(0, 10) })))
     setHolidays(h.map((x: Holiday) => ({ ...x, date: x.date.slice(0, 10) })))
+    setSubmittedUserIds(new Set((Array.isArray(subs) ? subs : []).map((s: { userId: string }) => s.userId)))
     setLoading(false)
     if (showSpinner) setRefreshing(false)
   }
@@ -63,6 +66,11 @@ export default function AdminAssignClient() {
       .then((data) => {
         setPublished(data.published)
         setPublishedAt(data.publishedAt)
+      })
+    fetch(`/api/preferences/submit?year=${year}&month=${month + 1}`)
+      .then((r) => r.json())
+      .then((subs) => {
+        setSubmittedUserIds(new Set((Array.isArray(subs) ? subs : []).map((s: { userId: string }) => s.userId)))
       })
   }, [year, month])
 
@@ -92,7 +100,7 @@ export default function AdminAssignClient() {
   }
 
   function getDayPrefs(dateStr: string) {
-    return prefs.filter((p) => p.date === dateStr)
+    return prefs.filter((p) => p.date === dateStr && submittedUserIds.has(p.user.id))
   }
 
   function getDayAssignments(dateStr: string) {
