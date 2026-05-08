@@ -269,12 +269,15 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
             {Array.from({ length: firstDow }).map((_, i) => (
               <div key={`empty-${i}`} className="border-b border-r p-2 min-h-[80px]" />
             ))}
-            {days.map((day) => {
+            {days.map((day, dayIndex) => {
               const dateStr = toDateStr(day)
               const dayPrefs = getDatePrefs(dateStr)
               const isOpen = openDate === dateStr
               const isWeekend = day.getDay() === 0 || day.getDay() === 6
               const holiday = holidays.find((h) => h.date === dateStr)
+              const totalRows = Math.ceil((firstDow + days.length) / 7)
+              const rowIndex = Math.floor((firstDow + dayIndex) / 7)
+              const openUpward = rowIndex >= totalRows - 2
 
               if (isWeekend || holiday) {
                 return (
@@ -312,7 +315,7 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
                   {isOpen && canSubmit && (
                     <div
                       ref={dropdownRef}
-                      className="absolute left-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-lg shadow-lg w-36 py-1"
+                      className={`absolute left-0 z-50 bg-white border border-gray-200 rounded-lg shadow-lg w-36 py-1 ${openUpward ? 'bottom-full mb-1' : 'top-full mt-1'}`}
                     >
                       {(Object.keys(SHIFTS) as ShiftKey[]).map((shift) => {
                         const selected = hasPref(dateStr, shift)
