@@ -30,10 +30,11 @@ export async function POST(req: NextRequest) {
     const { year, month } = await req.json()
     if (!year || !month) return NextResponse.json({ error: '缺少資料' }, { status: 400 })
 
+    const now = new Date()
     const submission = await prisma.preferenceSubmission.upsert({
       where: { userId_year_month: { userId: session.user.id, year, month } },
-      update: { submittedAt: new Date() },
-      create: { userId: session.user.id, year, month },
+      update: { submittedAt: now, confirmedAt: now },
+      create: { userId: session.user.id, year, month, confirmedAt: now },
     })
     return NextResponse.json(submission)
   } catch (e: any) {

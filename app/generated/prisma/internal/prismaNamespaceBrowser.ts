@@ -157,7 +157,8 @@ export const PreferenceSubmissionScalarFieldEnum = {
   userId: 'userId',
   year: 'year',
   month: 'month',
-  submittedAt: 'submittedAt'
+  submittedAt: 'submittedAt',
+  confirmedAt: 'confirmedAt'
 } as const
 
 export type PreferenceSubmissionScalarFieldEnum = (typeof PreferenceSubmissionScalarFieldEnum)[keyof typeof PreferenceSubmissionScalarFieldEnum]

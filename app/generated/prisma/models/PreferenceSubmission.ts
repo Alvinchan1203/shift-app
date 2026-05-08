@@ -42,6 +42,7 @@ export type PreferenceSubmissionMinAggregateOutputType = {
   year: number | null
   month: number | null
   submittedAt: Date | null
+  confirmedAt: Date | null
 }
 
 export type PreferenceSubmissionMaxAggregateOutputType = {
@@ -50,6 +51,7 @@ export type PreferenceSubmissionMaxAggregateOutputType = {
   year: number | null
   month: number | null
   submittedAt: Date | null
+  confirmedAt: Date | null
 }
 
 export type PreferenceSubmissionCountAggregateOutputType = {
@@ -58,6 +60,7 @@ export type PreferenceSubmissionCountAggregateOutputType = {
   year: number
   month: number
   submittedAt: number
+  confirmedAt: number
   _all: number
 }
 
@@ -78,6 +81,7 @@ export type PreferenceSubmissionMinAggregateInputType = {
   year?: true
   month?: true
   submittedAt?: true
+  confirmedAt?: true
 }
 
 export type PreferenceSubmissionMaxAggregateInputType = {
@@ -86,6 +90,7 @@ export type PreferenceSubmissionMaxAggregateInputType = {
   year?: true
   month?: true
   submittedAt?: true
+  confirmedAt?: true
 }
 
 export type PreferenceSubmissionCountAggregateInputType = {
@@ -94,6 +99,7 @@ export type PreferenceSubmissionCountAggregateInputType = {
   year?: true
   month?: true
   submittedAt?: true
+  confirmedAt?: true
   _all?: true
 }
 
@@ -189,6 +195,7 @@ export type PreferenceSubmissionGroupByOutputType = {
   year: number
   month: number
   submittedAt: Date
+  confirmedAt: Date | null
   _count: PreferenceSubmissionCountAggregateOutputType | null
   _avg: PreferenceSubmissionAvgAggregateOutputType | null
   _sum: PreferenceSubmissionSumAggregateOutputType | null
@@ -220,6 +227,7 @@ export type PreferenceSubmissionWhereInput = {
   year?: Prisma.IntFilter<"PreferenceSubmission"> | number
   month?: Prisma.IntFilter<"PreferenceSubmission"> | number
   submittedAt?: Prisma.DateTimeFilter<"PreferenceSubmission"> | Date | string
+  confirmedAt?: Prisma.DateTimeNullableFilter<"PreferenceSubmission"> | Date | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
@@ -229,6 +237,7 @@ export type PreferenceSubmissionOrderByWithRelationInput = {
   year?: Prisma.SortOrder
   month?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
+  confirmedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -242,6 +251,7 @@ export type PreferenceSubmissionWhereUniqueInput = Prisma.AtLeast<{
   year?: Prisma.IntFilter<"PreferenceSubmission"> | number
   month?: Prisma.IntFilter<"PreferenceSubmission"> | number
   submittedAt?: Prisma.DateTimeFilter<"PreferenceSubmission"> | Date | string
+  confirmedAt?: Prisma.DateTimeNullableFilter<"PreferenceSubmission"> | Date | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id" | "userId_year_month">
 
@@ -251,6 +261,7 @@ export type PreferenceSubmissionOrderByWithAggregationInput = {
   year?: Prisma.SortOrder
   month?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
+  confirmedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PreferenceSubmissionCountOrderByAggregateInput
   _avg?: Prisma.PreferenceSubmissionAvgOrderByAggregateInput
   _max?: Prisma.PreferenceSubmissionMaxOrderByAggregateInput
@@ -267,6 +278,7 @@ export type PreferenceSubmissionScalarWhereWithAggregatesInput = {
   year?: Prisma.IntWithAggregatesFilter<"PreferenceSubmission"> | number
   month?: Prisma.IntWithAggregatesFilter<"PreferenceSubmission"> | number
   submittedAt?: Prisma.DateTimeWithAggregatesFilter<"PreferenceSubmission"> | Date | string
+  confirmedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PreferenceSubmission"> | Date | string | null
 }
 
 export type PreferenceSubmissionCreateInput = {
@@ -274,6 +286,7 @@ export type PreferenceSubmissionCreateInput = {
   year: number
   month: number
   submittedAt?: Date | string
+  confirmedAt?: Date | string | null
   user: Prisma.UserCreateNestedOneWithoutSubmissionsInput
 }
 
@@ -283,6 +296,7 @@ export type PreferenceSubmissionUncheckedCreateInput = {
   year: number
   month: number
   submittedAt?: Date | string
+  confirmedAt?: Date | string | null
 }
 
 export type PreferenceSubmissionUpdateInput = {
@@ -290,6 +304,7 @@ export type PreferenceSubmissionUpdateInput = {
   year?: Prisma.IntFieldUpdateOperationsInput | number
   month?: Prisma.IntFieldUpdateOperationsInput | number
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutSubmissionsNestedInput
 }
 
@@ -299,6 +314,7 @@ export type PreferenceSubmissionUncheckedUpdateInput = {
   year?: Prisma.IntFieldUpdateOperationsInput | number
   month?: Prisma.IntFieldUpdateOperationsInput | number
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PreferenceSubmissionCreateManyInput = {
@@ -307,6 +323,7 @@ export type PreferenceSubmissionCreateManyInput = {
   year: number
   month: number
   submittedAt?: Date | string
+  confirmedAt?: Date | string | null
 }
 
 export type PreferenceSubmissionUpdateManyMutationInput = {
@@ -314,6 +331,7 @@ export type PreferenceSubmissionUpdateManyMutationInput = {
   year?: Prisma.IntFieldUpdateOperationsInput | number
   month?: Prisma.IntFieldUpdateOperationsInput | number
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PreferenceSubmissionUncheckedUpdateManyInput = {
@@ -322,6 +340,7 @@ export type PreferenceSubmissionUncheckedUpdateManyInput = {
   year?: Prisma.IntFieldUpdateOperationsInput | number
   month?: Prisma.IntFieldUpdateOperationsInput | number
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PreferenceSubmissionListRelationFilter = {
@@ -346,6 +365,7 @@ export type PreferenceSubmissionCountOrderByAggregateInput = {
   year?: Prisma.SortOrder
   month?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
+  confirmedAt?: Prisma.SortOrder
 }
 
 export type PreferenceSubmissionAvgOrderByAggregateInput = {
@@ -359,6 +379,7 @@ export type PreferenceSubmissionMaxOrderByAggregateInput = {
   year?: Prisma.SortOrder
   month?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
+  confirmedAt?: Prisma.SortOrder
 }
 
 export type PreferenceSubmissionMinOrderByAggregateInput = {
@@ -367,6 +388,7 @@ export type PreferenceSubmissionMinOrderByAggregateInput = {
   year?: Prisma.SortOrder
   month?: Prisma.SortOrder
   submittedAt?: Prisma.SortOrder
+  confirmedAt?: Prisma.SortOrder
 }
 
 export type PreferenceSubmissionSumOrderByAggregateInput = {
@@ -424,11 +446,16 @@ export type IntFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
 export type PreferenceSubmissionCreateWithoutUserInput = {
   id?: string
   year: number
   month: number
   submittedAt?: Date | string
+  confirmedAt?: Date | string | null
 }
 
 export type PreferenceSubmissionUncheckedCreateWithoutUserInput = {
@@ -436,6 +463,7 @@ export type PreferenceSubmissionUncheckedCreateWithoutUserInput = {
   year: number
   month: number
   submittedAt?: Date | string
+  confirmedAt?: Date | string | null
 }
 
 export type PreferenceSubmissionCreateOrConnectWithoutUserInput = {
@@ -473,6 +501,7 @@ export type PreferenceSubmissionScalarWhereInput = {
   year?: Prisma.IntFilter<"PreferenceSubmission"> | number
   month?: Prisma.IntFilter<"PreferenceSubmission"> | number
   submittedAt?: Prisma.DateTimeFilter<"PreferenceSubmission"> | Date | string
+  confirmedAt?: Prisma.DateTimeNullableFilter<"PreferenceSubmission"> | Date | string | null
 }
 
 export type PreferenceSubmissionCreateManyUserInput = {
@@ -480,6 +509,7 @@ export type PreferenceSubmissionCreateManyUserInput = {
   year: number
   month: number
   submittedAt?: Date | string
+  confirmedAt?: Date | string | null
 }
 
 export type PreferenceSubmissionUpdateWithoutUserInput = {
@@ -487,6 +517,7 @@ export type PreferenceSubmissionUpdateWithoutUserInput = {
   year?: Prisma.IntFieldUpdateOperationsInput | number
   month?: Prisma.IntFieldUpdateOperationsInput | number
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PreferenceSubmissionUncheckedUpdateWithoutUserInput = {
@@ -494,6 +525,7 @@ export type PreferenceSubmissionUncheckedUpdateWithoutUserInput = {
   year?: Prisma.IntFieldUpdateOperationsInput | number
   month?: Prisma.IntFieldUpdateOperationsInput | number
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PreferenceSubmissionUncheckedUpdateManyWithoutUserInput = {
@@ -501,6 +533,7 @@ export type PreferenceSubmissionUncheckedUpdateManyWithoutUserInput = {
   year?: Prisma.IntFieldUpdateOperationsInput | number
   month?: Prisma.IntFieldUpdateOperationsInput | number
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -511,6 +544,7 @@ export type PreferenceSubmissionSelect<ExtArgs extends runtime.Types.Extensions.
   year?: boolean
   month?: boolean
   submittedAt?: boolean
+  confirmedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["preferenceSubmission"]>
 
@@ -520,6 +554,7 @@ export type PreferenceSubmissionSelectCreateManyAndReturn<ExtArgs extends runtim
   year?: boolean
   month?: boolean
   submittedAt?: boolean
+  confirmedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["preferenceSubmission"]>
 
@@ -529,6 +564,7 @@ export type PreferenceSubmissionSelectUpdateManyAndReturn<ExtArgs extends runtim
   year?: boolean
   month?: boolean
   submittedAt?: boolean
+  confirmedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["preferenceSubmission"]>
 
@@ -538,9 +574,10 @@ export type PreferenceSubmissionSelectScalar = {
   year?: boolean
   month?: boolean
   submittedAt?: boolean
+  confirmedAt?: boolean
 }
 
-export type PreferenceSubmissionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "year" | "month" | "submittedAt", ExtArgs["result"]["preferenceSubmission"]>
+export type PreferenceSubmissionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "year" | "month" | "submittedAt" | "confirmedAt", ExtArgs["result"]["preferenceSubmission"]>
 export type PreferenceSubmissionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -562,6 +599,7 @@ export type $PreferenceSubmissionPayload<ExtArgs extends runtime.Types.Extension
     year: number
     month: number
     submittedAt: Date
+    confirmedAt: Date | null
   }, ExtArgs["result"]["preferenceSubmission"]>
   composites: {}
 }
@@ -991,6 +1029,7 @@ export interface PreferenceSubmissionFieldRefs {
   readonly year: Prisma.FieldRef<"PreferenceSubmission", 'Int'>
   readonly month: Prisma.FieldRef<"PreferenceSubmission", 'Int'>
   readonly submittedAt: Prisma.FieldRef<"PreferenceSubmission", 'DateTime'>
+  readonly confirmedAt: Prisma.FieldRef<"PreferenceSubmission", 'DateTime'>
 }
     
 

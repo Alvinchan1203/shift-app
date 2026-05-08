@@ -108,12 +108,13 @@ model AttendanceLog {
 }
 
 model PreferenceSubmission {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   year        Int
   month       Int
-  submittedAt DateTime @default(now())
+  submittedAt DateTime  @default(now())
+  confirmedAt DateTime?
 
   @@unique([userId, year, month])
 }
