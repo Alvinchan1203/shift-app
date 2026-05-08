@@ -1,13 +1,11 @@
-import { auth } from '@/auth'
-import { redirect } from 'next/navigation'
+import { requireAuth } from '@/lib/require-auth'
 import { prisma } from '@/lib/prisma'
 import Navbar from '@/components/Navbar'
 import ShiftBadge from '@/components/ShiftBadge'
 import { ShiftKey, SHIFT_HOURS } from '@/lib/constants'
 
 export default async function EmployeeSchedulePage() {
-  const session = await auth()
-  if (!session) redirect('/login')
+  const session = await requireAuth()
 
   const publishedMonths = await prisma.schedulePublish.findMany()
 

@@ -1,11 +1,10 @@
-import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
+import { requireAuth } from '@/lib/require-auth'
 import Navbar from '@/components/Navbar'
 import PasswordClient from './client'
 
 export default async function PasswordPage() {
-  const session = await auth()
-  if (!session) redirect('/login')
+  const session = await requireAuth()
 
   return (
     <div>

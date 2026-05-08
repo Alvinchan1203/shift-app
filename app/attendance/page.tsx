@@ -1,12 +1,10 @@
-import { auth } from '@/auth'
-import { redirect } from 'next/navigation'
+import { requireAuth } from '@/lib/require-auth'
 import { prisma } from '@/lib/prisma'
 import Navbar from '@/components/Navbar'
 import AttendanceClient from './client'
 
 export default async function AttendancePage() {
-  const session = await auth()
-  if (!session) redirect('/login')
+  const session = await requireAuth()
 
   const isAdmin = session.user.role === 'ADMIN'
 

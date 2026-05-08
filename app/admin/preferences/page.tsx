@@ -1,5 +1,4 @@
-import { auth } from '@/auth'
-import { redirect } from 'next/navigation'
+import { requireAuth } from '@/lib/require-auth'
 import { prisma } from '@/lib/prisma'
 import Navbar from '@/components/Navbar'
 import ShiftBadge from '@/components/ShiftBadge'
@@ -11,8 +10,8 @@ export default async function AdminPreferencesPage({
 }: {
   searchParams: Promise<{ year?: string; month?: string }>
 }) {
-  const session = await auth()
-  if (!session || session.user.role !== 'ADMIN') redirect('/employee/preferences')
+  const session = await requireAuth()
+  if (session.user.role !== 'ADMIN') redirect('/employee/preferences')
 
   const params = await searchParams
   const today = new Date()

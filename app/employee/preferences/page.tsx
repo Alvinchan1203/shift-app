@@ -1,12 +1,10 @@
-import { auth } from '@/auth'
-import { redirect } from 'next/navigation'
+import { requireAuth } from '@/lib/require-auth'
 import { prisma } from '@/lib/prisma'
 import Navbar from '@/components/Navbar'
 import EmployeePreferencesClient from './client'
 
 export default async function EmployeePreferencesPage() {
-  const session = await auth()
-  if (!session) redirect('/login')
+  const session = await requireAuth()
 
   const today = new Date()
   const targetDate = new Date(today.getFullYear(), today.getMonth() + 1, 1)

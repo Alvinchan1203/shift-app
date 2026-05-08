@@ -1,9 +1,8 @@
 import { redirect } from 'next/navigation'
-import { auth } from '@/auth'
+import { requireAuth } from '@/lib/require-auth'
 
 export default async function Home() {
-  const session = await auth()
-  if (!session) redirect('/login')
+  const session = await requireAuth()
   if (session.user.role === 'ADMIN') redirect('/admin/preferences')
   redirect('/employee/preferences')
 }

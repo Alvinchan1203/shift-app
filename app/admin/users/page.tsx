@@ -1,12 +1,11 @@
-import { auth } from '@/auth'
-import { redirect } from 'next/navigation'
+import { requireAuth } from '@/lib/require-auth'
 import { prisma } from '@/lib/prisma'
 import Navbar from '@/components/Navbar'
 import UsersClient from './client'
 
 export default async function UsersPage() {
-  const session = await auth()
-  if (!session || session.user.role !== 'ADMIN') redirect('/login')
+  const session = await requireAuth()
+  if (session.user.role !== 'ADMIN') redirect('/login')
 
   const usersRaw = await prisma.user.findMany({
     select: { id: true, name: true, email: true, role: true, extraSubmitEnabled: true, createdAt: true },
