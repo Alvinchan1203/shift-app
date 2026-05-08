@@ -109,11 +109,13 @@ export default async function AdminPreferencesPage({
                       <span className="text-xs text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">
                         提交於 {new Date(submitted).toLocaleString('zh-HK', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </span>
+                    ) : empPrefs.length > 0 ? (
+                      <span className="text-xs text-amber-600 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">已選擇・未確認提交</span>
                     ) : (
                       <span className="text-xs text-gray-400 bg-gray-50 border border-gray-200 px-2.5 py-1 rounded-full">未提交</span>
                     )}
                   </div>
-                  {submitted && empPrefs.length > 0 ? (
+                  {empPrefs.length > 0 ? (
                     <div className="px-5 py-3 flex flex-wrap gap-2">
                       {empPrefs.map(p => {
                         const d = p.date
@@ -126,7 +128,7 @@ export default async function AdminPreferencesPage({
                         )
                       })}
                     </div>
-                  ) : submitted && empPrefs.length === 0 ? (
+                  ) : submitted ? (
                     <p className="text-sm text-gray-400 px-5 py-4">未選擇任何班次</p>
                   ) : (
                     <p className="text-sm text-gray-400 px-5 py-4">—</p>
