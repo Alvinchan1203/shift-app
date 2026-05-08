@@ -206,8 +206,9 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
                         <div key={p.id} className="flex items-center justify-between">
                           <span className="text-base text-gray-700">{p.user.name}</span>
                           <button
-                            onClick={() => toggleAssign(dateStr, p.user.id, p.user.name, shift)}
-                            className={`text-sm px-3 py-2 rounded-lg transition ${
+                            onClick={() => !published && toggleAssign(dateStr, p.user.id, p.user.name, shift)}
+                            disabled={published}
+                            className={`text-sm px-3 py-2 rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed ${
                               assigned
                                 ? 'bg-green-100 text-green-700 hover:bg-red-100 hover:text-red-700'
                                 : 'bg-gray-100 text-gray-600 hover:bg-green-100 hover:text-green-700'
@@ -232,12 +233,14 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
                 <span className="text-base text-gray-700">{a.user.name}</span>
                 <div className="flex items-center gap-2">
                   <ShiftBadge shift={a.shift as ShiftKey} />
-                  <button
-                    onClick={() => toggleAssign(dateStr, a.userId, a.user.name, a.shift as ShiftKey)}
-                    className="text-xs text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg px-2 py-1 transition"
-                  >
-                    刪除
-                  </button>
+                  {!published && (
+                    <button
+                      onClick={() => toggleAssign(dateStr, a.userId, a.user.name, a.shift as ShiftKey)}
+                      className="text-xs text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg px-2 py-1 transition"
+                    >
+                      刪除
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
