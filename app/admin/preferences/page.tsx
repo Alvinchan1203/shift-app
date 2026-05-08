@@ -114,9 +114,9 @@ export default async function AdminPreferencesPage({
                         確認提交於 {new Date(subRecord.confirmedAt!).toLocaleString('zh-HK', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </span>
                     ) : isModifiedAfterConfirm ? (
-                      <span className="text-xs text-white bg-orange-500 border border-orange-500 px-2.5 py-1 rounded-full font-medium">⚠ 意願已更改・未重新確認提交</span>
-                    ) : subRecord ? (
-                      <span className="text-xs text-white bg-orange-500 border border-orange-500 px-2.5 py-1 rounded-full font-medium">⚠ 已選班次・未確認提交</span>
+                      <span className="text-xs text-yellow-700 bg-yellow-50 border border-yellow-300 px-2.5 py-1 rounded-full">
+                        已提交・意願有更新（未重新確認）
+                      </span>
                     ) : empPrefs.length > 0 ? (
                       <span className="text-xs text-white bg-orange-500 border border-orange-500 px-2.5 py-1 rounded-full font-medium">⚠ 已選班次・未確認提交</span>
                     ) : (
