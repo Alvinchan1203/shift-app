@@ -100,18 +100,15 @@ export default async function AdminPreferencesPage({
             {sortedEmployees.map(emp => {
               const subRecord = submissionByUser[emp.id]
               const empPrefs = prefsByUser[emp.id] ?? []
-              const hasConfirmed = subRecord?.confirmedAt != null
 
               return (
                 <div key={emp.id} className="bg-white rounded-2xl shadow-sm border overflow-hidden">
                   <div className="bg-gray-50 px-5 py-3 border-b flex items-center justify-between">
                     <span className="font-medium text-gray-800">{emp.name}</span>
-                    {hasConfirmed ? (
+                    {subRecord?.confirmedAt != null ? (
                       <span className="text-xs text-green-700 bg-green-50 border border-green-200 px-2.5 py-1 rounded-full">
-                        確認提交於 {new Date(subRecord!.confirmedAt!).toLocaleString('zh-HK', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        確認提交於 {new Date(subRecord.confirmedAt).toLocaleString('zh-HK', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </span>
-                    ) : empPrefs.length > 0 ? (
-                      <span className="text-xs text-white bg-orange-500 border border-orange-500 px-2.5 py-1 rounded-full font-medium">⚠ 已選班次・未確認提交</span>
                     ) : (
                       <span className="text-xs text-gray-400 bg-gray-50 border border-gray-200 px-2.5 py-1 rounded-full">未提交</span>
                     )}
