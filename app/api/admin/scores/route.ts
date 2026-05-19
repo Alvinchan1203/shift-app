@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
+import { SHIFT_DURATIONS } from '@/lib/constants'
 import {
   calcWorkHoursScore,
   calcAccountOpeningScore,
@@ -40,7 +41,7 @@ export async function GET(req: NextRequest) {
     }),
     prisma.attendanceRecord.findMany({
       where: { date: dateFilter },
-      select: { userId: true, durationMinutes: true },
+      select: { userId: true, type: true, durationMinutes: true },
     }),
     prisma.workLog.findMany({
       where: { date: dateFilter },
@@ -52,8 +53,9 @@ export async function GET(req: NextRequest) {
 
   const attendanceMinutes = new Map<string, number>()
   for (const r of attendanceRecords) {
-    if (r.durationMinutes) {
-      attendanceMinutes.set(r.userId, (attendanceMinutes.get(r.userId) ?? 0) + r.durationMinutes)
+    const mins = SHIFT_DURATIONS[r.type as keyof typeof SHIFT_DURATIONS] ?? r.durationMinutes ?? 0
+    if (mins > 0) {
+      attendanceMinutes.set(r.userId, (attendanceMinutes.get(r.userId) ?? 0) + mins)
     }
   }
 

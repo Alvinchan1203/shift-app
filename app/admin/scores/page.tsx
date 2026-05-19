@@ -3,6 +3,7 @@ import { requireAuth } from '@/lib/require-auth'
 import { prisma } from '@/lib/prisma'
 import Navbar from '@/components/Navbar'
 import AdminScoresClient from './client'
+import { SHIFT_DURATIONS } from '@/lib/constants'
 import {
   calcWorkHoursScore,
   calcAccountOpeningScore,
@@ -43,7 +44,7 @@ export default async function AdminScoresPage({
     }),
     prisma.attendanceRecord.findMany({
       where: { date: dateFilter },
-      select: { userId: true, durationMinutes: true },
+      select: { userId: true, type: true, durationMinutes: true },
     }),
     prisma.workLog.findMany({
       where: { date: dateFilter },
@@ -55,8 +56,9 @@ export default async function AdminScoresPage({
 
   const attendanceMinutesMap = new Map<string, number>()
   for (const r of attendanceRecords) {
-    if (r.durationMinutes) {
-      attendanceMinutesMap.set(r.userId, (attendanceMinutesMap.get(r.userId) ?? 0) + r.durationMinutes)
+    const mins = SHIFT_DURATIONS[r.type as keyof typeof SHIFT_DURATIONS] ?? r.durationMinutes ?? 0
+    if (mins > 0) {
+      attendanceMinutesMap.set(r.userId, (attendanceMinutesMap.get(r.userId) ?? 0) + mins)
     }
   }
 
