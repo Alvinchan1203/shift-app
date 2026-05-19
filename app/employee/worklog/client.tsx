@@ -135,49 +135,65 @@ export default function WorkLogClient({ initialYear, initialMonth, initialLogs }
 
         <div className="flex flex-col gap-1">
           <label className="text-xs text-gray-500">工作類型</label>
-          <div className="flex gap-2 flex-wrap">
+          <div className="border rounded-xl overflow-hidden divide-y">
             {WORK_TYPES.map(t => (
               <button
                 key={t}
                 type="button"
                 onClick={() => setWorkType(t)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
-                  workType === t
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                className={`w-full flex items-start gap-3 px-3 py-2.5 text-left transition-colors ${
+                  workType === t ? 'bg-blue-50' : 'bg-white hover:bg-gray-50'
                 }`}
               >
-                {t}{t !== 'E' ? ` (${WORK_TYPE_POINTS[t]}分)` : ''}
+                <span className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mt-0.5 ${
+                  workType === t
+                    ? t === 'A' ? 'bg-blue-600 text-white' :
+                      t === 'B' ? 'bg-green-600 text-white' :
+                      t === 'C' ? 'bg-purple-600 text-white' :
+                      t === 'D' ? 'bg-orange-500 text-white' :
+                      'bg-gray-600 text-white'
+                    : t === 'A' ? 'bg-blue-100 text-blue-700' :
+                      t === 'B' ? 'bg-green-100 text-green-700' :
+                      t === 'C' ? 'bg-purple-100 text-purple-700' :
+                      t === 'D' ? 'bg-orange-100 text-orange-700' :
+                      'bg-gray-100 text-gray-600'
+                }`}>{t}</span>
+                <span className="flex-1 min-w-0">
+                  <span className="text-xs text-gray-600 leading-relaxed">{WORK_TYPE_LABELS[t]}</span>
+                </span>
+                <span className={`flex-shrink-0 text-xs font-semibold mt-0.5 ${workType === t ? 'text-blue-600' : 'text-gray-400'}`}>
+                  {t !== 'E' ? `${WORK_TYPE_POINTS[t]}分` : '自訂'}
+                </span>
               </button>
             ))}
           </div>
-          <p className="text-xs text-gray-400 mt-1">{WORK_TYPE_LABELS[workType]}</p>
         </div>
 
         {workType === 'E' && (
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-gray-500">分數</label>
-            <input
-              type="number"
-              value={customPoints}
-              onChange={e => setCustomPoints(e.target.value)}
-              placeholder="請輸入分數"
-              className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-32"
-              min={0}
-            />
-          </div>
+          <>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs text-gray-500">分數</label>
+              <input
+                type="number"
+                value={customPoints}
+                onChange={e => setCustomPoints(e.target.value)}
+                placeholder="請輸入分數"
+                className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-32"
+                min={0}
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs text-gray-500">說明（請列明工作內容）</label>
+              <input
+                type="text"
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                placeholder="請列明工作內容"
+                className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </>
         )}
-
-        <div className="flex flex-col gap-1">
-          <label className="text-xs text-gray-500">說明（選填）</label>
-          <input
-            type="text"
-            value={description}
-            onChange={e => setDescription(e.target.value)}
-            placeholder={workType === 'E' ? '請列明工作內容' : ''}
-            className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
 
         {error && <p className="text-sm text-red-500">{error}</p>}
 
