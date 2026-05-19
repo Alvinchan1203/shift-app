@@ -25,6 +25,15 @@ function toDateStr(d: Date) {
   return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`
 }
 
+function fmtCreatedAt(iso: string) {
+  const d = new Date(iso)
+  return d.toLocaleString('zh-HK', {
+    month: 'numeric', day: 'numeric',
+    hour: '2-digit', minute: '2-digit', hour12: false,
+    timeZone: 'Asia/Hong_Kong',
+  })
+}
+
 export default function WorkLogClient({ initialYear, initialMonth, initialLogs }: Props) {
   const [year, setYear] = useState(initialYear)
   const [month, setMonth] = useState(initialMonth)
@@ -236,7 +245,10 @@ export default function WorkLogClient({ initialYear, initialMonth, initialLogs }
                             log.workType === 'D' ? 'bg-orange-100 text-orange-700' :
                             'bg-gray-100 text-gray-700'
                           }`}>{log.workType}</span>
-                          <span className="text-xs text-gray-500 truncate">{log.description || WORK_TYPE_LABELS[log.workType]}</span>
+                          <span className="min-w-0">
+                            <span className="text-xs text-gray-500 truncate block">{log.description || WORK_TYPE_LABELS[log.workType]}</span>
+                            <span className="text-xs text-gray-400">錄入於 {fmtCreatedAt(log.createdAt)}</span>
+                          </span>
                         </div>
                         <div className="flex items-center gap-3 flex-shrink-0">
                           <span className="text-sm font-medium text-gray-700">{log.points} 分</span>

@@ -43,6 +43,7 @@ export default async function AdminWorkLogsPage({
     workType: l.workType,
     description: l.description,
     points: l.points,
+    createdAt: l.createdAt.toISOString(),
   }))
 
   const prevDate = new Date(year, month - 2, 1)

@@ -12,6 +12,16 @@ type WorkLog = {
   workType: string
   description: string | null
   points: number
+  createdAt: string
+}
+
+function fmtCreatedAt(iso: string) {
+  const d = new Date(iso)
+  return d.toLocaleString('zh-HK', {
+    month: 'numeric', day: 'numeric',
+    hour: '2-digit', minute: '2-digit', hour12: false,
+    timeZone: 'Asia/Hong_Kong',
+  })
 }
 
 type Employee = { id: string; name: string }
@@ -140,8 +150,11 @@ export default function AdminWorkLogsClient({
                       <span className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${TYPE_COLORS[log.workType] ?? 'bg-gray-100 text-gray-700'}`}>
                         {log.workType}
                       </span>
-                      <span className="flex-1 text-xs text-gray-600 truncate min-w-0">
-                        {log.description || WORK_TYPE_LABELS[log.workType]}
+                      <span className="flex-1 min-w-0">
+                        <span className="text-xs text-gray-600 block truncate">
+                          {log.description || WORK_TYPE_LABELS[log.workType]}
+                        </span>
+                        <span className="text-xs text-gray-400">錄入於 {fmtCreatedAt(log.createdAt)}</span>
                       </span>
                       <span className="text-sm font-medium text-gray-700 shrink-0">{log.points} 分</span>
                     </div>
