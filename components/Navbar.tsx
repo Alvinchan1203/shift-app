@@ -34,20 +34,22 @@ export default function Navbar({ userName, role }: NavbarProps) {
       ]
 
   return (
-    <nav className="bg-white shadow-sm border-b">
+    <nav className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700/50 shadow-lg shadow-black/20">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
-        <span className="font-bold text-blue-600 text-base sm:text-lg shrink-0">金鐘辦公室Bee報更系統</span>
+        <span className="font-bold text-base sm:text-lg shrink-0 bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent tracking-tight">
+          金鐘辦公室Bee報更系統
+        </span>
 
         {/* 桌面版導航 */}
-        <div className="hidden sm:flex items-center gap-4 flex-1 min-w-0 mx-4">
+        <div className="hidden sm:flex items-center gap-0.5 flex-1 min-w-0 mx-3 overflow-x-auto">
           {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className={`text-sm font-medium transition whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                 pathname === link.href
-                  ? 'text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-600 hover:text-blue-600'
+                  ? 'text-cyan-400 bg-cyan-400/10 border border-cyan-400/20'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
               }`}
             >
               {link.label}
@@ -55,16 +57,18 @@ export default function Navbar({ userName, role }: NavbarProps) {
           ))}
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
-          <span className="hidden sm:inline text-sm text-gray-600">
+        <div className="flex items-center gap-3 shrink-0">
+          <span className="hidden sm:flex items-center gap-2 text-sm text-slate-300">
             {userName}
             {role === 'ADMIN' && (
-              <span className="ml-1 bg-orange-100 text-orange-700 text-xs px-2 py-0.5 rounded-full">管理員</span>
+              <span className="bg-cyan-500/15 text-cyan-400 text-xs px-2 py-0.5 rounded-full border border-cyan-500/30 font-medium">
+                管理員
+              </span>
             )}
           </span>
           <button
             onClick={() => signOut({ callbackUrl: '/login' })}
-            className="hidden sm:inline text-sm text-gray-500 hover:text-red-500 transition"
+            className="hidden sm:inline text-sm text-slate-500 hover:text-red-400 transition"
           >
             登出
           </button>
@@ -72,7 +76,7 @@ export default function Navbar({ userName, role }: NavbarProps) {
           {/* 手機版漢堡按鈕 */}
           <button
             onClick={() => setMenuOpen(o => !o)}
-            className="sm:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition"
+            className="sm:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition"
             aria-label="選單"
           >
             {menuOpen ? (
@@ -90,11 +94,11 @@ export default function Navbar({ userName, role }: NavbarProps) {
 
       {/* 手機版下拉選單 */}
       {menuOpen && (
-        <div className="sm:hidden border-t bg-white px-4 py-2">
-          <div className="text-xs text-gray-400 py-2">
+        <div className="sm:hidden border-t border-slate-700/50 bg-slate-900/95 backdrop-blur-sm px-4 py-2">
+          <div className="flex items-center gap-2 text-xs text-slate-500 py-2">
             {userName}
             {role === 'ADMIN' && (
-              <span className="ml-1 bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">管理員</span>
+              <span className="bg-cyan-500/15 text-cyan-400 px-2 py-0.5 rounded-full border border-cyan-500/30">管理員</span>
             )}
           </div>
           {links.map((link) => (
@@ -102,8 +106,8 @@ export default function Navbar({ userName, role }: NavbarProps) {
               key={link.href}
               href={link.href}
               onClick={() => setMenuOpen(false)}
-              className={`block py-3 text-sm font-medium border-b border-gray-50 transition ${
-                pathname === link.href ? 'text-blue-600' : 'text-gray-700 hover:text-blue-600'
+              className={`block py-2.5 text-sm font-medium border-b border-slate-800 transition ${
+                pathname === link.href ? 'text-cyan-400' : 'text-slate-400 hover:text-white'
               }`}
             >
               {link.label}
@@ -111,7 +115,7 @@ export default function Navbar({ userName, role }: NavbarProps) {
           ))}
           <button
             onClick={() => signOut({ callbackUrl: '/login' })}
-            className="block w-full text-left py-3 text-sm text-red-500 hover:text-red-600 transition"
+            className="block w-full text-left py-2.5 text-sm text-slate-500 hover:text-red-400 transition"
           >
             登出
           </button>
