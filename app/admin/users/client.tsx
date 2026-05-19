@@ -38,12 +38,13 @@ export default function UsersClient({ currentUserName, initialData }: { currentU
       setAddError('請填寫所有欄位')
       return
     }
+    const roleLabel = addForm.role === 'EMPLOYEE' ? 'Bee' : '管理員'
     if (addForm.password !== addForm.confirmPassword) {
-      setAddError('Bee密碼不相符')
+      setAddError(`${roleLabel}密碼不相符`)
       return
     }
     if (addForm.password.length < 6) {
-      setAddError('Bee密碼最少需要6個字元')
+      setAddError(`${roleLabel}密碼最少需要6個字元`)
       return
     }
     setAddSaving(true)
@@ -120,7 +121,7 @@ export default function UsersClient({ currentUserName, initialData }: { currentU
           onClick={openAdd}
           className="px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-medium hover:bg-blue-700 transition"
         >
-          + 新增Bee
+          + 新增管理員/BEE
         </button>
       </div>
 
@@ -175,52 +176,56 @@ export default function UsersClient({ currentUserName, initialData }: { currentU
       })}
 
       {/* Add Employee Modal */}
-      {addModal && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setAddModal(false)} />
-          <div className="relative bg-white rounded-t-2xl sm:rounded-2xl p-5 w-full sm:max-w-sm shadow-xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-gray-800">新增Bee帳號</h3>
-              <button onClick={() => setAddModal(false)} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
-            </div>
+      {addModal && (() => {
+        const isBee = addForm.role === 'EMPLOYEE'
+        const roleLabel = isBee ? 'Bee' : '管理員'
+        return (
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+            <div className="absolute inset-0 bg-black/40" onClick={() => setAddModal(false)} />
+            <div className="relative bg-white rounded-t-2xl sm:rounded-2xl p-5 w-full sm:max-w-sm shadow-xl max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-gray-800">新增{roleLabel}帳號</h3>
+                <button onClick={() => setAddModal(false)} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
+              </div>
 
-            <div className="space-y-3 mb-4">
-              <input type="text" placeholder="Bee姓名" value={addForm.name}
-                onChange={e => setAddForm(f => ({ ...f, name: e.target.value }))} className={inputCls} />
-              <input type="password" placeholder="Bee初始密碼" value={addForm.password}
-                onChange={e => setAddForm(f => ({ ...f, password: e.target.value }))} className={inputCls} />
-              <input type="password" placeholder="確認Bee密碼" value={addForm.confirmPassword}
-                onChange={e => setAddForm(f => ({ ...f, confirmPassword: e.target.value }))} className={inputCls} />
-              <div>
-                <p className="text-xs text-gray-500 mb-2">帳號角色</p>
-                <div className="flex gap-2">
-                  {(['EMPLOYEE', 'ADMIN'] as const).map(r => (
-                    <button key={r} type="button"
-                      onClick={() => setAddForm(f => ({ ...f, role: r }))}
-                      className={`flex-1 py-2 rounded-xl border text-sm font-medium transition
-                        ${addForm.role === r ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}
-                    >
-                      {r === 'EMPLOYEE' ? 'Bee' : '管理員'}
-                    </button>
-                  ))}
+              <div className="space-y-3 mb-4">
+                <input type="text" placeholder={`${roleLabel}姓名`} value={addForm.name}
+                  onChange={e => setAddForm(f => ({ ...f, name: e.target.value }))} className={inputCls} />
+                <input type="password" placeholder={`${roleLabel}初始密碼`} value={addForm.password}
+                  onChange={e => setAddForm(f => ({ ...f, password: e.target.value }))} className={inputCls} />
+                <input type="password" placeholder={`確認${roleLabel}密碼`} value={addForm.confirmPassword}
+                  onChange={e => setAddForm(f => ({ ...f, confirmPassword: e.target.value }))} className={inputCls} />
+                <div>
+                  <p className="text-xs text-gray-500 mb-2">帳號角色</p>
+                  <div className="flex gap-2">
+                    {(['EMPLOYEE', 'ADMIN'] as const).map(r => (
+                      <button key={r} type="button"
+                        onClick={() => setAddForm(f => ({ ...f, role: r }))}
+                        className={`flex-1 py-2 rounded-xl border text-sm font-medium transition
+                          ${addForm.role === r ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}
+                      >
+                        {r === 'EMPLOYEE' ? 'Bee' : '管理員'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="border-t pt-3">
+                  <p className="text-xs text-gray-500 mb-2">請輸入您的管理員密碼以確認操作</p>
+                  <input type="password" placeholder="管理員密碼" value={addForm.adminPassword}
+                    onChange={e => setAddForm(f => ({ ...f, adminPassword: e.target.value }))} className={inputCls} />
                 </div>
               </div>
-              <div className="border-t pt-3">
-                <p className="text-xs text-gray-500 mb-2">請輸入您的管理員密碼以確認操作</p>
-                <input type="password" placeholder="管理員密碼" value={addForm.adminPassword}
-                  onChange={e => setAddForm(f => ({ ...f, adminPassword: e.target.value }))} className={inputCls} />
-              </div>
+
+              {addError && <p className="text-xs text-red-500 mb-3">{addError}</p>}
+
+              <button onClick={addEmployee} disabled={addSaving}
+                className="w-full py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition disabled:opacity-50">
+                {addSaving ? '處理中...' : `新增${roleLabel}`}
+              </button>
             </div>
-
-            {addError && <p className="text-xs text-red-500 mb-3">{addError}</p>}
-
-            <button onClick={addEmployee} disabled={addSaving}
-              className="w-full py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition disabled:opacity-50">
-              {addSaving ? '處理中...' : '新增Bee'}
-            </button>
           </div>
-        </div>
-      )}
+        )
+      })()}
 
       {/* Reset Password Modal */}
       {resetModal && (
