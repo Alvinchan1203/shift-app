@@ -168,80 +168,58 @@ export default function AdminScoresClient({
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50 border-b">
-                <th className="text-left px-4 py-3 font-medium text-gray-600">姓名</th>
-                <th className="text-center px-3 py-3 font-medium text-gray-600">
-                  <div>① 上班時數</div>
-                  <div className="text-xs font-normal text-gray-400">/30分</div>
-                </th>
-                <th className="text-center px-3 py-3 font-medium text-gray-600">
-                  <div>② 開戶見證</div>
-                  <div className="text-xs font-normal text-gray-400">/10分</div>
-                </th>
-                <th className="text-center px-3 py-3 font-medium text-gray-600">
-                  <div>③ 實際工作</div>
-                  <div className="text-xs font-normal text-gray-400">/30分</div>
-                </th>
-                <th className="text-center px-3 py-3 font-medium text-gray-600">
-                  <div>④ 管理員評分</div>
-                  <div className="text-xs font-normal text-gray-400">/30分</div>
-                </th>
-                <th className="text-center px-3 py-3 font-medium text-gray-600">總分</th>
-                <th className="text-center px-3 py-3 font-medium text-gray-600">薪資倍數</th>
+              <tr className="bg-gray-50 border-b text-xs">
+                <th className="text-left px-4 py-2 font-medium text-gray-600">姓名</th>
+                <th className="text-center px-3 py-2 font-medium text-gray-600">① 上班時數<span className="text-gray-400 font-normal"> /30</span></th>
+                <th className="text-center px-3 py-2 font-medium text-gray-600">② 開戶見證<span className="text-gray-400 font-normal"> /10</span></th>
+                <th className="text-center px-3 py-2 font-medium text-gray-600">③ 實際工作<span className="text-gray-400 font-normal"> /30</span></th>
+                <th className="text-center px-3 py-2 font-medium text-gray-600">④ 管理員評分<span className="text-gray-400 font-normal"> /30</span></th>
+                <th className="text-center px-3 py-2 font-medium text-gray-600">總分</th>
+                <th className="text-center px-3 py-2 font-medium text-gray-600">薪資倍數</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {data.map(emp => (
                 <tr key={emp.employeeId} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3 font-medium text-gray-800">{emp.employeeName}</td>
+                  <td className="px-4 py-2 font-medium text-gray-800 text-sm">{emp.employeeName}</td>
 
                   {/* Item 1 */}
-                  <td className="px-3 py-3 text-center">
-                    <div className="font-semibold text-gray-800">{emp.item1}</div>
-                    <div className="text-xs text-gray-400">{Math.round(emp.totalAttendanceMinutes / 60 * 10) / 10}h</div>
+                  <td className="px-3 py-2 text-center whitespace-nowrap">
+                    <span className="font-semibold text-gray-800">{emp.item1}</span>
+                    <span className="text-xs text-gray-400 ml-1.5">{Math.round(emp.totalAttendanceMinutes / 60 * 10) / 10}h</span>
                   </td>
 
                   {/* Item 2 */}
-                  <td className="px-3 py-3 text-center">
-                    <div className="font-semibold text-gray-800">{emp.item2}</div>
-                    <div className="text-xs text-gray-400">
-                      {emp.witnessCount > 0
-                        ? `${emp.successCount}/${emp.witnessCount}`
-                        : '未設定'}
-                    </div>
-                    <button
-                      onClick={() => openWitnessModal(emp)}
-                      className="mt-1 text-xs text-blue-500 hover:text-blue-700"
-                    >編輯</button>
+                  <td className="px-3 py-2 text-center whitespace-nowrap">
+                    <span className="font-semibold text-gray-800">{emp.item2}</span>
+                    <span className="text-xs text-gray-400 ml-1.5">
+                      {emp.witnessCount > 0 ? `${emp.successCount}/${emp.witnessCount}` : '未設定'}
+                    </span>
+                    <button onClick={() => openWitnessModal(emp)} className="ml-2 text-xs text-blue-500 hover:text-blue-700">編輯</button>
                   </td>
 
                   {/* Item 3 */}
-                  <td className="px-3 py-3 text-center">
-                    <div className="font-semibold text-gray-800">{emp.item3}</div>
-                    <div className="text-xs text-gray-400">{emp.totalWorkPoints}分</div>
+                  <td className="px-3 py-2 text-center whitespace-nowrap">
+                    <span className="font-semibold text-gray-800">{emp.item3}</span>
+                    <span className="text-xs text-gray-400 ml-1.5">{emp.totalWorkPoints}分</span>
                   </td>
 
                   {/* Item 4 */}
-                  <td className="px-3 py-3 text-center">
-                    <div className="font-semibold text-gray-800">{emp.item4}</div>
-                    <div className="text-xs text-gray-400">
-                      {emp.adjustments.length > 0
-                        ? `${emp.adjustments.length}項調整`
-                        : '起始25分'}
-                    </div>
-                    <button
-                      onClick={() => openAdjModal(emp)}
-                      className="mt-1 text-xs text-blue-500 hover:text-blue-700"
-                    >編輯</button>
+                  <td className="px-3 py-2 text-center whitespace-nowrap">
+                    <span className="font-semibold text-gray-800">{emp.item4}</span>
+                    <span className="text-xs text-gray-400 ml-1.5">
+                      {emp.adjustments.length > 0 ? `${emp.adjustments.length}項調整` : '起始25分'}
+                    </span>
+                    <button onClick={() => openAdjModal(emp)} className="ml-2 text-xs text-blue-500 hover:text-blue-700">編輯</button>
                   </td>
 
                   {/* Total */}
-                  <td className="px-3 py-3 text-center">
+                  <td className="px-3 py-2 text-center">
                     <span className="font-bold text-gray-900">{emp.total}</span>
                   </td>
 
                   {/* Multiplier */}
-                  <td className="px-3 py-3 text-center">
+                  <td className="px-3 py-2 text-center">
                     <MultiplierBadge multiplier={emp.multiplier} />
                   </td>
                 </tr>
