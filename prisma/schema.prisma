@@ -21,10 +21,12 @@ model User {
   preferenceEnabled  Boolean           @default(true)
   extraSubmitEnabled Boolean           @default(false)
   createdAt          DateTime          @default(now())
-  preferences  ShiftPreference[]
-  assignments  ShiftAssignment[]
-  attendances  AttendanceRecord[]
-  submissions  PreferenceSubmission[]
+  preferences   ShiftPreference[]
+  assignments   ShiftAssignment[]
+  attendances   AttendanceRecord[]
+  submissions   PreferenceSubmission[]
+  workLogs      WorkLog[]
+  monthlyScores MonthlyScore[]
 }
 
 enum Role {
@@ -127,4 +129,49 @@ model SchedulePublish {
   publishedBy String
 
   @@unique([year, month])
+}
+
+enum WorkType {
+  A
+  B
+  C
+  D
+  E
+}
+
+model WorkLog {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date        DateTime @db.Date
+  workType    WorkType
+  description String?
+  points      Int
+  createdAt   DateTime @default(now())
+}
+
+model MonthlyScore {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  year         Int
+  month        Int
+  witnessCount Int      @default(0)
+  successCount Int      @default(0)
+  adjustments  AdminScoreAdjustment[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([userId, year, month])
+}
+
+model AdminScoreAdjustment {
+  id             String       @id @default(cuid())
+  monthlyScoreId String
+  monthlyScore   MonthlyScore @relation(fields: [monthlyScoreId], references: [id], onDelete: Cascade)
+  description    String
+  points         Int
+  adminId        String
+  adminName      String
+  createdAt      DateTime     @default(now())
 }

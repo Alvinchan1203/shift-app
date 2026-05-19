@@ -20,6 +20,7 @@ export default function Navbar({ userName, role }: NavbarProps) {
         { href: '/admin/assign', label: '分配排班' },
         { href: '/admin/holidays', label: '假期管理' },
         { href: '/attendance', label: '實際出勤' },
+        { href: '/admin/scores', label: '員工評分' },
         { href: '/admin/users', label: '賬戶管理' },
         { href: '/employee/password', label: '修改密碼' },
       ]
@@ -27,6 +28,7 @@ export default function Navbar({ userName, role }: NavbarProps) {
         { href: '/employee/preferences', label: '提交意願' },
         { href: '/employee/schedule', label: '我的排班' },
         { href: '/attendance', label: '出勤記錄' },
+        { href: '/employee/worklog', label: '工作記錄' },
         { href: '/employee/password', label: '修改密碼' },
       ]
 
