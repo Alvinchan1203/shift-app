@@ -44,6 +44,22 @@ export const WORK_TYPE_POINTS: Record<string, number> = {
   D: 60,
 }
 
+export const DEDUCTION_ITEMS = [
+  { type: 'LATE',               label: '遲到',               points: 1  },
+  { type: 'ABSENCE',            label: '缺勤',               points: 10 },
+  { type: 'SCHEDULE_CHANGE',    label: '改更',               points: 2  },
+  { type: 'COMMON_AREA_EATING', label: '在Common area 飲食', points: 8  },
+  { type: 'PUNCH_INACCURACY',   label: '打卡確準性',          points: 1  },
+  { type: 'COMPLAINT',          label: '成立投訴',            points: 10 },
+] as const
+
+export function calcTotalDeductions(deductions: { type: string; count: number }[]): number {
+  return deductions.reduce((sum, d) => {
+    const item = DEDUCTION_ITEMS.find(i => i.type === d.type)
+    return sum + (item ? item.points * d.count : 0)
+  }, 0)
+}
+
 export const WORK_TYPE_LABELS: Record<string, string> = {
   A: '提/存實股、簽收支票、補簽名/更改戶口資料、補交文件/CL/住址、銷戶',
   B: 'App應用、查詢戶口資料、出入金、存實股、更改戶口忘記密碼資料、引導客戶開戶',

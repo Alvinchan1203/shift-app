@@ -81,3 +81,23 @@ export type PreferenceSubmission = Prisma.PreferenceSubmissionModel
  * 
  */
 export type SchedulePublish = Prisma.SchedulePublishModel
+/**
+ * Model WorkLog
+ * 
+ */
+export type WorkLog = Prisma.WorkLogModel
+/**
+ * Model MonthlyScore
+ * 
+ */
+export type MonthlyScore = Prisma.MonthlyScoreModel
+/**
+ * Model AdminScoreAdjustment
+ * 
+ */
+export type AdminScoreAdjustment = Prisma.AdminScoreAdjustmentModel
+/**
+ * Model MonthlyDeduction
+ * 
+ */
+export type MonthlyDeduction = Prisma.MonthlyDeductionModel

@@ -41,3 +41,26 @@ export const AttendanceType = {
 } as const
 
 export type AttendanceType = (typeof AttendanceType)[keyof typeof AttendanceType]
+
+
+export const WorkType = {
+  A: 'A',
+  B: 'B',
+  C: 'C',
+  D: 'D',
+  E: 'E'
+} as const
+
+export type WorkType = (typeof WorkType)[keyof typeof WorkType]
+
+
+export const DeductionType = {
+  LATE: 'LATE',
+  ABSENCE: 'ABSENCE',
+  SCHEDULE_CHANGE: 'SCHEDULE_CHANGE',
+  COMMON_AREA_EATING: 'COMMON_AREA_EATING',
+  PUNCH_INACCURACY: 'PUNCH_INACCURACY',
+  COMPLAINT: 'COMPLAINT'
+} as const
+
+export type DeductionType = (typeof DeductionType)[keyof typeof DeductionType]

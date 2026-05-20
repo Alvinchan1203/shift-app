@@ -210,6 +210,9 @@ export type UserWhereInput = {
   assignments?: Prisma.ShiftAssignmentListRelationFilter
   attendances?: Prisma.AttendanceRecordListRelationFilter
   submissions?: Prisma.PreferenceSubmissionListRelationFilter
+  workLogs?: Prisma.WorkLogListRelationFilter
+  monthlyScores?: Prisma.MonthlyScoreListRelationFilter
+  monthlyDeductions?: Prisma.MonthlyDeductionListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -225,6 +228,9 @@ export type UserOrderByWithRelationInput = {
   assignments?: Prisma.ShiftAssignmentOrderByRelationAggregateInput
   attendances?: Prisma.AttendanceRecordOrderByRelationAggregateInput
   submissions?: Prisma.PreferenceSubmissionOrderByRelationAggregateInput
+  workLogs?: Prisma.WorkLogOrderByRelationAggregateInput
+  monthlyScores?: Prisma.MonthlyScoreOrderByRelationAggregateInput
+  monthlyDeductions?: Prisma.MonthlyDeductionOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -243,6 +249,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   assignments?: Prisma.ShiftAssignmentListRelationFilter
   attendances?: Prisma.AttendanceRecordListRelationFilter
   submissions?: Prisma.PreferenceSubmissionListRelationFilter
+  workLogs?: Prisma.WorkLogListRelationFilter
+  monthlyScores?: Prisma.MonthlyScoreListRelationFilter
+  monthlyDeductions?: Prisma.MonthlyDeductionListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -286,6 +295,9 @@ export type UserCreateInput = {
   assignments?: Prisma.ShiftAssignmentCreateNestedManyWithoutUserInput
   attendances?: Prisma.AttendanceRecordCreateNestedManyWithoutUserInput
   submissions?: Prisma.PreferenceSubmissionCreateNestedManyWithoutUserInput
+  workLogs?: Prisma.WorkLogCreateNestedManyWithoutUserInput
+  monthlyScores?: Prisma.MonthlyScoreCreateNestedManyWithoutUserInput
+  monthlyDeductions?: Prisma.MonthlyDeductionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -301,6 +313,9 @@ export type UserUncheckedCreateInput = {
   assignments?: Prisma.ShiftAssignmentUncheckedCreateNestedManyWithoutUserInput
   attendances?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutUserInput
   submissions?: Prisma.PreferenceSubmissionUncheckedCreateNestedManyWithoutUserInput
+  workLogs?: Prisma.WorkLogUncheckedCreateNestedManyWithoutUserInput
+  monthlyScores?: Prisma.MonthlyScoreUncheckedCreateNestedManyWithoutUserInput
+  monthlyDeductions?: Prisma.MonthlyDeductionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -316,6 +331,9 @@ export type UserUpdateInput = {
   assignments?: Prisma.ShiftAssignmentUpdateManyWithoutUserNestedInput
   attendances?: Prisma.AttendanceRecordUpdateManyWithoutUserNestedInput
   submissions?: Prisma.PreferenceSubmissionUpdateManyWithoutUserNestedInput
+  workLogs?: Prisma.WorkLogUpdateManyWithoutUserNestedInput
+  monthlyScores?: Prisma.MonthlyScoreUpdateManyWithoutUserNestedInput
+  monthlyDeductions?: Prisma.MonthlyDeductionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -331,6 +349,9 @@ export type UserUncheckedUpdateInput = {
   assignments?: Prisma.ShiftAssignmentUncheckedUpdateManyWithoutUserNestedInput
   attendances?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutUserNestedInput
   submissions?: Prisma.PreferenceSubmissionUncheckedUpdateManyWithoutUserNestedInput
+  workLogs?: Prisma.WorkLogUncheckedUpdateManyWithoutUserNestedInput
+  monthlyScores?: Prisma.MonthlyScoreUncheckedUpdateManyWithoutUserNestedInput
+  monthlyDeductions?: Prisma.MonthlyDeductionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -476,6 +497,48 @@ export type UserUpdateOneRequiredWithoutSubmissionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSubmissionsInput, Prisma.UserUpdateWithoutSubmissionsInput>, Prisma.UserUncheckedUpdateWithoutSubmissionsInput>
 }
 
+export type UserCreateNestedOneWithoutWorkLogsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutWorkLogsInput, Prisma.UserUncheckedCreateWithoutWorkLogsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutWorkLogsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutWorkLogsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutWorkLogsInput, Prisma.UserUncheckedCreateWithoutWorkLogsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutWorkLogsInput
+  upsert?: Prisma.UserUpsertWithoutWorkLogsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutWorkLogsInput, Prisma.UserUpdateWithoutWorkLogsInput>, Prisma.UserUncheckedUpdateWithoutWorkLogsInput>
+}
+
+export type UserCreateNestedOneWithoutMonthlyScoresInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutMonthlyScoresInput, Prisma.UserUncheckedCreateWithoutMonthlyScoresInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutMonthlyScoresInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutMonthlyScoresNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutMonthlyScoresInput, Prisma.UserUncheckedCreateWithoutMonthlyScoresInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutMonthlyScoresInput
+  upsert?: Prisma.UserUpsertWithoutMonthlyScoresInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutMonthlyScoresInput, Prisma.UserUpdateWithoutMonthlyScoresInput>, Prisma.UserUncheckedUpdateWithoutMonthlyScoresInput>
+}
+
+export type UserCreateNestedOneWithoutMonthlyDeductionsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutMonthlyDeductionsInput, Prisma.UserUncheckedCreateWithoutMonthlyDeductionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutMonthlyDeductionsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutMonthlyDeductionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutMonthlyDeductionsInput, Prisma.UserUncheckedCreateWithoutMonthlyDeductionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutMonthlyDeductionsInput
+  upsert?: Prisma.UserUpsertWithoutMonthlyDeductionsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutMonthlyDeductionsInput, Prisma.UserUpdateWithoutMonthlyDeductionsInput>, Prisma.UserUncheckedUpdateWithoutMonthlyDeductionsInput>
+}
+
 export type UserCreateWithoutPreferencesInput = {
   id?: string
   name: string
@@ -488,6 +551,9 @@ export type UserCreateWithoutPreferencesInput = {
   assignments?: Prisma.ShiftAssignmentCreateNestedManyWithoutUserInput
   attendances?: Prisma.AttendanceRecordCreateNestedManyWithoutUserInput
   submissions?: Prisma.PreferenceSubmissionCreateNestedManyWithoutUserInput
+  workLogs?: Prisma.WorkLogCreateNestedManyWithoutUserInput
+  monthlyScores?: Prisma.MonthlyScoreCreateNestedManyWithoutUserInput
+  monthlyDeductions?: Prisma.MonthlyDeductionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPreferencesInput = {
@@ -502,6 +568,9 @@ export type UserUncheckedCreateWithoutPreferencesInput = {
   assignments?: Prisma.ShiftAssignmentUncheckedCreateNestedManyWithoutUserInput
   attendances?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutUserInput
   submissions?: Prisma.PreferenceSubmissionUncheckedCreateNestedManyWithoutUserInput
+  workLogs?: Prisma.WorkLogUncheckedCreateNestedManyWithoutUserInput
+  monthlyScores?: Prisma.MonthlyScoreUncheckedCreateNestedManyWithoutUserInput
+  monthlyDeductions?: Prisma.MonthlyDeductionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPreferencesInput = {
@@ -532,6 +601,9 @@ export type UserUpdateWithoutPreferencesInput = {
   assignments?: Prisma.ShiftAssignmentUpdateManyWithoutUserNestedInput
   attendances?: Prisma.AttendanceRecordUpdateManyWithoutUserNestedInput
   submissions?: Prisma.PreferenceSubmissionUpdateManyWithoutUserNestedInput
+  workLogs?: Prisma.WorkLogUpdateManyWithoutUserNestedInput
+  monthlyScores?: Prisma.MonthlyScoreUpdateManyWithoutUserNestedInput
+  monthlyDeductions?: Prisma.MonthlyDeductionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPreferencesInput = {
@@ -546,6 +618,9 @@ export type UserUncheckedUpdateWithoutPreferencesInput = {
   assignments?: Prisma.ShiftAssignmentUncheckedUpdateManyWithoutUserNestedInput
   attendances?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutUserNestedInput
   submissions?: Prisma.PreferenceSubmissionUncheckedUpdateManyWithoutUserNestedInput
+  workLogs?: Prisma.WorkLogUncheckedUpdateManyWithoutUserNestedInput
+  monthlyScores?: Prisma.MonthlyScoreUncheckedUpdateManyWithoutUserNestedInput
+  monthlyDeductions?: Prisma.MonthlyDeductionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAssignmentsInput = {
@@ -560,6 +635,9 @@ export type UserCreateWithoutAssignmentsInput = {
   preferences?: Prisma.ShiftPreferenceCreateNestedManyWithoutUserInput
   attendances?: Prisma.AttendanceRecordCreateNestedManyWithoutUserInput
   submissions?: Prisma.PreferenceSubmissionCreateNestedManyWithoutUserInput
+  workLogs?: Prisma.WorkLogCreateNestedManyWithoutUserInput
+  monthlyScores?: Prisma.MonthlyScoreCreateNestedManyWithoutUserInput
+  monthlyDeductions?: Prisma.MonthlyDeductionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAssignmentsInput = {
@@ -574,6 +652,9 @@ export type UserUncheckedCreateWithoutAssignmentsInput = {
   preferences?: Prisma.ShiftPreferenceUncheckedCreateNestedManyWithoutUserInput
   attendances?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutUserInput
   submissions?: Prisma.PreferenceSubmissionUncheckedCreateNestedManyWithoutUserInput
+  workLogs?: Prisma.WorkLogUncheckedCreateNestedManyWithoutUserInput
+  monthlyScores?: Prisma.MonthlyScoreUncheckedCreateNestedManyWithoutUserInput
+  monthlyDeductions?: Prisma.MonthlyDeductionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAssignmentsInput = {
@@ -604,6 +685,9 @@ export type UserUpdateWithoutAssignmentsInput = {
   preferences?: Prisma.ShiftPreferenceUpdateManyWithoutUserNestedInput
   attendances?: Prisma.AttendanceRecordUpdateManyWithoutUserNestedInput
   submissions?: Prisma.PreferenceSubmissionUpdateManyWithoutUserNestedInput
+  workLogs?: Prisma.WorkLogUpdateManyWithoutUserNestedInput
+  monthlyScores?: Prisma.MonthlyScoreUpdateManyWithoutUserNestedInput
+  monthlyDeductions?: Prisma.MonthlyDeductionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignmentsInput = {
@@ -618,6 +702,9 @@ export type UserUncheckedUpdateWithoutAssignmentsInput = {
   preferences?: Prisma.ShiftPreferenceUncheckedUpdateManyWithoutUserNestedInput
   attendances?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutUserNestedInput
   submissions?: Prisma.PreferenceSubmissionUncheckedUpdateManyWithoutUserNestedInput
+  workLogs?: Prisma.WorkLogUncheckedUpdateManyWithoutUserNestedInput
+  monthlyScores?: Prisma.MonthlyScoreUncheckedUpdateManyWithoutUserNestedInput
+  monthlyDeductions?: Prisma.MonthlyDeductionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAttendancesInput = {
@@ -632,6 +719,9 @@ export type UserCreateWithoutAttendancesInput = {
   preferences?: Prisma.ShiftPreferenceCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentCreateNestedManyWithoutUserInput
   submissions?: Prisma.PreferenceSubmissionCreateNestedManyWithoutUserInput
+  workLogs?: Prisma.WorkLogCreateNestedManyWithoutUserInput
+  monthlyScores?: Prisma.MonthlyScoreCreateNestedManyWithoutUserInput
+  monthlyDeductions?: Prisma.MonthlyDeductionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAttendancesInput = {
@@ -646,6 +736,9 @@ export type UserUncheckedCreateWithoutAttendancesInput = {
   preferences?: Prisma.ShiftPreferenceUncheckedCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentUncheckedCreateNestedManyWithoutUserInput
   submissions?: Prisma.PreferenceSubmissionUncheckedCreateNestedManyWithoutUserInput
+  workLogs?: Prisma.WorkLogUncheckedCreateNestedManyWithoutUserInput
+  monthlyScores?: Prisma.MonthlyScoreUncheckedCreateNestedManyWithoutUserInput
+  monthlyDeductions?: Prisma.MonthlyDeductionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAttendancesInput = {
@@ -676,6 +769,9 @@ export type UserUpdateWithoutAttendancesInput = {
   preferences?: Prisma.ShiftPreferenceUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUpdateManyWithoutUserNestedInput
   submissions?: Prisma.PreferenceSubmissionUpdateManyWithoutUserNestedInput
+  workLogs?: Prisma.WorkLogUpdateManyWithoutUserNestedInput
+  monthlyScores?: Prisma.MonthlyScoreUpdateManyWithoutUserNestedInput
+  monthlyDeductions?: Prisma.MonthlyDeductionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAttendancesInput = {
@@ -690,6 +786,9 @@ export type UserUncheckedUpdateWithoutAttendancesInput = {
   preferences?: Prisma.ShiftPreferenceUncheckedUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUncheckedUpdateManyWithoutUserNestedInput
   submissions?: Prisma.PreferenceSubmissionUncheckedUpdateManyWithoutUserNestedInput
+  workLogs?: Prisma.WorkLogUncheckedUpdateManyWithoutUserNestedInput
+  monthlyScores?: Prisma.MonthlyScoreUncheckedUpdateManyWithoutUserNestedInput
+  monthlyDeductions?: Prisma.MonthlyDeductionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSubmissionsInput = {
@@ -704,6 +803,9 @@ export type UserCreateWithoutSubmissionsInput = {
   preferences?: Prisma.ShiftPreferenceCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentCreateNestedManyWithoutUserInput
   attendances?: Prisma.AttendanceRecordCreateNestedManyWithoutUserInput
+  workLogs?: Prisma.WorkLogCreateNestedManyWithoutUserInput
+  monthlyScores?: Prisma.MonthlyScoreCreateNestedManyWithoutUserInput
+  monthlyDeductions?: Prisma.MonthlyDeductionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSubmissionsInput = {
@@ -718,6 +820,9 @@ export type UserUncheckedCreateWithoutSubmissionsInput = {
   preferences?: Prisma.ShiftPreferenceUncheckedCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentUncheckedCreateNestedManyWithoutUserInput
   attendances?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutUserInput
+  workLogs?: Prisma.WorkLogUncheckedCreateNestedManyWithoutUserInput
+  monthlyScores?: Prisma.MonthlyScoreUncheckedCreateNestedManyWithoutUserInput
+  monthlyDeductions?: Prisma.MonthlyDeductionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSubmissionsInput = {
@@ -748,6 +853,9 @@ export type UserUpdateWithoutSubmissionsInput = {
   preferences?: Prisma.ShiftPreferenceUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUpdateManyWithoutUserNestedInput
   attendances?: Prisma.AttendanceRecordUpdateManyWithoutUserNestedInput
+  workLogs?: Prisma.WorkLogUpdateManyWithoutUserNestedInput
+  monthlyScores?: Prisma.MonthlyScoreUpdateManyWithoutUserNestedInput
+  monthlyDeductions?: Prisma.MonthlyDeductionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSubmissionsInput = {
@@ -762,6 +870,261 @@ export type UserUncheckedUpdateWithoutSubmissionsInput = {
   preferences?: Prisma.ShiftPreferenceUncheckedUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUncheckedUpdateManyWithoutUserNestedInput
   attendances?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutUserNestedInput
+  workLogs?: Prisma.WorkLogUncheckedUpdateManyWithoutUserNestedInput
+  monthlyScores?: Prisma.MonthlyScoreUncheckedUpdateManyWithoutUserNestedInput
+  monthlyDeductions?: Prisma.MonthlyDeductionUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutWorkLogsInput = {
+  id?: string
+  name: string
+  email: string
+  password: string
+  role?: $Enums.Role
+  preferenceEnabled?: boolean
+  extraSubmitEnabled?: boolean
+  createdAt?: Date | string
+  preferences?: Prisma.ShiftPreferenceCreateNestedManyWithoutUserInput
+  assignments?: Prisma.ShiftAssignmentCreateNestedManyWithoutUserInput
+  attendances?: Prisma.AttendanceRecordCreateNestedManyWithoutUserInput
+  submissions?: Prisma.PreferenceSubmissionCreateNestedManyWithoutUserInput
+  monthlyScores?: Prisma.MonthlyScoreCreateNestedManyWithoutUserInput
+  monthlyDeductions?: Prisma.MonthlyDeductionCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutWorkLogsInput = {
+  id?: string
+  name: string
+  email: string
+  password: string
+  role?: $Enums.Role
+  preferenceEnabled?: boolean
+  extraSubmitEnabled?: boolean
+  createdAt?: Date | string
+  preferences?: Prisma.ShiftPreferenceUncheckedCreateNestedManyWithoutUserInput
+  assignments?: Prisma.ShiftAssignmentUncheckedCreateNestedManyWithoutUserInput
+  attendances?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutUserInput
+  submissions?: Prisma.PreferenceSubmissionUncheckedCreateNestedManyWithoutUserInput
+  monthlyScores?: Prisma.MonthlyScoreUncheckedCreateNestedManyWithoutUserInput
+  monthlyDeductions?: Prisma.MonthlyDeductionUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutWorkLogsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutWorkLogsInput, Prisma.UserUncheckedCreateWithoutWorkLogsInput>
+}
+
+export type UserUpsertWithoutWorkLogsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutWorkLogsInput, Prisma.UserUncheckedUpdateWithoutWorkLogsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutWorkLogsInput, Prisma.UserUncheckedCreateWithoutWorkLogsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutWorkLogsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutWorkLogsInput, Prisma.UserUncheckedUpdateWithoutWorkLogsInput>
+}
+
+export type UserUpdateWithoutWorkLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  preferenceEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  extraSubmitEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preferences?: Prisma.ShiftPreferenceUpdateManyWithoutUserNestedInput
+  assignments?: Prisma.ShiftAssignmentUpdateManyWithoutUserNestedInput
+  attendances?: Prisma.AttendanceRecordUpdateManyWithoutUserNestedInput
+  submissions?: Prisma.PreferenceSubmissionUpdateManyWithoutUserNestedInput
+  monthlyScores?: Prisma.MonthlyScoreUpdateManyWithoutUserNestedInput
+  monthlyDeductions?: Prisma.MonthlyDeductionUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutWorkLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  preferenceEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  extraSubmitEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preferences?: Prisma.ShiftPreferenceUncheckedUpdateManyWithoutUserNestedInput
+  assignments?: Prisma.ShiftAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  attendances?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutUserNestedInput
+  submissions?: Prisma.PreferenceSubmissionUncheckedUpdateManyWithoutUserNestedInput
+  monthlyScores?: Prisma.MonthlyScoreUncheckedUpdateManyWithoutUserNestedInput
+  monthlyDeductions?: Prisma.MonthlyDeductionUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutMonthlyScoresInput = {
+  id?: string
+  name: string
+  email: string
+  password: string
+  role?: $Enums.Role
+  preferenceEnabled?: boolean
+  extraSubmitEnabled?: boolean
+  createdAt?: Date | string
+  preferences?: Prisma.ShiftPreferenceCreateNestedManyWithoutUserInput
+  assignments?: Prisma.ShiftAssignmentCreateNestedManyWithoutUserInput
+  attendances?: Prisma.AttendanceRecordCreateNestedManyWithoutUserInput
+  submissions?: Prisma.PreferenceSubmissionCreateNestedManyWithoutUserInput
+  workLogs?: Prisma.WorkLogCreateNestedManyWithoutUserInput
+  monthlyDeductions?: Prisma.MonthlyDeductionCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutMonthlyScoresInput = {
+  id?: string
+  name: string
+  email: string
+  password: string
+  role?: $Enums.Role
+  preferenceEnabled?: boolean
+  extraSubmitEnabled?: boolean
+  createdAt?: Date | string
+  preferences?: Prisma.ShiftPreferenceUncheckedCreateNestedManyWithoutUserInput
+  assignments?: Prisma.ShiftAssignmentUncheckedCreateNestedManyWithoutUserInput
+  attendances?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutUserInput
+  submissions?: Prisma.PreferenceSubmissionUncheckedCreateNestedManyWithoutUserInput
+  workLogs?: Prisma.WorkLogUncheckedCreateNestedManyWithoutUserInput
+  monthlyDeductions?: Prisma.MonthlyDeductionUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutMonthlyScoresInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutMonthlyScoresInput, Prisma.UserUncheckedCreateWithoutMonthlyScoresInput>
+}
+
+export type UserUpsertWithoutMonthlyScoresInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutMonthlyScoresInput, Prisma.UserUncheckedUpdateWithoutMonthlyScoresInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutMonthlyScoresInput, Prisma.UserUncheckedCreateWithoutMonthlyScoresInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutMonthlyScoresInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutMonthlyScoresInput, Prisma.UserUncheckedUpdateWithoutMonthlyScoresInput>
+}
+
+export type UserUpdateWithoutMonthlyScoresInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  preferenceEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  extraSubmitEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preferences?: Prisma.ShiftPreferenceUpdateManyWithoutUserNestedInput
+  assignments?: Prisma.ShiftAssignmentUpdateManyWithoutUserNestedInput
+  attendances?: Prisma.AttendanceRecordUpdateManyWithoutUserNestedInput
+  submissions?: Prisma.PreferenceSubmissionUpdateManyWithoutUserNestedInput
+  workLogs?: Prisma.WorkLogUpdateManyWithoutUserNestedInput
+  monthlyDeductions?: Prisma.MonthlyDeductionUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutMonthlyScoresInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  preferenceEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  extraSubmitEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preferences?: Prisma.ShiftPreferenceUncheckedUpdateManyWithoutUserNestedInput
+  assignments?: Prisma.ShiftAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  attendances?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutUserNestedInput
+  submissions?: Prisma.PreferenceSubmissionUncheckedUpdateManyWithoutUserNestedInput
+  workLogs?: Prisma.WorkLogUncheckedUpdateManyWithoutUserNestedInput
+  monthlyDeductions?: Prisma.MonthlyDeductionUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutMonthlyDeductionsInput = {
+  id?: string
+  name: string
+  email: string
+  password: string
+  role?: $Enums.Role
+  preferenceEnabled?: boolean
+  extraSubmitEnabled?: boolean
+  createdAt?: Date | string
+  preferences?: Prisma.ShiftPreferenceCreateNestedManyWithoutUserInput
+  assignments?: Prisma.ShiftAssignmentCreateNestedManyWithoutUserInput
+  attendances?: Prisma.AttendanceRecordCreateNestedManyWithoutUserInput
+  submissions?: Prisma.PreferenceSubmissionCreateNestedManyWithoutUserInput
+  workLogs?: Prisma.WorkLogCreateNestedManyWithoutUserInput
+  monthlyScores?: Prisma.MonthlyScoreCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutMonthlyDeductionsInput = {
+  id?: string
+  name: string
+  email: string
+  password: string
+  role?: $Enums.Role
+  preferenceEnabled?: boolean
+  extraSubmitEnabled?: boolean
+  createdAt?: Date | string
+  preferences?: Prisma.ShiftPreferenceUncheckedCreateNestedManyWithoutUserInput
+  assignments?: Prisma.ShiftAssignmentUncheckedCreateNestedManyWithoutUserInput
+  attendances?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutUserInput
+  submissions?: Prisma.PreferenceSubmissionUncheckedCreateNestedManyWithoutUserInput
+  workLogs?: Prisma.WorkLogUncheckedCreateNestedManyWithoutUserInput
+  monthlyScores?: Prisma.MonthlyScoreUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutMonthlyDeductionsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutMonthlyDeductionsInput, Prisma.UserUncheckedCreateWithoutMonthlyDeductionsInput>
+}
+
+export type UserUpsertWithoutMonthlyDeductionsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutMonthlyDeductionsInput, Prisma.UserUncheckedUpdateWithoutMonthlyDeductionsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutMonthlyDeductionsInput, Prisma.UserUncheckedCreateWithoutMonthlyDeductionsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutMonthlyDeductionsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutMonthlyDeductionsInput, Prisma.UserUncheckedUpdateWithoutMonthlyDeductionsInput>
+}
+
+export type UserUpdateWithoutMonthlyDeductionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  preferenceEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  extraSubmitEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preferences?: Prisma.ShiftPreferenceUpdateManyWithoutUserNestedInput
+  assignments?: Prisma.ShiftAssignmentUpdateManyWithoutUserNestedInput
+  attendances?: Prisma.AttendanceRecordUpdateManyWithoutUserNestedInput
+  submissions?: Prisma.PreferenceSubmissionUpdateManyWithoutUserNestedInput
+  workLogs?: Prisma.WorkLogUpdateManyWithoutUserNestedInput
+  monthlyScores?: Prisma.MonthlyScoreUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutMonthlyDeductionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  preferenceEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  extraSubmitEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  preferences?: Prisma.ShiftPreferenceUncheckedUpdateManyWithoutUserNestedInput
+  assignments?: Prisma.ShiftAssignmentUncheckedUpdateManyWithoutUserNestedInput
+  attendances?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutUserNestedInput
+  submissions?: Prisma.PreferenceSubmissionUncheckedUpdateManyWithoutUserNestedInput
+  workLogs?: Prisma.WorkLogUncheckedUpdateManyWithoutUserNestedInput
+  monthlyScores?: Prisma.MonthlyScoreUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -774,6 +1137,9 @@ export type UserCountOutputType = {
   assignments: number
   attendances: number
   submissions: number
+  workLogs: number
+  monthlyScores: number
+  monthlyDeductions: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -781,6 +1147,9 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   assignments?: boolean | UserCountOutputTypeCountAssignmentsArgs
   attendances?: boolean | UserCountOutputTypeCountAttendancesArgs
   submissions?: boolean | UserCountOutputTypeCountSubmissionsArgs
+  workLogs?: boolean | UserCountOutputTypeCountWorkLogsArgs
+  monthlyScores?: boolean | UserCountOutputTypeCountMonthlyScoresArgs
+  monthlyDeductions?: boolean | UserCountOutputTypeCountMonthlyDeductionsArgs
 }
 
 /**
@@ -821,6 +1190,27 @@ export type UserCountOutputTypeCountSubmissionsArgs<ExtArgs extends runtime.Type
   where?: Prisma.PreferenceSubmissionWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountWorkLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.WorkLogWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountMonthlyScoresArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MonthlyScoreWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountMonthlyDeductionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MonthlyDeductionWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -835,6 +1225,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   assignments?: boolean | Prisma.User$assignmentsArgs<ExtArgs>
   attendances?: boolean | Prisma.User$attendancesArgs<ExtArgs>
   submissions?: boolean | Prisma.User$submissionsArgs<ExtArgs>
+  workLogs?: boolean | Prisma.User$workLogsArgs<ExtArgs>
+  monthlyScores?: boolean | Prisma.User$monthlyScoresArgs<ExtArgs>
+  monthlyDeductions?: boolean | Prisma.User$monthlyDeductionsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -877,6 +1270,9 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   assignments?: boolean | Prisma.User$assignmentsArgs<ExtArgs>
   attendances?: boolean | Prisma.User$attendancesArgs<ExtArgs>
   submissions?: boolean | Prisma.User$submissionsArgs<ExtArgs>
+  workLogs?: boolean | Prisma.User$workLogsArgs<ExtArgs>
+  monthlyScores?: boolean | Prisma.User$monthlyScoresArgs<ExtArgs>
+  monthlyDeductions?: boolean | Prisma.User$monthlyDeductionsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -889,6 +1285,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     assignments: Prisma.$ShiftAssignmentPayload<ExtArgs>[]
     attendances: Prisma.$AttendanceRecordPayload<ExtArgs>[]
     submissions: Prisma.$PreferenceSubmissionPayload<ExtArgs>[]
+    workLogs: Prisma.$WorkLogPayload<ExtArgs>[]
+    monthlyScores: Prisma.$MonthlyScorePayload<ExtArgs>[]
+    monthlyDeductions: Prisma.$MonthlyDeductionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1297,6 +1696,9 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   assignments<T extends Prisma.User$assignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ShiftAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   attendances<T extends Prisma.User$attendancesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$attendancesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AttendanceRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   submissions<T extends Prisma.User$submissionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$submissionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PreferenceSubmissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  workLogs<T extends Prisma.User$workLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$workLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WorkLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  monthlyScores<T extends Prisma.User$monthlyScoresArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$monthlyScoresArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MonthlyScorePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  monthlyDeductions<T extends Prisma.User$monthlyDeductionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$monthlyDeductionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MonthlyDeductionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1820,6 +2222,78 @@ export type User$submissionsArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.PreferenceSubmissionScalarFieldEnum | Prisma.PreferenceSubmissionScalarFieldEnum[]
+}
+
+/**
+ * User.workLogs
+ */
+export type User$workLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the WorkLog
+   */
+  select?: Prisma.WorkLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the WorkLog
+   */
+  omit?: Prisma.WorkLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WorkLogInclude<ExtArgs> | null
+  where?: Prisma.WorkLogWhereInput
+  orderBy?: Prisma.WorkLogOrderByWithRelationInput | Prisma.WorkLogOrderByWithRelationInput[]
+  cursor?: Prisma.WorkLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.WorkLogScalarFieldEnum | Prisma.WorkLogScalarFieldEnum[]
+}
+
+/**
+ * User.monthlyScores
+ */
+export type User$monthlyScoresArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MonthlyScore
+   */
+  select?: Prisma.MonthlyScoreSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MonthlyScore
+   */
+  omit?: Prisma.MonthlyScoreOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MonthlyScoreInclude<ExtArgs> | null
+  where?: Prisma.MonthlyScoreWhereInput
+  orderBy?: Prisma.MonthlyScoreOrderByWithRelationInput | Prisma.MonthlyScoreOrderByWithRelationInput[]
+  cursor?: Prisma.MonthlyScoreWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MonthlyScoreScalarFieldEnum | Prisma.MonthlyScoreScalarFieldEnum[]
+}
+
+/**
+ * User.monthlyDeductions
+ */
+export type User$monthlyDeductionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MonthlyDeduction
+   */
+  select?: Prisma.MonthlyDeductionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MonthlyDeduction
+   */
+  omit?: Prisma.MonthlyDeductionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MonthlyDeductionInclude<ExtArgs> | null
+  where?: Prisma.MonthlyDeductionWhereInput
+  orderBy?: Prisma.MonthlyDeductionOrderByWithRelationInput | Prisma.MonthlyDeductionOrderByWithRelationInput[]
+  cursor?: Prisma.MonthlyDeductionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MonthlyDeductionScalarFieldEnum | Prisma.MonthlyDeductionScalarFieldEnum[]
 }
 
 /**

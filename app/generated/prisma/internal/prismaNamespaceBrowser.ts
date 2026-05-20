@@ -58,7 +58,11 @@ export const ModelName = {
   AttendanceRecord: 'AttendanceRecord',
   AttendanceLog: 'AttendanceLog',
   PreferenceSubmission: 'PreferenceSubmission',
-  SchedulePublish: 'SchedulePublish'
+  SchedulePublish: 'SchedulePublish',
+  WorkLog: 'WorkLog',
+  MonthlyScore: 'MonthlyScore',
+  AdminScoreAdjustment: 'AdminScoreAdjustment',
+  MonthlyDeduction: 'MonthlyDeduction'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -173,6 +177,60 @@ export const SchedulePublishScalarFieldEnum = {
 } as const
 
 export type SchedulePublishScalarFieldEnum = (typeof SchedulePublishScalarFieldEnum)[keyof typeof SchedulePublishScalarFieldEnum]
+
+
+export const WorkLogScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  date: 'date',
+  workType: 'workType',
+  description: 'description',
+  points: 'points',
+  createdAt: 'createdAt'
+} as const
+
+export type WorkLogScalarFieldEnum = (typeof WorkLogScalarFieldEnum)[keyof typeof WorkLogScalarFieldEnum]
+
+
+export const MonthlyScoreScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  year: 'year',
+  month: 'month',
+  witnessCount: 'witnessCount',
+  successCount: 'successCount',
+  confirmedMinutes: 'confirmedMinutes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MonthlyScoreScalarFieldEnum = (typeof MonthlyScoreScalarFieldEnum)[keyof typeof MonthlyScoreScalarFieldEnum]
+
+
+export const AdminScoreAdjustmentScalarFieldEnum = {
+  id: 'id',
+  monthlyScoreId: 'monthlyScoreId',
+  description: 'description',
+  points: 'points',
+  adminId: 'adminId',
+  adminName: 'adminName',
+  createdAt: 'createdAt'
+} as const
+
+export type AdminScoreAdjustmentScalarFieldEnum = (typeof AdminScoreAdjustmentScalarFieldEnum)[keyof typeof AdminScoreAdjustmentScalarFieldEnum]
+
+
+export const MonthlyDeductionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  year: 'year',
+  month: 'month',
+  type: 'type',
+  count: 'count',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MonthlyDeductionScalarFieldEnum = (typeof MonthlyDeductionScalarFieldEnum)[keyof typeof MonthlyDeductionScalarFieldEnum]
 
 
 export const SortOrder = {

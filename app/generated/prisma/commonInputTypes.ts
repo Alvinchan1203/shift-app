@@ -253,6 +253,40 @@ export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedDateTimeNullableFilter<$PrismaModel>
 }
 
+export type EnumWorkTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.WorkType | Prisma.EnumWorkTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.WorkType[] | Prisma.ListEnumWorkTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.WorkType[] | Prisma.ListEnumWorkTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumWorkTypeFilter<$PrismaModel> | $Enums.WorkType
+}
+
+export type EnumWorkTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.WorkType | Prisma.EnumWorkTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.WorkType[] | Prisma.ListEnumWorkTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.WorkType[] | Prisma.ListEnumWorkTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumWorkTypeWithAggregatesFilter<$PrismaModel> | $Enums.WorkType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumWorkTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumWorkTypeFilter<$PrismaModel>
+}
+
+export type EnumDeductionTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.DeductionType | Prisma.EnumDeductionTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.DeductionType[] | Prisma.ListEnumDeductionTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DeductionType[] | Prisma.ListEnumDeductionTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDeductionTypeFilter<$PrismaModel> | $Enums.DeductionType
+}
+
+export type EnumDeductionTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.DeductionType | Prisma.EnumDeductionTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.DeductionType[] | Prisma.ListEnumDeductionTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DeductionType[] | Prisma.ListEnumDeductionTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDeductionTypeWithAggregatesFilter<$PrismaModel> | $Enums.DeductionType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumDeductionTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumDeductionTypeFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -503,6 +537,40 @@ export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntNullableFilter<$PrismaModel>
   _min?: Prisma.NestedDateTimeNullableFilter<$PrismaModel>
   _max?: Prisma.NestedDateTimeNullableFilter<$PrismaModel>
+}
+
+export type NestedEnumWorkTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.WorkType | Prisma.EnumWorkTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.WorkType[] | Prisma.ListEnumWorkTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.WorkType[] | Prisma.ListEnumWorkTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumWorkTypeFilter<$PrismaModel> | $Enums.WorkType
+}
+
+export type NestedEnumWorkTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.WorkType | Prisma.EnumWorkTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.WorkType[] | Prisma.ListEnumWorkTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.WorkType[] | Prisma.ListEnumWorkTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumWorkTypeWithAggregatesFilter<$PrismaModel> | $Enums.WorkType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumWorkTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumWorkTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumDeductionTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.DeductionType | Prisma.EnumDeductionTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.DeductionType[] | Prisma.ListEnumDeductionTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DeductionType[] | Prisma.ListEnumDeductionTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDeductionTypeFilter<$PrismaModel> | $Enums.DeductionType
+}
+
+export type NestedEnumDeductionTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.DeductionType | Prisma.EnumDeductionTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.DeductionType[] | Prisma.ListEnumDeductionTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.DeductionType[] | Prisma.ListEnumDeductionTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumDeductionTypeWithAggregatesFilter<$PrismaModel> | $Enums.DeductionType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumDeductionTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumDeductionTypeFilter<$PrismaModel>
 }
 
 

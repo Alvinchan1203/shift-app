@@ -391,7 +391,11 @@ export const ModelName = {
   AttendanceRecord: 'AttendanceRecord',
   AttendanceLog: 'AttendanceLog',
   PreferenceSubmission: 'PreferenceSubmission',
-  SchedulePublish: 'SchedulePublish'
+  SchedulePublish: 'SchedulePublish',
+  WorkLog: 'WorkLog',
+  MonthlyScore: 'MonthlyScore',
+  AdminScoreAdjustment: 'AdminScoreAdjustment',
+  MonthlyDeduction: 'MonthlyDeduction'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -407,7 +411,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "shiftPreference" | "shiftAssignment" | "holiday" | "attendanceRecord" | "attendanceLog" | "preferenceSubmission" | "schedulePublish"
+    modelProps: "user" | "shiftPreference" | "shiftAssignment" | "holiday" | "attendanceRecord" | "attendanceLog" | "preferenceSubmission" | "schedulePublish" | "workLog" | "monthlyScore" | "adminScoreAdjustment" | "monthlyDeduction"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1003,6 +1007,302 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    WorkLog: {
+      payload: Prisma.$WorkLogPayload<ExtArgs>
+      fields: Prisma.WorkLogFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.WorkLogFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkLogPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.WorkLogFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkLogPayload>
+        }
+        findFirst: {
+          args: Prisma.WorkLogFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkLogPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.WorkLogFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkLogPayload>
+        }
+        findMany: {
+          args: Prisma.WorkLogFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkLogPayload>[]
+        }
+        create: {
+          args: Prisma.WorkLogCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkLogPayload>
+        }
+        createMany: {
+          args: Prisma.WorkLogCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.WorkLogCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkLogPayload>[]
+        }
+        delete: {
+          args: Prisma.WorkLogDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkLogPayload>
+        }
+        update: {
+          args: Prisma.WorkLogUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkLogPayload>
+        }
+        deleteMany: {
+          args: Prisma.WorkLogDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.WorkLogUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.WorkLogUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkLogPayload>[]
+        }
+        upsert: {
+          args: Prisma.WorkLogUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$WorkLogPayload>
+        }
+        aggregate: {
+          args: Prisma.WorkLogAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateWorkLog>
+        }
+        groupBy: {
+          args: Prisma.WorkLogGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WorkLogGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.WorkLogCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.WorkLogCountAggregateOutputType> | number
+        }
+      }
+    }
+    MonthlyScore: {
+      payload: Prisma.$MonthlyScorePayload<ExtArgs>
+      fields: Prisma.MonthlyScoreFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MonthlyScoreFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyScorePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MonthlyScoreFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyScorePayload>
+        }
+        findFirst: {
+          args: Prisma.MonthlyScoreFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyScorePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MonthlyScoreFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyScorePayload>
+        }
+        findMany: {
+          args: Prisma.MonthlyScoreFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyScorePayload>[]
+        }
+        create: {
+          args: Prisma.MonthlyScoreCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyScorePayload>
+        }
+        createMany: {
+          args: Prisma.MonthlyScoreCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MonthlyScoreCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyScorePayload>[]
+        }
+        delete: {
+          args: Prisma.MonthlyScoreDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyScorePayload>
+        }
+        update: {
+          args: Prisma.MonthlyScoreUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyScorePayload>
+        }
+        deleteMany: {
+          args: Prisma.MonthlyScoreDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MonthlyScoreUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MonthlyScoreUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyScorePayload>[]
+        }
+        upsert: {
+          args: Prisma.MonthlyScoreUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyScorePayload>
+        }
+        aggregate: {
+          args: Prisma.MonthlyScoreAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMonthlyScore>
+        }
+        groupBy: {
+          args: Prisma.MonthlyScoreGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MonthlyScoreGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MonthlyScoreCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MonthlyScoreCountAggregateOutputType> | number
+        }
+      }
+    }
+    AdminScoreAdjustment: {
+      payload: Prisma.$AdminScoreAdjustmentPayload<ExtArgs>
+      fields: Prisma.AdminScoreAdjustmentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AdminScoreAdjustmentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminScoreAdjustmentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AdminScoreAdjustmentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminScoreAdjustmentPayload>
+        }
+        findFirst: {
+          args: Prisma.AdminScoreAdjustmentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminScoreAdjustmentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AdminScoreAdjustmentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminScoreAdjustmentPayload>
+        }
+        findMany: {
+          args: Prisma.AdminScoreAdjustmentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminScoreAdjustmentPayload>[]
+        }
+        create: {
+          args: Prisma.AdminScoreAdjustmentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminScoreAdjustmentPayload>
+        }
+        createMany: {
+          args: Prisma.AdminScoreAdjustmentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AdminScoreAdjustmentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminScoreAdjustmentPayload>[]
+        }
+        delete: {
+          args: Prisma.AdminScoreAdjustmentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminScoreAdjustmentPayload>
+        }
+        update: {
+          args: Prisma.AdminScoreAdjustmentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminScoreAdjustmentPayload>
+        }
+        deleteMany: {
+          args: Prisma.AdminScoreAdjustmentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AdminScoreAdjustmentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AdminScoreAdjustmentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminScoreAdjustmentPayload>[]
+        }
+        upsert: {
+          args: Prisma.AdminScoreAdjustmentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminScoreAdjustmentPayload>
+        }
+        aggregate: {
+          args: Prisma.AdminScoreAdjustmentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAdminScoreAdjustment>
+        }
+        groupBy: {
+          args: Prisma.AdminScoreAdjustmentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AdminScoreAdjustmentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AdminScoreAdjustmentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AdminScoreAdjustmentCountAggregateOutputType> | number
+        }
+      }
+    }
+    MonthlyDeduction: {
+      payload: Prisma.$MonthlyDeductionPayload<ExtArgs>
+      fields: Prisma.MonthlyDeductionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MonthlyDeductionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyDeductionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MonthlyDeductionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyDeductionPayload>
+        }
+        findFirst: {
+          args: Prisma.MonthlyDeductionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyDeductionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MonthlyDeductionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyDeductionPayload>
+        }
+        findMany: {
+          args: Prisma.MonthlyDeductionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyDeductionPayload>[]
+        }
+        create: {
+          args: Prisma.MonthlyDeductionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyDeductionPayload>
+        }
+        createMany: {
+          args: Prisma.MonthlyDeductionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MonthlyDeductionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyDeductionPayload>[]
+        }
+        delete: {
+          args: Prisma.MonthlyDeductionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyDeductionPayload>
+        }
+        update: {
+          args: Prisma.MonthlyDeductionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyDeductionPayload>
+        }
+        deleteMany: {
+          args: Prisma.MonthlyDeductionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MonthlyDeductionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MonthlyDeductionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyDeductionPayload>[]
+        }
+        upsert: {
+          args: Prisma.MonthlyDeductionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyDeductionPayload>
+        }
+        aggregate: {
+          args: Prisma.MonthlyDeductionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMonthlyDeduction>
+        }
+        groupBy: {
+          args: Prisma.MonthlyDeductionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MonthlyDeductionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MonthlyDeductionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MonthlyDeductionCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1140,6 +1440,60 @@ export const SchedulePublishScalarFieldEnum = {
 export type SchedulePublishScalarFieldEnum = (typeof SchedulePublishScalarFieldEnum)[keyof typeof SchedulePublishScalarFieldEnum]
 
 
+export const WorkLogScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  date: 'date',
+  workType: 'workType',
+  description: 'description',
+  points: 'points',
+  createdAt: 'createdAt'
+} as const
+
+export type WorkLogScalarFieldEnum = (typeof WorkLogScalarFieldEnum)[keyof typeof WorkLogScalarFieldEnum]
+
+
+export const MonthlyScoreScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  year: 'year',
+  month: 'month',
+  witnessCount: 'witnessCount',
+  successCount: 'successCount',
+  confirmedMinutes: 'confirmedMinutes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MonthlyScoreScalarFieldEnum = (typeof MonthlyScoreScalarFieldEnum)[keyof typeof MonthlyScoreScalarFieldEnum]
+
+
+export const AdminScoreAdjustmentScalarFieldEnum = {
+  id: 'id',
+  monthlyScoreId: 'monthlyScoreId',
+  description: 'description',
+  points: 'points',
+  adminId: 'adminId',
+  adminName: 'adminName',
+  createdAt: 'createdAt'
+} as const
+
+export type AdminScoreAdjustmentScalarFieldEnum = (typeof AdminScoreAdjustmentScalarFieldEnum)[keyof typeof AdminScoreAdjustmentScalarFieldEnum]
+
+
+export const MonthlyDeductionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  year: 'year',
+  month: 'month',
+  type: 'type',
+  count: 'count',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MonthlyDeductionScalarFieldEnum = (typeof MonthlyDeductionScalarFieldEnum)[keyof typeof MonthlyDeductionScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1258,6 +1612,34 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'WorkType'
+ */
+export type EnumWorkTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'WorkType'>
+    
+
+
+/**
+ * Reference to a field of type 'WorkType[]'
+ */
+export type ListEnumWorkTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'WorkType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'DeductionType'
+ */
+export type EnumDeductionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DeductionType'>
+    
+
+
+/**
+ * Reference to a field of type 'DeductionType[]'
+ */
+export type ListEnumDeductionTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DeductionType[]'>
     
 
 
@@ -1392,6 +1774,10 @@ export type GlobalOmitConfig = {
   attendanceLog?: Prisma.AttendanceLogOmit
   preferenceSubmission?: Prisma.PreferenceSubmissionOmit
   schedulePublish?: Prisma.SchedulePublishOmit
+  workLog?: Prisma.WorkLogOmit
+  monthlyScore?: Prisma.MonthlyScoreOmit
+  adminScoreAdjustment?: Prisma.AdminScoreAdjustmentOmit
+  monthlyDeduction?: Prisma.MonthlyDeductionOmit
 }
 
 /* Types for Logging */

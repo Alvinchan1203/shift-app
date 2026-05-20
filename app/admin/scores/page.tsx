@@ -10,6 +10,7 @@ import {
   calcActualWorkScore,
   calcAdminScore,
   calcSalaryMultiplier,
+  calcTotalDeductions,
 } from '@/lib/scoring'
 
 export default async function AdminScoresPage({
@@ -32,7 +33,7 @@ export default async function AdminScoresPage({
     lt: new Date(Date.UTC(year, month, 1)),
   }
 
-  const [employees, monthlyScores, attendanceRecords, workLogs] = await Promise.all([
+  const [employees, monthlyScores, attendanceRecords, workLogs, deductionRecords] = await Promise.all([
     prisma.user.findMany({
       where: { role: 'EMPLOYEE' },
       select: { id: true, name: true },
@@ -50,9 +51,20 @@ export default async function AdminScoresPage({
       where: { date: dateFilter },
       select: { userId: true, points: true },
     }),
+    prisma.monthlyDeduction.findMany({
+      where: { year, month },
+      select: { userId: true, type: true, count: true },
+    }),
   ])
 
   const scoreMap = new Map(monthlyScores.map(s => [s.userId, s]))
+
+  const deductionsMap = new Map<string, { type: string; count: number }[]>()
+  for (const d of deductionRecords) {
+    const existing = deductionsMap.get(d.userId) ?? []
+    existing.push({ type: d.type, count: d.count })
+    deductionsMap.set(d.userId, existing)
+  }
 
   const attendanceMinutesMap = new Map<string, number>()
   for (const r of attendanceRecords) {
@@ -82,7 +94,9 @@ export default async function AdminScoresPage({
     const item2 = calcAccountOpeningScore(score?.witnessCount ?? 0, score?.successCount ?? 0)
     const item3 = calcActualWorkScore(totalWorkPoints, effectiveMinutes)
     const item4 = calcAdminScore(adjustments)
-    const total = item1 + item2 + item3 + item4
+    const deductions = deductionsMap.get(emp.id) ?? []
+    const totalDeductions = calcTotalDeductions(deductions)
+    const total = Math.max(0, item1 + item2 + item3 + item4 - totalDeductions)
     const multiplier = calcSalaryMultiplier(total)
 
     return {
@@ -99,6 +113,8 @@ export default async function AdminScoresPage({
       item2,
       item3,
       item4,
+      deductions,
+      totalDeductions,
       total,
       multiplier,
     }

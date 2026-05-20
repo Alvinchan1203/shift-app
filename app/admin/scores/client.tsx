@@ -6,6 +6,8 @@ import {
   calcAccountOpeningScore,
   calcAdminScore,
   calcSalaryMultiplier,
+  calcTotalDeductions,
+  DEDUCTION_ITEMS,
 } from '@/lib/scoring'
 
 type Adjustment = {
@@ -14,6 +16,11 @@ type Adjustment = {
   points: number
   adminName: string
   createdAt: string
+}
+
+type Deduction = {
+  type: string
+  count: number
 }
 
 type EmployeeScore = {
@@ -30,6 +37,8 @@ type EmployeeScore = {
   item2: number
   item3: number
   item4: number
+  deductions: Deduction[]
+  totalDeductions: number
   total: number
   multiplier: number
 }
@@ -70,6 +79,11 @@ export default function AdminScoresClient({
   const [adjSubmitting, setAdjSubmitting] = useState(false)
   const [adjError, setAdjError] = useState<string | null>(null)
 
+  // Deductions modal
+  const [dedModal, setDedModal] = useState<{ employeeId: string; employeeName: string } | null>(null)
+  const [dedCounts, setDedCounts] = useState<Record<string, string>>({})
+  const [dedSaving, setDedSaving] = useState(false)
+
   function updateEmployee(employeeId: string, updater: (e: EmployeeScore) => EmployeeScore) {
     setData(prev => prev.map(e => e.employeeId === employeeId ? updater(e) : e))
   }
@@ -93,7 +107,7 @@ export default function AdminScoresClient({
     if (res.ok) {
       const newItem2 = calcAccountOpeningScore(witnessCount, successCount)
       updateEmployee(witnessModal.employeeId, e => {
-        const newTotal = e.item1 + newItem2 + e.item3 + e.item4
+        const newTotal = Math.max(0, e.item1 + newItem2 + e.item3 + e.item4 - e.totalDeductions)
         return { ...e, witnessCount, successCount, item2: newItem2, total: newTotal, multiplier: calcSalaryMultiplier(newTotal) }
       })
       setWitnessModal(null)
@@ -125,7 +139,7 @@ export default function AdminScoresClient({
     updateEmployee(adjModal.employeeId, e => {
       const newAdjs = [...e.adjustments, newAdj]
       const newItem4 = calcAdminScore(newAdjs)
-      const newTotal = e.item1 + e.item2 + e.item3 + newItem4
+      const newTotal = Math.max(0, e.item1 + e.item2 + e.item3 + newItem4 - e.totalDeductions)
       return { ...e, adjustments: newAdjs, item4: newItem4, total: newTotal, multiplier: calcSalaryMultiplier(newTotal) }
     })
     setAdjDesc('')
@@ -138,9 +152,42 @@ export default function AdminScoresClient({
       updateEmployee(employeeId, e => {
         const newAdjs = e.adjustments.filter(a => a.id !== adjId)
         const newItem4 = calcAdminScore(newAdjs)
-        const newTotal = e.item1 + e.item2 + e.item3 + newItem4
+        const newTotal = Math.max(0, e.item1 + e.item2 + e.item3 + newItem4 - e.totalDeductions)
         return { ...e, adjustments: newAdjs, item4: newItem4, total: newTotal, multiplier: calcSalaryMultiplier(newTotal) }
       })
+    }
+  }
+
+  function openDedModal(emp: EmployeeScore) {
+    setDedModal({ employeeId: emp.employeeId, employeeName: emp.employeeName })
+    const counts: Record<string, string> = {}
+    for (const item of DEDUCTION_ITEMS) {
+      const found = emp.deductions.find(d => d.type === item.type)
+      counts[item.type] = String(found?.count ?? 0)
+    }
+    setDedCounts(counts)
+  }
+
+  async function saveDedData() {
+    if (!dedModal) return
+    setDedSaving(true)
+    const deductions = DEDUCTION_ITEMS.map(item => ({
+      type: item.type,
+      count: parseInt(dedCounts[item.type]) || 0,
+    }))
+    const res = await fetch(`/api/admin/scores/${dedModal.employeeId}/deductions`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ year, month, deductions }),
+    })
+    setDedSaving(false)
+    if (res.ok) {
+      const newTotalDeductions = calcTotalDeductions(deductions)
+      updateEmployee(dedModal.employeeId, e => {
+        const newTotal = Math.max(0, e.item1 + e.item2 + e.item3 + e.item4 - newTotalDeductions)
+        return { ...e, deductions, totalDeductions: newTotalDeductions, total: newTotal, multiplier: calcSalaryMultiplier(newTotal) }
+      })
+      setDedModal(null)
     }
   }
 
@@ -163,6 +210,7 @@ export default function AdminScoresClient({
                 <th className="text-center px-3 py-2 font-medium text-gray-600">② 開戶見證<span className="text-gray-400 font-normal"> /10</span></th>
                 <th className="text-center px-3 py-2 font-medium text-gray-600">③ 實際工作<span className="text-gray-400 font-normal"> /30</span></th>
                 <th className="text-center px-3 py-2 font-medium text-gray-600">④ 管理員評分<span className="text-gray-400 font-normal"> /30</span></th>
+                <th className="text-center px-3 py-2 font-medium text-gray-600">⑤ 扣分</th>
                 <th className="text-center px-3 py-2 font-medium text-gray-600">總分</th>
                 <th className="text-center px-3 py-2 font-medium text-gray-600">薪資倍數</th>
               </tr>
@@ -204,6 +252,14 @@ export default function AdminScoresClient({
                       {emp.adjustments.length > 0 ? `${emp.adjustments.length}項調整` : '起始25分'}
                     </span>
                     <button onClick={() => openAdjModal(emp)} className="ml-2 text-xs text-blue-500 hover:text-blue-700">編輯</button>
+                  </td>
+
+                  {/* Item 5: Deductions */}
+                  <td className="px-3 py-2 text-center whitespace-nowrap">
+                    <span className={`font-semibold ${emp.totalDeductions > 0 ? 'text-red-500' : 'text-gray-400'}`}>
+                      {emp.totalDeductions > 0 ? `-${emp.totalDeductions}` : '0'}
+                    </span>
+                    <button onClick={() => openDedModal(emp)} className="ml-2 text-xs text-blue-500 hover:text-blue-700">編輯</button>
                   </td>
 
                   {/* Total */}
@@ -326,6 +382,53 @@ export default function AdminScoresClient({
                 </button>
               </div>
               {adjError && <p className="text-sm text-red-500">{adjError}</p>}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Deductions Modal */}
+      {dedModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="font-semibold text-gray-800">⑤ 扣分項目</h3>
+                <p className="text-sm text-gray-500">{dedModal.employeeName}</p>
+              </div>
+              <button onClick={() => setDedModal(null)} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
+            </div>
+            <div className="space-y-3">
+              {DEDUCTION_ITEMS.map(item => (
+                <div key={item.type} className="flex items-center justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-gray-700">{item.label}</p>
+                    <p className="text-xs text-gray-400">{item.points}分/次</p>
+                  </div>
+                  <input
+                    type="number"
+                    min={0}
+                    value={dedCounts[item.type] ?? '0'}
+                    onChange={e => setDedCounts(p => ({ ...p, [item.type]: e.target.value }))}
+                    className="w-16 border rounded-lg px-2 py-1.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-red-400"
+                  />
+                  <span className="text-xs text-red-400 w-10 text-right shrink-0">
+                    -{(parseInt(dedCounts[item.type]) || 0) * item.points}分
+                  </span>
+                </div>
+              ))}
+              <div className="border-t pt-3 flex justify-between items-center">
+                <span className="text-sm text-gray-600">合計扣分</span>
+                <span className="font-semibold text-red-500">
+                  -{DEDUCTION_ITEMS.reduce((sum, item) => sum + (parseInt(dedCounts[item.type]) || 0) * item.points, 0)}分
+                </span>
+              </div>
+            </div>
+            <div className="flex gap-2 mt-5">
+              <button onClick={() => setDedModal(null)} className="flex-1 border border-gray-300 text-gray-600 rounded-lg py-2 text-sm hover:bg-gray-50">取消</button>
+              <button onClick={saveDedData} disabled={dedSaving} className="flex-1 bg-red-500 text-white rounded-lg py-2 text-sm font-medium hover:bg-red-600 disabled:opacity-60">
+                {dedSaving ? '儲存中...' : '儲存'}
+              </button>
             </div>
           </div>
         </div>
