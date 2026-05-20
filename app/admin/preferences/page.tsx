@@ -74,7 +74,7 @@ export default async function AdminPreferencesPage({
               </span>
             )}
           </div>
-          <MonthPicker year={year} month={month} getHref={(y, m) => `/admin/preferences?year=${y}&month=${m}`} />
+          <MonthPicker year={year} month={month} basePath="/admin/preferences" />
         </div>
 
         {allEmployees.length === 0 ? (

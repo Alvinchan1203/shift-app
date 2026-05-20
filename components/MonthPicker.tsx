@@ -7,12 +7,12 @@ interface Props {
   year: number
   month: number // 1-indexed
   onChange?: (year: number, month: number) => void
-  getHref?: (year: number, month: number) => string
+  basePath?: string // for URL-based navigation; builds ?year=Y&month=M
 }
 
 const MONTH_LABELS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
 
-export default function MonthPicker({ year, month, onChange, getHref }: Props) {
+export default function MonthPicker({ year, month, onChange, basePath }: Props) {
   const [open, setOpen] = useState(false)
   const [pickerYear, setPickerYear] = useState(year)
   const ref = useRef<HTMLDivElement>(null)
@@ -36,7 +36,7 @@ export default function MonthPicker({ year, month, onChange, getHref }: Props) {
   function navigate(y: number, m: number) {
     setOpen(false)
     if (onChange) onChange(y, m)
-    else if (getHref) router.push(getHref(y, m))
+    else if (basePath) router.push(`${basePath}?year=${y}&month=${m}`)
   }
 
   function prev() {

@@ -72,7 +72,7 @@ export default function AdminWorkLogsClient({
     <main className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-gray-800">員工工作記錄</h2>
-        <MonthPicker year={year} month={month} getHref={(y, m) => `/admin/worklogs?year=${y}&month=${m}`} />
+        <MonthPicker year={year} month={month} basePath="/admin/worklogs" />
       </div>
 
       {/* Employee filter + summary */}
