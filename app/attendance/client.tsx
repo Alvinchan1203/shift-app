@@ -287,11 +287,11 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
     const assignment = getAssignment(userId, dateStr)
     const prefill = dayRecords.length === 0 && assignment ? assignment.shift as AttendanceTypeKey : null
 
-    if (restDay) return <td className="border border-gray-200 bg-gray-50/60 w-9" />
+    if (restDay) return <td className="border border-gray-400 bg-gray-50/60 w-9" />
 
     if (!isAdmin) {
       return (
-        <td className="border border-gray-200 w-9 p-0">
+        <td className="border border-gray-400 w-9 p-0">
           {dayRecords.length > 0 ? (
             <div className="flex flex-col">
               {dayRecords.map(r => (
@@ -310,11 +310,11 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
     }
 
     return (
-      <td className="border border-gray-200 w-9 p-0">
+      <td className="border border-gray-400 w-9 p-0">
         <button
           onClick={() => openModal(userId, userName, dateStr)}
           className={`flex flex-col items-center justify-center text-xs font-medium w-full h-full min-h-[26px] transition
-            ${dayRecords.length === 0 && !prefill ? 'hover:bg-blue-50 text-gray-200 hover:text-blue-400' : ''}`}
+            ${dayRecords.length === 0 && !prefill ? 'hover:bg-blue-50 text-gray-500 hover:text-blue-500' : ''}`}
         >
           {dayRecords.length > 0 ? (
             dayRecords.map(r => (
