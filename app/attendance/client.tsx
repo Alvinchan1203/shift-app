@@ -287,7 +287,7 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
     const assignment = getAssignment(userId, dateStr)
     const prefill = dayRecords.length === 0 && assignment ? assignment.shift as AttendanceTypeKey : null
 
-    if (restDay) return <td className="border border-gray-100 bg-pink-50 w-9" />
+    if (restDay) return <td className="border border-gray-100 bg-gray-50/60 w-9" />
 
     if (!isAdmin) {
       return (
@@ -353,7 +353,7 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
               {monthDays.map(day => {
                 const { rest } = isRestDay(day)
                 return (
-                  <th key={toDateStr(day)} className={`text-center px-0 py-2 font-medium w-9 text-xs ${rest ? 'text-pink-400 bg-pink-50' : 'text-gray-500'}`}>
+                  <th key={toDateStr(day)} className={`text-center px-0 py-2 font-medium w-9 text-xs ${rest ? 'text-pink-300' : 'text-gray-500'}`}>
                     <div>{day.getDate()}</div>
                     <div className="text-gray-300 font-normal">{'日一二三四五六'[day.getDay()]}</div>
                   </th>
@@ -373,7 +373,7 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
                       {isAdmin ? (
                         <button
                           onClick={() => openHoursModal(user.id, user.name)}
-                          className={`text-xs transition ${confirmedMins[user.id] != null ? 'text-green-600 font-medium' : 'text-gray-300 hover:text-blue-400'}`}
+                          className={`text-xs transition ${confirmedMins[user.id] != null ? 'text-green-600 font-medium' : 'text-gray-400 hover:text-blue-500'}`}
                         >
                           {confirmedMins[user.id] != null ? `· ✓ ${formatDuration(confirmedMins[user.id]!)}` : '· 設工時'}
                         </button>
