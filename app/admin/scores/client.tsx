@@ -10,6 +10,15 @@ import {
   DEDUCTION_ITEMS,
 } from '@/lib/scoring'
 
+const DED_SHORT: Record<string, string> = {
+  LATE: '遲到',
+  ABSENCE: '缺勤',
+  SCHEDULE_CHANGE: '改更',
+  COMMON_AREA_EATING: '飲食',
+  PUNCH_INACCURACY: '打卡',
+  COMPLAINT: '投訴',
+}
+
 type Adjustment = {
   id: string
   description: string
@@ -194,7 +203,7 @@ export default function AdminScoresClient({
   const adjModalEmployee = adjModal ? data.find(e => e.employeeId === adjModal.employeeId) : null
 
   return (
-    <main className="max-w-6xl mx-auto px-4 py-6 sm:py-8">
+    <main className="max-w-7xl mx-auto px-4 py-6 sm:py-8">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-gray-800">員工評分</h2>
         <MonthPicker year={year} month={month} basePath="/admin/scores" />
@@ -255,11 +264,26 @@ export default function AdminScoresClient({
                   </td>
 
                   {/* Item 5: Deductions */}
-                  <td className="px-3 py-2 text-center whitespace-nowrap">
-                    <span className={`font-semibold ${emp.totalDeductions > 0 ? 'text-red-500' : 'text-gray-400'}`}>
-                      {emp.totalDeductions > 0 ? `-${emp.totalDeductions}` : '0'}
-                    </span>
-                    <button onClick={() => openDedModal(emp)} className="ml-2 text-xs text-blue-500 hover:text-blue-700">編輯</button>
+                  <td className="px-3 py-2">
+                    <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-xs">
+                      {DEDUCTION_ITEMS.map(item => {
+                        const count = emp.deductions.find(d => d.type === item.type)?.count ?? 0
+                        return (
+                          <div key={item.type} className="flex items-center justify-between gap-1">
+                            <span className="text-gray-500">{DED_SHORT[item.type]}</span>
+                            <span className={count > 0 ? 'font-semibold text-red-500' : 'text-gray-300'}>
+                              {count > 0 ? `×${count}` : '—'}
+                            </span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                    <div className="flex items-center justify-between mt-1.5">
+                      <span className={`text-xs font-semibold ${emp.totalDeductions > 0 ? 'text-red-500' : 'text-gray-300'}`}>
+                        {emp.totalDeductions > 0 ? `-${emp.totalDeductions}分` : '—'}
+                      </span>
+                      <button onClick={() => openDedModal(emp)} className="text-xs text-blue-500 hover:text-blue-700">編輯</button>
+                    </div>
                   </td>
 
                   {/* Total */}
