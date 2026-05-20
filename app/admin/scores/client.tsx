@@ -264,12 +264,12 @@ export default function AdminScoresClient({
                   </td>
 
                   {/* Item 5: Deductions */}
-                  <td className="px-3 py-2">
-                    <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-xs">
+                  <td className="px-3 py-1.5">
+                    <div className="grid grid-cols-3 gap-x-2 gap-y-0 text-xs">
                       {DEDUCTION_ITEMS.map(item => {
                         const count = emp.deductions.find(d => d.type === item.type)?.count ?? 0
                         return (
-                          <div key={item.type} className="flex items-center justify-between gap-1">
+                          <div key={item.type} className="flex items-center gap-0.5">
                             <span className="text-gray-500">{DED_SHORT[item.type]}</span>
                             <span className={count > 0 ? 'font-semibold text-red-500' : 'text-gray-300'}>
                               {count > 0 ? `×${count}` : '—'}
@@ -278,11 +278,11 @@ export default function AdminScoresClient({
                         )
                       })}
                     </div>
-                    <div className="flex items-center justify-between mt-1.5">
-                      <span className={`text-xs font-semibold ${emp.totalDeductions > 0 ? 'text-red-500' : 'text-gray-300'}`}>
+                    <div className="flex items-center justify-between text-xs mt-0.5">
+                      <span className={emp.totalDeductions > 0 ? 'font-semibold text-red-500' : 'text-gray-300'}>
                         {emp.totalDeductions > 0 ? `-${emp.totalDeductions}分` : '—'}
                       </span>
-                      <button onClick={() => openDedModal(emp)} className="text-xs text-blue-500 hover:text-blue-700">編輯</button>
+                      <button onClick={() => openDedModal(emp)} className="text-blue-500 hover:text-blue-700">編輯</button>
                     </div>
                   </td>
 
