@@ -1,8 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import MonthPicker from '@/components/MonthPicker'
 import {
   calcAccountOpeningScore,
   calcAdminScore,
@@ -37,10 +36,6 @@ type EmployeeScore = {
 interface Props {
   year: number
   month: number
-  prevYear: number
-  prevMonth: number
-  nextYear: number
-  nextMonth: number
   employeeData: EmployeeScore[]
 }
 
@@ -58,9 +53,8 @@ function MultiplierBadge({ multiplier }: { multiplier: number }) {
 }
 
 export default function AdminScoresClient({
-  year, month, prevYear, prevMonth, nextYear, nextMonth, employeeData,
+  year, month, employeeData,
 }: Props) {
-  const router = useRouter()
   const [data, setData] = useState<EmployeeScore[]>(employeeData)
 
   // Witness modal
@@ -74,8 +68,6 @@ export default function AdminScoresClient({
   const [adjPoints, setAdjPoints] = useState('')
   const [adjSubmitting, setAdjSubmitting] = useState(false)
   const [adjError, setAdjError] = useState<string | null>(null)
-
-  const monthLabel = new Date(year, month - 1).toLocaleDateString('zh-HK', { year: 'numeric', month: 'long' })
 
   function updateEmployee(employeeId: string, updater: (e: EmployeeScore) => EmployeeScore) {
     setData(prev => prev.map(e => e.employeeId === employeeId ? updater(e) : e))
@@ -157,11 +149,7 @@ export default function AdminScoresClient({
     <main className="max-w-6xl mx-auto px-4 py-6 sm:py-8">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-gray-800">員工評分</h2>
-        <div className="flex items-center gap-2">
-          <Link href={`/admin/scores?year=${prevYear}&month=${prevMonth}`} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600">‹</Link>
-          <span className="text-sm font-medium text-gray-700 min-w-[100px] text-center">{monthLabel}</span>
-          <Link href={`/admin/scores?year=${nextYear}&month=${nextMonth}`} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600">›</Link>
-        </div>
+        <MonthPicker year={year} month={month} getHref={(y, m) => `/admin/scores?year=${y}&month=${m}`} />
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">

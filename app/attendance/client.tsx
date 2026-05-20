@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { ATTENDANCE_TYPES, AttendanceTypeKey, SHIFT_DURATIONS, formatDuration } from '@/lib/constants'
+import MonthPicker from '@/components/MonthPicker'
 
 type User = { id: string; name: string }
 type AttendanceRecord = {
@@ -235,16 +236,6 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
     }
   }
 
-  function prevMonth() {
-    if (month === 0) { setMonth(11); setYear(y => y - 1) }
-    else setMonth(m => m - 1)
-  }
-  function nextMonth() {
-    if (month === 11) { setMonth(0); setYear(y => y + 1) }
-    else setMonth(m => m + 1)
-  }
-
-  const monthLabel = new Date(year, month).toLocaleDateString('zh-HK', { year: 'numeric', month: 'long' })
 
   const monthDays = days
 
@@ -319,10 +310,8 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
       <Legend />
 
       {/* 月份導航 */}
-      <div className="flex items-center justify-between mb-4">
-        <button onClick={prevMonth} className="px-3 py-1.5 rounded-lg border hover:bg-gray-100">‹</button>
-        <span className="font-semibold text-gray-800">{monthLabel}</span>
-        <button onClick={nextMonth} className="px-3 py-1.5 rounded-lg border hover:bg-gray-100">›</button>
+      <div className="flex justify-center mb-4">
+        <MonthPicker year={year} month={month + 1} onChange={(y, m) => { setYear(y); setMonth(m - 1) }} />
       </div>
 
       {/* ── Roster 表格（橫向捲動）── */}

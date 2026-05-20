@@ -46,22 +46,10 @@ export default async function AdminWorkLogsPage({
     createdAt: l.createdAt.toISOString(),
   }))
 
-  const prevDate = new Date(year, month - 2, 1)
-  const nextDate = new Date(year, month, 1)
-
   return (
     <div>
       <Navbar userName={session.user.name!} role={session.user.role} />
-      <AdminWorkLogsClient
-        year={year}
-        month={month}
-        prevYear={prevDate.getFullYear()}
-        prevMonth={prevDate.getMonth() + 1}
-        nextYear={nextDate.getFullYear()}
-        nextMonth={nextDate.getMonth() + 1}
-        employees={employees}
-        initialLogs={serialized}
-      />
+      <AdminWorkLogsClient year={year} month={month} employees={employees} initialLogs={serialized} />
     </div>
   )
 }

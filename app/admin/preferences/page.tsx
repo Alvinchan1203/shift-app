@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
 import Navbar from '@/components/Navbar'
 import ShiftBadge from '@/components/ShiftBadge'
 import { ShiftKey } from '@/lib/constants'
-import Link from 'next/link'
+import MonthPicker from '@/components/MonthPicker'
 
 export default async function AdminPreferencesPage({
   searchParams,
@@ -20,13 +20,6 @@ export default async function AdminPreferencesPage({
 
   const year = params.year ? parseInt(params.year) : defaultDate.getFullYear()
   const month = params.month ? parseInt(params.month) : defaultDate.getMonth() + 1 // 1-indexed
-
-  const prevDate = new Date(year, month - 2, 1)
-  const nextDate = new Date(year, month, 1)
-  const prevYear = prevDate.getFullYear()
-  const prevMonth = prevDate.getMonth() + 1
-  const nextYear = nextDate.getFullYear()
-  const nextMonth = nextDate.getMonth() + 1
 
   const [allEmployees, prefs, submissions] = await Promise.all([
     prisma.user.findMany({
@@ -66,7 +59,6 @@ export default async function AdminPreferencesPage({
     return a.name.localeCompare(b.name)
   })
 
-  const monthLabel = new Date(year, month - 1).toLocaleDateString('zh-HK', { year: 'numeric', month: 'long' })
   const submittedCount = allEmployees.filter(e => submissionByUser[e.id]?.confirmedAt != null).length
 
   return (
@@ -82,23 +74,7 @@ export default async function AdminPreferencesPage({
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2">
-            <Link
-              href={`/admin/preferences?year=${prevYear}&month=${prevMonth}`}
-              className="px-3 py-1.5 rounded-lg border hover:bg-gray-100 text-gray-600 text-sm"
-            >
-              ‹
-            </Link>
-            <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1.5 rounded-lg min-w-[80px] text-center">
-              {monthLabel}
-            </span>
-            <Link
-              href={`/admin/preferences?year=${nextYear}&month=${nextMonth}`}
-              className="px-3 py-1.5 rounded-lg border hover:bg-gray-100 text-gray-600 text-sm"
-            >
-              ›
-            </Link>
-          </div>
+          <MonthPicker year={year} month={month} getHref={(y, m) => `/admin/preferences?year=${y}&month=${m}`} />
         </div>
 
         {allEmployees.length === 0 ? (

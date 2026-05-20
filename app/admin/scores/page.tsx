@@ -101,21 +101,10 @@ export default async function AdminScoresPage({
     }
   })
 
-  const prevDate = new Date(year, month - 2, 1)
-  const nextDate = new Date(year, month, 1)
-
   return (
     <div>
       <Navbar userName={session.user.name!} role={session.user.role} />
-      <AdminScoresClient
-        year={year}
-        month={month}
-        prevYear={prevDate.getFullYear()}
-        prevMonth={prevDate.getMonth() + 1}
-        nextYear={nextDate.getFullYear()}
-        nextMonth={nextDate.getMonth() + 1}
-        employeeData={employeeData}
-      />
+      <AdminScoresClient year={year} month={month} employeeData={employeeData} />
     </div>
   )
 }

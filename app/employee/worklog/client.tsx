@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { WORK_TYPE_LABELS, WORK_TYPE_POINTS } from '@/lib/scoring'
+import MonthPicker from '@/components/MonthPicker'
 
 type WorkLog = {
   id: string
@@ -58,15 +59,6 @@ export default function WorkLogClient({ initialYear, initialMonth, initialLogs }
       .catch(() => setLoadingMonth(false))
   }, [year, month])
 
-  function prevMonth() {
-    if (month === 1) { setYear(y => y - 1); setMonth(12) }
-    else setMonth(m => m - 1)
-  }
-  function nextMonth() {
-    if (month === 12) { setYear(y => y + 1); setMonth(1) }
-    else setMonth(m => m + 1)
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
@@ -114,17 +106,11 @@ export default function WorkLogClient({ initialYear, initialMonth, initialLogs }
   const sortedDates = [...grouped.keys()].sort()
   const totalPoints = logs.reduce((sum, l) => sum + l.points, 0)
 
-  const monthLabel = new Date(year, month - 1).toLocaleDateString('zh-HK', { year: 'numeric', month: 'long' })
-
   return (
     <main className="max-w-2xl mx-auto px-4 py-6 sm:py-8">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-gray-800">工作記錄</h2>
-        <div className="flex items-center gap-2">
-          <button onClick={prevMonth} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600">‹</button>
-          <span className="text-sm font-medium text-gray-700 min-w-[90px] text-center">{monthLabel}</span>
-          <button onClick={nextMonth} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600">›</button>
-        </div>
+        <MonthPicker year={year} month={month} onChange={(y, m) => { setYear(y); setMonth(m) }} />
       </div>
 
       {/* Submit form */}

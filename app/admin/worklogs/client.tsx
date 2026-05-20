@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
+import MonthPicker from '@/components/MonthPicker'
 import { WORK_TYPE_LABELS, WORK_TYPE_POINTS } from '@/lib/scoring'
 
 type WorkLog = {
@@ -29,10 +29,6 @@ type Employee = { id: string; name: string }
 interface Props {
   year: number
   month: number
-  prevYear: number
-  prevMonth: number
-  nextYear: number
-  nextMonth: number
   employees: Employee[]
   initialLogs: WorkLog[]
 }
@@ -46,11 +42,9 @@ const TYPE_COLORS: Record<string, string> = {
 }
 
 export default function AdminWorkLogsClient({
-  year, month, prevYear, prevMonth, nextYear, nextMonth, employees, initialLogs,
+  year, month, employees, initialLogs,
 }: Props) {
   const [selectedEmployee, setSelectedEmployee] = useState<string>('all')
-
-  const monthLabel = new Date(year, month - 1).toLocaleDateString('zh-HK', { year: 'numeric', month: 'long' })
 
   const filtered = selectedEmployee === 'all'
     ? initialLogs
@@ -78,11 +72,7 @@ export default function AdminWorkLogsClient({
     <main className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-gray-800">員工工作記錄</h2>
-        <div className="flex items-center gap-2">
-          <Link href={`/admin/worklogs?year=${prevYear}&month=${prevMonth}`} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600">‹</Link>
-          <span className="text-sm font-medium text-gray-700 min-w-[100px] text-center">{monthLabel}</span>
-          <Link href={`/admin/worklogs?year=${nextYear}&month=${nextMonth}`} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600">›</Link>
-        </div>
+        <MonthPicker year={year} month={month} getHref={(y, m) => `/admin/worklogs?year=${y}&month=${m}`} />
       </div>
 
       {/* Employee filter + summary */}
