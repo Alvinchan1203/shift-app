@@ -76,9 +76,11 @@ export default async function AdminScoresPage({
       createdAt: a.createdAt.toISOString(),
     }))
 
-    const item1 = calcWorkHoursScore(totalAttendanceMinutes)
+    const confirmedMinutes = score?.confirmedMinutes ?? null
+    const effectiveMinutes = confirmedMinutes ?? totalAttendanceMinutes
+    const item1 = calcWorkHoursScore(effectiveMinutes)
     const item2 = calcAccountOpeningScore(score?.witnessCount ?? 0, score?.successCount ?? 0)
-    const item3 = calcActualWorkScore(totalWorkPoints, totalAttendanceMinutes)
+    const item3 = calcActualWorkScore(totalWorkPoints, effectiveMinutes)
     const item4 = calcAdminScore(adjustments)
     const total = item1 + item2 + item3 + item4
     const multiplier = calcSalaryMultiplier(total)
@@ -91,6 +93,7 @@ export default async function AdminScoresPage({
       successCount: score?.successCount ?? 0,
       adjustments,
       totalAttendanceMinutes,
+      confirmedMinutes,
       totalWorkPoints,
       item1,
       item2,

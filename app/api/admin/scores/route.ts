@@ -68,13 +68,15 @@ export async function GET(req: NextRequest) {
     const score = scoreMap.get(emp.id)
     const totalAttendanceMinutes = attendanceMinutes.get(emp.id) ?? 0
     const totalWorkPoints = workPoints.get(emp.id) ?? 0
+    const confirmedMinutes = score?.confirmedMinutes ?? null
+    const effectiveMinutes = confirmedMinutes ?? totalAttendanceMinutes
 
-    const item1 = calcWorkHoursScore(totalAttendanceMinutes)
+    const item1 = calcWorkHoursScore(effectiveMinutes)
     const item2 = calcAccountOpeningScore(
       score?.witnessCount ?? 0,
       score?.successCount ?? 0
     )
-    const item3 = calcActualWorkScore(totalWorkPoints, totalAttendanceMinutes)
+    const item3 = calcActualWorkScore(totalWorkPoints, effectiveMinutes)
     const item4 = calcAdminScore(score?.adjustments ?? [])
     const total = item1 + item2 + item3 + item4
     const multiplier = calcSalaryMultiplier(total)
@@ -87,6 +89,7 @@ export async function GET(req: NextRequest) {
       successCount: score?.successCount ?? 0,
       adjustments: score?.adjustments ?? [],
       totalAttendanceMinutes,
+      confirmedMinutes,
       totalWorkPoints,
       item1,
       item2,

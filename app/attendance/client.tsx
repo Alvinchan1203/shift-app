@@ -25,6 +25,7 @@ type InitialData = {
   records: { id: string; userId: string; date: string; type: string; note: string | null; durationMinutes: number | null }[]
   assignments: { userId: string; date: string; shift: string }[]
   holidays: { id: string; date: string; name: string }[]
+  confirmedMinutesMap: Record<string, number | null>
   logs: { id: string; userId: string; userName: string; date: string; type: string; action: string; adminId: string; adminName: string; createdAt: string }[]
 }
 
@@ -65,6 +66,10 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
   const [saveError, setSaveError] = useState<string | null>(null)
   const [logs, setLogs] = useState<AttendanceLog[]>(initialData.logs as AttendanceLog[])
   const [showLog, setShowLog] = useState(false)
+  const [confirmedMins, setConfirmedMins] = useState<Record<string, number | null>>(initialData.confirmedMinutesMap ?? {})
+  const [hoursModal, setHoursModal] = useState<{ userId: string; userName: string } | null>(null)
+  const [hoursInput, setHoursInput] = useState('')
+  const [hoursSaving, setHoursSaving] = useState(false)
 
   useEffect(() => {
     if (isInitialMount.current) { isInitialMount.current = false; return }
@@ -73,9 +78,11 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
     Promise.all([
       fetch(`/api/attendance?year=${year}&month=${m1}`).then(r => r.json()),
       fetch(`/api/assignments?year=${year}&month=${m1}`).then(r => r.json()),
-    ]).then(([att, asgn]) => {
+      fetch(`/api/attendance/confirm-hours?year=${year}&month=${m1}`).then(r => r.json()),
+    ]).then(([att, asgn, confirmMap]) => {
       setRecords(att.map((r: AttendanceRecord) => ({ ...r, date: r.date.slice(0, 10) })))
       setAssignments(asgn.map((a: Assignment) => ({ ...a, date: a.date.slice(0, 10) })))
+      setConfirmedMins(confirmMap)
       setLoadingMonth(false)
     })
   }, [year, month])
@@ -237,6 +244,29 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
   }
 
 
+  function openHoursModal(userId: string, userName: string) {
+    const mins = confirmedMins[userId]
+    setHoursInput(mins != null ? String(Math.round(mins / 60 * 10) / 10) : '')
+    setHoursModal({ userId, userName })
+  }
+
+  async function saveConfirmedHours() {
+    if (!hoursModal) return
+    setHoursSaving(true)
+    const hours = parseFloat(hoursInput)
+    const confirmedMinutes = !hoursInput.trim() || isNaN(hours) || hours < 0 ? null : Math.round(hours * 60)
+    const res = await fetch('/api/attendance/confirm-hours', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: hoursModal.userId, year, month: month + 1, confirmedMinutes }),
+    })
+    setHoursSaving(false)
+    if (res.ok) {
+      setConfirmedMins(prev => ({ ...prev, [hoursModal!.userId]: confirmedMinutes }))
+      setHoursModal(null)
+    }
+  }
+
   const monthDays = days
 
   // ── 圖例 ──
@@ -339,6 +369,16 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
                   <td className="sticky left-0 z-10 bg-white hover:bg-gray-50 px-4 py-2 border-r min-w-[110px]">
                     <div className="font-medium text-gray-800">{user.name}</div>
                     <div className="text-xs text-gray-400">{formatDuration(totalMins)}</div>
+                    {isAdmin ? (
+                      <button
+                        onClick={() => openHoursModal(user.id, user.name)}
+                        className={`text-xs mt-0.5 transition ${confirmedMins[user.id] != null ? 'text-green-600 font-medium' : 'text-gray-300 hover:text-blue-400'}`}
+                      >
+                        {confirmedMins[user.id] != null ? `✓ ${formatDuration(confirmedMins[user.id]!)}` : '+ 設工時'}
+                      </button>
+                    ) : confirmedMins[user.id] != null ? (
+                      <div className="text-xs text-green-600 font-medium mt-0.5">✓ {formatDuration(confirmedMins[user.id]!)}</div>
+                    ) : null}
                   </td>
                   {monthDays.map(day => {
                     const dateStr = toDateStr(day)
@@ -405,11 +445,16 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
       {/* ── 員工個人出勤記錄（手機 / 個人檢視）── */}
       {!isAdmin && (
         <div className="mt-8">
+          {confirmedMins[currentUserId] != null && (
+            <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-3">
+              <span className="text-sm text-green-700 font-medium">✓ 管理員已確認本月工時：{formatDuration(confirmedMins[currentUserId]!)}</span>
+            </div>
+          )}
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-medium text-gray-700">本月出勤明細</h3>
             {totalMinutesEmployee > 0 && (
               <span className="text-sm font-semibold text-blue-700">
-                總工時 {formatDuration(totalMinutesEmployee)}
+                估算工時 {formatDuration(totalMinutesEmployee)}
               </span>
             )}
           </div>
@@ -523,6 +568,41 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
                   清除
                 </button>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 確認工時 Modal（管理員）── */}
+      {hoursModal && isAdmin && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setHoursModal(null)} />
+          <div className="relative bg-white rounded-t-2xl sm:rounded-2xl p-5 w-full sm:max-w-xs shadow-xl">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="font-semibold text-gray-800">{hoursModal.userName}</p>
+                <p className="text-sm text-gray-500">設定本月確認工時</p>
+              </div>
+              <button onClick={() => setHoursModal(null)} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
+            </div>
+            <div className="flex items-center gap-2 mb-2">
+              <input
+                type="number"
+                value={hoursInput}
+                onChange={e => setHoursInput(e.target.value)}
+                placeholder="例如 72.5"
+                min={0}
+                step={0.5}
+                className="flex-1 border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <span className="text-sm text-gray-600 shrink-0">小時</span>
+            </div>
+            <p className="text-xs text-gray-400 mb-4">留空並確認可清除已設定的工時</p>
+            <div className="flex gap-2">
+              <button onClick={() => setHoursModal(null)} className="flex-1 border border-gray-300 text-gray-600 rounded-xl py-2.5 text-sm hover:bg-gray-50 transition">取消</button>
+              <button onClick={saveConfirmedHours} disabled={hoursSaving} className="flex-1 bg-blue-600 text-white rounded-xl py-2.5 text-sm font-medium hover:bg-blue-700 disabled:opacity-60 transition">
+                {hoursSaving ? '儲存中...' : '確認'}
+              </button>
             </div>
           </div>
         </div>

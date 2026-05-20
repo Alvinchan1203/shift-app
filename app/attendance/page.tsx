@@ -19,7 +19,7 @@ export default async function AttendancePage() {
     ? await prisma.user.findMany({ where: { role: 'EMPLOYEE' }, select: { id: true, name: true }, orderBy: { name: 'asc' } })
     : [{ id: session.user.id, name: session.user.name! }]
 
-  const [records, assignments, holidays] = await Promise.all([
+  const [records, assignments, holidays, monthlyScores] = await Promise.all([
     prisma.attendanceRecord.findMany({
       where: {
         ...(isAdmin ? {} : { userId: session.user.id }),
@@ -35,11 +35,24 @@ export default async function AttendancePage() {
       orderBy: [{ date: 'asc' }, { shift: 'asc' }],
     }),
     prisma.holiday.findMany(),
+    prisma.monthlyScore.findMany({
+      where: {
+        year: currentYear,
+        month: currentMonth + 1,
+        ...(isAdmin ? {} : { userId: session.user.id }),
+      },
+      select: { userId: true, confirmedMinutes: true },
+    }),
   ])
 
   const logs = isAdmin
     ? await prisma.attendanceLog.findMany({ orderBy: { createdAt: 'desc' }, take: 200 })
     : []
+
+  const confirmedMinutesMap: Record<string, number | null> = {}
+  for (const s of monthlyScores) {
+    confirmedMinutesMap[s.userId] = s.confirmedMinutes ?? null
+  }
 
   const initialData = {
     initialYear: currentYear,
@@ -62,6 +75,7 @@ export default async function AttendancePage() {
       date: h.date.toISOString().slice(0, 10),
       name: h.name,
     })),
+    confirmedMinutesMap,
     logs: logs.map(l => ({
       id: l.id,
       userId: l.userId,

@@ -24,6 +24,7 @@ type EmployeeScore = {
   successCount: number
   adjustments: Adjustment[]
   totalAttendanceMinutes: number
+  confirmedMinutes: number | null
   totalWorkPoints: number
   item1: number
   item2: number
@@ -174,7 +175,11 @@ export default function AdminScoresClient({
                   {/* Item 1 */}
                   <td className="px-3 py-2 text-center whitespace-nowrap">
                     <span className="font-semibold text-gray-800">{emp.item1}</span>
-                    <span className="text-xs text-gray-400 ml-1.5">{Math.round(emp.totalAttendanceMinutes / 60 * 10) / 10}h</span>
+                    {emp.confirmedMinutes != null ? (
+                      <span className="text-xs text-green-600 font-medium ml-1.5">✓ {Math.round(emp.confirmedMinutes / 60 * 10) / 10}h</span>
+                    ) : (
+                      <span className="text-xs text-gray-400 ml-1.5">{Math.round(emp.totalAttendanceMinutes / 60 * 10) / 10}h</span>
+                    )}
                   </td>
 
                   {/* Item 2 */}

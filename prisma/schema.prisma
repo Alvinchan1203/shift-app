@@ -156,9 +156,10 @@ model MonthlyScore {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   year         Int
   month        Int
-  witnessCount Int      @default(0)
-  successCount Int      @default(0)
-  adjustments  AdminScoreAdjustment[]
+  witnessCount     Int  @default(0)
+  successCount     Int  @default(0)
+  confirmedMinutes Int?
+  adjustments      AdminScoreAdjustment[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
