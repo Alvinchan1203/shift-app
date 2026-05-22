@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { requireAuth } from '@/lib/require-auth'
 import { prisma } from '@/lib/prisma'
-import Navbar from '@/components/Navbar'
+import Sidebar from '@/components/Sidebar'
 import AdminScoresClient from './client'
 import { SHIFT_DURATIONS } from '@/lib/constants'
 import {
@@ -121,9 +121,11 @@ export default async function AdminScoresPage({
   })
 
   return (
-    <div>
-      <Navbar userName={session.user.name!} role={session.user.role} />
-      <AdminScoresClient year={year} month={month} employeeData={employeeData} />
+    <div className="flex flex-col md:flex-row min-h-screen">
+      <Sidebar userName={session.user.name!} role={session.user.role} />
+      <div className="flex-1 min-w-0">
+        <AdminScoresClient year={year} month={month} employeeData={employeeData} />
+      </div>
     </div>
   )
 }

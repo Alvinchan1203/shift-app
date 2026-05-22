@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { requireAuth } from '@/lib/require-auth'
 import { prisma } from '@/lib/prisma'
-import Navbar from '@/components/Navbar'
+import Sidebar from '@/components/Sidebar'
 import UsersClient from './client'
 
 export default async function UsersPage() {
@@ -15,9 +15,9 @@ export default async function UsersPage() {
   const initialData = usersRaw.map(u => ({ ...u, createdAt: u.createdAt.toISOString() }))
 
   return (
-    <div>
-      <Navbar userName={session.user.name!} role={session.user.role} />
-      <main className="max-w-2xl mx-auto px-4 py-6">
+    <div className="flex flex-col md:flex-row min-h-screen">
+      <Sidebar userName={session.user.name!} role={session.user.role} />
+      <main className="flex-1 w-full max-w-2xl mx-auto px-4 py-6">
         <h2 className="text-xl font-bold text-gray-800 mb-6">賬戶管理</h2>
         <UsersClient currentUserName={session.user.name!} initialData={initialData} />
       </main>
