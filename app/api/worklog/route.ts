@@ -21,6 +21,15 @@ export async function GET(req: NextRequest) {
     lt: new Date(Date.UTC(year, month, 1)),
   } : null
 
+  if (session.user.role === 'ADMIN' && !targetUserId) {
+    const logs = await prisma.workLog.findMany({
+      where: { ...(dateFilter ? { date: dateFilter } : {}) },
+      include: { user: { select: { name: true } } },
+      orderBy: [{ date: 'asc' }, { createdAt: 'asc' }],
+    })
+    return NextResponse.json(logs.map(l => ({ ...l, userName: l.user.name })))
+  }
+
   const logs = await prisma.workLog.findMany({
     where: { userId, ...(dateFilter ? { date: dateFilter } : {}) },
     orderBy: [{ date: 'asc' }, { createdAt: 'asc' }],
@@ -50,9 +59,13 @@ export async function POST(req: NextRequest) {
       if (points === undefined) return NextResponse.json({ error: '無效工作類型' }, { status: 400 })
     }
 
+    const userId = session.user.role === 'ADMIN' && body.userId
+      ? body.userId
+      : session.user.id
+
     const log = await prisma.workLog.create({
       data: {
-        userId: session.user.id,
+        userId,
         date: new Date(date),
         workType: workType as any,
         description: description ?? null,
