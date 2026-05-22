@@ -52,10 +52,12 @@ export default function EmployeePreferencesView({ userName }: { userName: string
   if (!loaded) return <Skeleton />
 
   return (
-    <EmployeePreferencesClient
-      userName={userName}
-      extraSubmitEnabled={extraSubmitEnabled}
-      initialData={{ prefs, holidays, submission }}
-    />
+    <main className="max-w-3xl mx-auto px-4 py-8">
+      <EmployeePreferencesClient
+        userName={userName}
+        extraSubmitEnabled={extraSubmitEnabled}
+        initialData={{ prefs, holidays, submission }}
+      />
+    </main>
   )
 }

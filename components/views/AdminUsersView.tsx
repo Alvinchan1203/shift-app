@@ -33,6 +33,8 @@ export default function AdminUsersView({ userName }: { userName: string }) {
   if (!data) return <Skeleton />
 
   return (
-    <UsersClient currentUserName={userName} initialData={data} />
+    <main className="max-w-2xl mx-auto px-4 py-6">
+      <UsersClient currentUserName={userName} initialData={data} />
+    </main>
   )
 }
