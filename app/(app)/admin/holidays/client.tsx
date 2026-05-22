@@ -102,7 +102,7 @@ export default function AdminHolidaysClient({ initialData }: { initialData: Holi
         </div>
         <div className="grid grid-cols-7">
           {Array.from({ length: firstDow }).map((_, i) => (
-            <div key={`e-${i}`} className="border-b border-r p-2 min-h-[72px]" />
+            <div key={`e-${i}`} className="border-b border-r p-2 min-h-[100px]" />
           ))}
           {days.map((day) => {
             const dateStr = toDateStr(day)
@@ -114,7 +114,7 @@ export default function AdminHolidaysClient({ initialData }: { initialData: Holi
               <button
                 key={dateStr}
                 onClick={() => setSelectedDate(isSelected ? null : dateStr)}
-                className={`border-b border-r p-2 min-h-[72px] text-left w-full transition
+                className={`border-b border-r p-2 min-h-[100px] text-left w-full transition
                   ${holiday ? 'bg-pink-50 hover:bg-pink-100' : isWeekend ? 'bg-gray-50 hover:bg-gray-100' : 'hover:bg-blue-50'}
                   ${isSelected ? 'ring-2 ring-inset ring-blue-400' : ''}`}
               >

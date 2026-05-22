@@ -11,7 +11,7 @@ export default async function AdminHolidaysPage() {
   const initialData = holidays.map(h => ({ id: h.id, date: h.date.toISOString().slice(0, 10), name: h.name }))
 
   return (
-    <main className="max-w-3xl mx-auto px-4 py-8">
+    <main className="max-w-7xl mx-auto px-6 py-8">
         <h2 className="text-xl font-bold text-gray-800 mb-6">假期管理</h2>
         <AdminHolidaysClient initialData={initialData} />
     </main>
