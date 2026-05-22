@@ -1,6 +1,5 @@
 import { requireAuth } from '@/lib/require-auth'
 import { prisma } from '@/lib/prisma'
-import Sidebar from '@/components/Sidebar'
 import ShiftBadge from '@/components/ShiftBadge'
 import { ShiftKey, SHIFT_HOURS } from '@/lib/constants'
 
@@ -33,9 +32,7 @@ export default async function EmployeeSchedulePage() {
   const sortedMonths = [...grouped.keys()].sort((a, b) => b.localeCompare(a))
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen">
-      <Sidebar userName={session.user.name!} role={session.user.role} />
-      <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-6 sm:py-8">
+    <main className="max-w-3xl mx-auto px-4 py-6 sm:py-8">
         <h2 className="text-xl font-bold text-gray-800 mb-4 sm:mb-6">我的排班</h2>
         {sortedMonths.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-sm border p-8 text-center text-gray-400">
@@ -74,7 +71,6 @@ export default async function EmployeeSchedulePage() {
             })}
           </div>
         )}
-      </main>
-    </div>
+    </main>
   )
 }

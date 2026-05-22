@@ -1,7 +1,6 @@
 import { redirect } from 'next/navigation'
 import { requireAuth } from '@/lib/require-auth'
 import { prisma } from '@/lib/prisma'
-import Sidebar from '@/components/Sidebar'
 import ShiftBadge from '@/components/ShiftBadge'
 import { ShiftKey } from '@/lib/constants'
 import MonthPicker from '@/components/MonthPicker'
@@ -62,9 +61,7 @@ export default async function AdminPreferencesPage({
   const submittedCount = allEmployees.filter(e => submissionByUser[e.id]?.confirmedAt != null).length
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen">
-      <Sidebar userName={session.user.name!} role={session.user.role} />
-      <main className="flex-1 w-full max-w-4xl mx-auto px-4 py-8">
+    <main className="max-w-4xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <h2 className="text-xl font-bold text-gray-800">Bee上班意願</h2>
@@ -120,7 +117,6 @@ export default async function AdminPreferencesPage({
             })}
           </div>
         )}
-      </main>
-    </div>
+    </main>
   )
 }

@@ -1,7 +1,6 @@
 import { redirect } from 'next/navigation'
 import { requireAuth } from '@/lib/require-auth'
 import { prisma } from '@/lib/prisma'
-import Sidebar from '@/components/Sidebar'
 import AdminWorkLogsClient from './client'
 
 export default async function AdminWorkLogsPage({
@@ -46,12 +45,5 @@ export default async function AdminWorkLogsPage({
     createdAt: l.createdAt.toISOString(),
   }))
 
-  return (
-    <div className="flex flex-col md:flex-row min-h-screen">
-      <Sidebar userName={session.user.name!} role={session.user.role} />
-      <div className="flex-1 min-w-0">
-        <AdminWorkLogsClient year={year} month={month} employees={employees} initialLogs={serialized} />
-      </div>
-    </div>
-  )
+  return <AdminWorkLogsClient year={year} month={month} employees={employees} initialLogs={serialized} />
 }

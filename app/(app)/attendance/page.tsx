@@ -1,6 +1,5 @@
 import { requireAuth } from '@/lib/require-auth'
 import { prisma } from '@/lib/prisma'
-import Sidebar from '@/components/Sidebar'
 import AttendanceClient from './client'
 
 export default async function AttendancePage() {
@@ -90,14 +89,11 @@ export default async function AttendancePage() {
   }
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen">
-      <Sidebar userName={session.user.name!} role={session.user.role} />
-      <main className="flex-1 min-w-0 px-4 py-6">
+    <main className="px-4 py-6">
         <h2 className="text-xl font-bold text-gray-800 mb-6">
           {isAdmin ? '實際出勤管理' : '我的出勤記錄'}
         </h2>
         <AttendanceClient isAdmin={isAdmin} users={usersData} currentUserId={session.user.id} initialData={initialData} />
-      </main>
-    </div>
+    </main>
   )
 }

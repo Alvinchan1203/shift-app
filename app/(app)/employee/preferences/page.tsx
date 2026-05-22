@@ -1,6 +1,5 @@
 import { requireAuth } from '@/lib/require-auth'
 import { prisma } from '@/lib/prisma'
-import Sidebar from '@/components/Sidebar'
 import EmployeePreferencesClient from './client'
 
 export default async function EmployeePreferencesPage() {
@@ -33,9 +32,7 @@ export default async function EmployeePreferencesPage() {
   }
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen">
-      <Sidebar userName={session.user.name!} role={session.user.role} />
-      <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-8">
+    <main className="max-w-3xl mx-auto px-4 py-8">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-6 gap-3">
           <h2 className="text-xl font-bold text-gray-800 shrink-0">提交上班意願</h2>
           <div className="flex gap-2 sm:gap-3 flex-wrap">
@@ -56,7 +53,6 @@ export default async function EmployeePreferencesPage() {
           extraSubmitEnabled={user?.extraSubmitEnabled ?? false}
           initialData={initialData}
         />
-      </main>
-    </div>
+    </main>
   )
 }
