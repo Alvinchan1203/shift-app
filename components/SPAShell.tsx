@@ -23,34 +23,40 @@ interface Props {
 export default function SPAShell({ userName, role, userId }: Props) {
   const defaultView = role === 'ADMIN' ? 'admin/preferences' : 'employee/preferences'
   const [view, setView] = useState(defaultView)
+  const [mounted, setMounted] = useState<Set<string>>(new Set([defaultView]))
 
-  function renderView() {
-    switch (view) {
-      case 'admin/preferences': return <AdminPreferencesView />
-      case 'admin/assign': return <AdminAssignView />
-      case 'admin/holidays': return <AdminHolidaysView />
-      case 'attendance': return <AttendanceView isAdmin={role === 'ADMIN'} userId={userId} userName={userName} />
-      case 'admin/worklogs': return <AdminWorkLogsView />
-      case 'admin/scores': return <AdminScoresView />
-      case 'admin/users': return <AdminUsersView userName={userName} />
-      case 'employee/preferences': return <EmployeePreferencesView userName={userName} />
-      case 'employee/schedule': return <EmployeeScheduleView />
-      case 'employee/worklog': return <EmployeeWorkLogView />
-      case 'password': return <PasswordView />
-      default: return null
-    }
+  function navigate(v: string) {
+    setView(v)
+    setMounted(prev => {
+      if (prev.has(v)) return prev
+      const next = new Set(prev)
+      next.add(v)
+      return next
+    })
   }
+
+  const show = (key: string) => view === key ? '' : 'hidden'
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
       <Sidebar
         userName={userName}
         role={role}
-        onNavigate={setView}
+        onNavigate={navigate}
         activeView={view}
       />
       <div className="flex-1 min-w-0">
-        {renderView()}
+        {mounted.has('admin/preferences') && <div className={show('admin/preferences')}><AdminPreferencesView /></div>}
+        {mounted.has('admin/assign') && <div className={show('admin/assign')}><AdminAssignView /></div>}
+        {mounted.has('admin/holidays') && <div className={show('admin/holidays')}><AdminHolidaysView /></div>}
+        {mounted.has('attendance') && <div className={show('attendance')}><AttendanceView isAdmin={role === 'ADMIN'} userId={userId} userName={userName} /></div>}
+        {mounted.has('admin/worklogs') && <div className={show('admin/worklogs')}><AdminWorkLogsView /></div>}
+        {mounted.has('admin/scores') && <div className={show('admin/scores')}><AdminScoresView /></div>}
+        {mounted.has('admin/users') && <div className={show('admin/users')}><AdminUsersView userName={userName} /></div>}
+        {mounted.has('employee/preferences') && <div className={show('employee/preferences')}><EmployeePreferencesView userName={userName} /></div>}
+        {mounted.has('employee/schedule') && <div className={show('employee/schedule')}><EmployeeScheduleView /></div>}
+        {mounted.has('employee/worklog') && <div className={show('employee/worklog')}><EmployeeWorkLogView /></div>}
+        {mounted.has('password') && <div className={show('password')}><PasswordView /></div>}
       </div>
     </div>
   )
