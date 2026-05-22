@@ -31,6 +31,7 @@ interface Props {
   month: number
   employees: Employee[]
   initialLogs: WorkLog[]
+  onMonthChange?: (year: number, month: number) => void
 }
 
 const TYPE_COLORS: Record<string, string> = {
@@ -42,7 +43,7 @@ const TYPE_COLORS: Record<string, string> = {
 }
 
 export default function AdminWorkLogsClient({
-  year, month, employees, initialLogs,
+  year, month, employees, initialLogs, onMonthChange,
 }: Props) {
   const [selectedEmployee, setSelectedEmployee] = useState<string>('all')
 
@@ -72,7 +73,7 @@ export default function AdminWorkLogsClient({
     <main className="max-w-4xl mx-auto px-4 py-6 sm:py-8">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-gray-800">員工工作記錄</h2>
-        <MonthPicker year={year} month={month} basePath="/admin/worklogs" />
+        <MonthPicker year={year} month={month} onChange={onMonthChange} basePath={onMonthChange ? undefined : '/admin/worklogs'} />
       </div>
 
       {/* Employee filter + summary */}

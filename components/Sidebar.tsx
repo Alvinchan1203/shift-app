@@ -8,29 +8,31 @@ import { useState } from 'react'
 interface SidebarProps {
   userName: string
   role: string
+  onNavigate?: (view: string) => void
+  activeView?: string
 }
 
-export default function Sidebar({ userName, role }: SidebarProps) {
+export default function Sidebar({ userName, role, onNavigate, activeView }: SidebarProps) {
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
 
   const links = role === 'ADMIN'
     ? [
-        { href: '/admin/preferences', label: '報更紀錄' },
-        { href: '/admin/assign', label: '分配排班' },
-        { href: '/admin/holidays', label: '假期管理' },
-        { href: '/attendance', label: '實際出勤' },
-        { href: '/admin/worklogs', label: '員工工作記錄' },
-        { href: '/admin/scores', label: '員工評分' },
-        { href: '/admin/users', label: '賬戶管理' },
-        { href: '/employee/password', label: '修改密碼' },
+        { href: '/admin/preferences', view: 'admin/preferences', label: '報更紀錄' },
+        { href: '/admin/assign', view: 'admin/assign', label: '分配排班' },
+        { href: '/admin/holidays', view: 'admin/holidays', label: '假期管理' },
+        { href: '/attendance', view: 'attendance', label: '實際出勤' },
+        { href: '/admin/worklogs', view: 'admin/worklogs', label: '員工工作記錄' },
+        { href: '/admin/scores', view: 'admin/scores', label: '員工評分' },
+        { href: '/admin/users', view: 'admin/users', label: '賬戶管理' },
+        { href: '/employee/password', view: 'password', label: '修改密碼' },
       ]
     : [
-        { href: '/employee/preferences', label: '提交意願' },
-        { href: '/employee/schedule', label: '我的排班' },
-        { href: '/attendance', label: '出勤記錄' },
-        { href: '/employee/worklog', label: '工作記錄' },
-        { href: '/employee/password', label: '修改密碼' },
+        { href: '/employee/preferences', view: 'employee/preferences', label: '提交意願' },
+        { href: '/employee/schedule', view: 'employee/schedule', label: '我的排班' },
+        { href: '/attendance', view: 'attendance', label: '出勤記錄' },
+        { href: '/employee/worklog', view: 'employee/worklog', label: '工作記錄' },
+        { href: '/employee/password', view: 'password', label: '修改密碼' },
       ]
 
   const navContent = (
@@ -41,20 +43,32 @@ export default function Sidebar({ userName, role }: SidebarProps) {
       </div>
 
       <nav className="flex-1 px-2 py-3 space-y-0.5 overflow-y-auto">
-        {links.map(link => (
-          <Link
-            key={link.href}
-            href={link.href}
-            onClick={() => setMenuOpen(false)}
-            className={`flex items-center px-3 py-2 rounded-lg text-sm transition-colors ${
-              pathname === link.href
-                ? 'bg-indigo-50 text-indigo-700 font-medium'
-                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-            }`}
-          >
-            {link.label}
-          </Link>
-        ))}
+        {links.map(link => {
+          const isActive = onNavigate ? activeView === link.view : pathname === link.href
+          const cls = `flex items-center px-3 py-2 rounded-lg text-sm transition-colors w-full text-left ${
+            isActive
+              ? 'bg-indigo-50 text-indigo-700 font-medium'
+              : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+          }`
+          return onNavigate ? (
+            <button
+              key={link.view}
+              onClick={() => { onNavigate(link.view); setMenuOpen(false) }}
+              className={cls}
+            >
+              {link.label}
+            </button>
+          ) : (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setMenuOpen(false)}
+              className={cls}
+            >
+              {link.label}
+            </Link>
+          )
+        })}
       </nav>
 
       <div className="border-t border-gray-100 px-5 py-4">

@@ -56,6 +56,7 @@ interface Props {
   year: number
   month: number
   employeeData: EmployeeScore[]
+  onMonthChange?: (year: number, month: number) => void
 }
 
 function MultiplierBadge({ multiplier }: { multiplier: number }) {
@@ -72,7 +73,7 @@ function MultiplierBadge({ multiplier }: { multiplier: number }) {
 }
 
 export default function AdminScoresClient({
-  year, month, employeeData,
+  year, month, employeeData, onMonthChange,
 }: Props) {
   const [data, setData] = useState<EmployeeScore[]>(employeeData)
 
@@ -206,7 +207,7 @@ export default function AdminScoresClient({
     <main className="max-w-7xl mx-auto px-4 py-6 sm:py-8">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-gray-800">員工評分</h2>
-        <MonthPicker year={year} month={month} basePath="/admin/scores" />
+        <MonthPicker year={year} month={month} onChange={onMonthChange} basePath={onMonthChange ? undefined : '/admin/scores'} />
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
