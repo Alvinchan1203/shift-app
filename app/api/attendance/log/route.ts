@@ -2,13 +2,23 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const session = await auth()
   if (!session || session.user.role !== 'ADMIN') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
+  const { searchParams } = new URL(req.url)
+  const year = searchParams.get('year') ? parseInt(searchParams.get('year')!) : null
+  const month = searchParams.get('month') ? parseInt(searchParams.get('month')!) : null
+
+  const dateFilter = year && month ? {
+    gte: new Date(Date.UTC(year, month - 1, 1)),
+    lt: new Date(Date.UTC(year, month, 1)),
+  } : null
+
   const logs = await prisma.attendanceLog.findMany({
+    where: dateFilter ? { date: dateFilter } : {},
     orderBy: { createdAt: 'desc' },
     take: 200,
   })

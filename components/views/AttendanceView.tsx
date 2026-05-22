@@ -48,7 +48,7 @@ export default function AttendanceView({ isAdmin, userId, userName }: Props) {
     const adminPromises = isAdmin
       ? [
           fetch('/api/admin/users').then(r => r.json()),
-          fetch('/api/attendance/log').then(r => r.json()),
+          fetch(`/api/attendance/log?year=${year}&month=${m1}`).then(r => r.json()),
         ]
       : [Promise.resolve(null), Promise.resolve(null)]
 
