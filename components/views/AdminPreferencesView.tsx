@@ -44,6 +44,7 @@ export default function AdminPreferencesView() {
   const [employees, setEmployees] = useState<Employee[] | null>(null)
   const [prefs, setPrefs] = useState<Pref[]>([])
   const [submissions, setSubmissions] = useState<Submission[]>([])
+  const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
     setEmployees(null)
@@ -65,7 +66,7 @@ export default function AdminPreferencesView() {
       )
       setSubmissions(Array.isArray(subsData) ? subsData : [])
     })
-  }, [year, month])
+  }, [year, month, refreshKey])
 
   if (!employees) return <Skeleton />
 
@@ -110,7 +111,10 @@ export default function AdminPreferencesView() {
             </span>
           )}
         </div>
-        <MonthPicker year={year} month={month} onChange={(y, m) => { setYear(y); setMonth(m) }} />
+        <div className="flex items-center gap-2">
+          <MonthPicker year={year} month={month} onChange={(y, m) => { setYear(y); setMonth(m) }} />
+          <button onClick={() => setRefreshKey(k => k + 1)} className="px-2.5 py-1.5 rounded-lg border hover:bg-gray-100 text-gray-500 transition" title="重新整理">↺</button>
+        </div>
       </div>
 
       {employees.length === 0 ? (

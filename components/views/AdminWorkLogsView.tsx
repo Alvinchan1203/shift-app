@@ -35,6 +35,7 @@ export default function AdminWorkLogsView() {
   const [month, setMonth] = useState(today.getMonth() + 1)
   const [employees, setEmployees] = useState<Employee[] | null>(null)
   const [logs, setLogs] = useState<WorkLog[] | null>(null)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
     setLogs(null)
@@ -45,7 +46,7 @@ export default function AdminWorkLogsView() {
       setEmployees(empData.map((e: Employee) => ({ id: e.id, name: e.name })))
       setLogs(logsData.map((l: WorkLog) => ({ ...l, date: l.date.slice(0, 10) })))
     })
-  }, [year, month])
+  }, [year, month, refreshKey])
 
   if (!employees || !logs) return <Skeleton />
 
@@ -57,6 +58,7 @@ export default function AdminWorkLogsView() {
       employees={employees}
       initialLogs={logs}
       onMonthChange={(y, m) => { setYear(y); setMonth(m) }}
+      onRefresh={() => setRefreshKey(k => k + 1)}
     />
   )
 }

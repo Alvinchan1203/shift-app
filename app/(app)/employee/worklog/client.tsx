@@ -20,6 +20,7 @@ interface Props {
   initialYear: number
   initialMonth: number
   initialLogs: WorkLog[]
+  initialAttendanceDates: string[]
 }
 
 function toDateStr(d: Date) {
@@ -35,10 +36,11 @@ function fmtCreatedAt(iso: string) {
   })
 }
 
-export default function WorkLogClient({ initialYear, initialMonth, initialLogs }: Props) {
+export default function WorkLogClient({ initialYear, initialMonth, initialLogs, initialAttendanceDates }: Props) {
   const [year, setYear] = useState(initialYear)
   const [month, setMonth] = useState(initialMonth)
   const [logs, setLogs] = useState<WorkLog[]>(initialLogs)
+  const [attendanceDates, setAttendanceDates] = useState<string[]>(initialAttendanceDates)
   const [loadingMonth, setLoadingMonth] = useState(false)
   const isInitialMount = useRef(true)
 
@@ -53,16 +55,25 @@ export default function WorkLogClient({ initialYear, initialMonth, initialLogs }
   useEffect(() => {
     if (isInitialMount.current) { isInitialMount.current = false; return }
     setLoadingMonth(true)
-    fetch(`/api/worklog?year=${year}&month=${month}`)
-      .then(r => r.json())
-      .then(data => { setLogs(data); setLoadingMonth(false) })
-      .catch(() => setLoadingMonth(false))
+    Promise.all([
+      fetch(`/api/worklog?year=${year}&month=${month}`).then(r => r.json()),
+      fetch(`/api/attendance?year=${year}&month=${month}`).then(r => r.json()),
+    ]).then(([wl, att]) => {
+      setLogs(wl)
+      setAttendanceDates((att as { date: string; type: string }[])
+        .filter(r => ['A', 'B', 'C'].includes(r.type))
+        .map(r => r.date.slice(0, 10)))
+      setLoadingMonth(false)
+    }).catch(() => setLoadingMonth(false))
   }, [year, month])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
     if (!date) { setError('請選擇日期'); return }
+    if (!attendanceDates.includes(date)) {
+      setError('該日期沒有 A/B/C 上班記錄，無法錄入工作記錄'); return
+    }
     if (workType === 'E' && (!customPoints || isNaN(parseInt(customPoints)))) {
       setError('請輸入有效分數'); return
     }

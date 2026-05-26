@@ -290,7 +290,7 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
     const assignment = getAssignment(userId, dateStr)
     const prefill = dayRecords.length === 0 && assignment ? assignment.shift as AttendanceTypeKey : null
 
-    if (restDay) return <td className="border border-gray-400 bg-gray-50/60 w-9" />
+    if (restDay) return <td className="border border-gray-400 bg-pink-50 w-9" />
 
     if (!isAdmin) {
       return (
@@ -338,13 +338,47 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
   const monthRecordsEmployee = records.filter(r => r.date.startsWith(monthPrefix))
   const totalMinutesEmployee = calcMonthlyMinutes(currentUserId)
 
+  const todayStr = toDateStr(new Date())
+  const assignPrefillEntries = assignments
+    .filter(a =>
+      a.userId === currentUserId &&
+      a.date.startsWith(monthPrefix) &&
+      a.date < todayStr &&
+      ['A', 'B', 'C'].includes(a.shift) &&
+      !monthRecordsEmployee.some(r => r.date === a.date)
+    )
+    .map(a => ({ id: `pf-${a.date}`, date: a.date, type: a.shift as AttendanceTypeKey, durationMinutes: null as number | null, isPrefill: true }))
+  const allDetailEntries = [
+    ...monthRecordsEmployee.map(r => ({ ...r, isPrefill: false })),
+    ...assignPrefillEntries,
+  ].sort((a, b) => a.date.localeCompare(b.date))
+
   return (
     <div>
       <Legend />
 
       {/* 月份導航 */}
-      <div className="flex justify-center mb-4">
+      <div className="flex justify-center items-center gap-2 mb-4">
         <MonthPicker year={year} month={month + 1} onChange={(y, m) => { setYear(y); setMonth(m - 1) }} />
+        <button
+          onClick={() => {
+            const m1 = month + 1
+            const promises: Promise<any>[] = [
+              fetch(`/api/attendance?year=${year}&month=${m1}`).then(r => r.json()),
+              fetch(`/api/assignments?year=${year}&month=${m1}`).then(r => r.json()),
+              fetch(`/api/attendance/confirm-hours?year=${year}&month=${m1}`).then(r => r.json()),
+            ]
+            if (isAdmin) promises.push(fetch(`/api/attendance/log?year=${year}&month=${m1}`).then(r => r.json()))
+            Promise.all(promises).then(([att, asgn, confirmMap, logsData]) => {
+              setRecords(att.map((r: AttendanceRecord) => ({ ...r, date: r.date.slice(0, 10) })))
+              setAssignments(asgn.map((a: Assignment) => ({ ...a, date: a.date.slice(0, 10) })))
+              setConfirmedMins(confirmMap)
+              if (isAdmin && logsData) setLogs(logsData.map((l: AttendanceLog) => ({ ...l, date: l.date.slice(0, 10) })))
+            })
+          }}
+          className="px-2.5 py-1.5 rounded-lg border hover:bg-gray-100 text-gray-500 transition"
+          title="重新整理"
+        >↺</button>
       </div>
 
       {/* ── Roster 表格（橫向捲動）── */}
@@ -463,17 +497,18 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
               </span>
             )}
           </div>
-          {monthRecordsEmployee.length === 0 ? (
+          {allDetailEntries.length === 0 ? (
             <p className="text-sm text-gray-400">本月暫無出勤記錄</p>
           ) : (
             <div className="bg-white rounded-2xl border divide-y">
-              {monthRecordsEmployee
-                .sort((a, b) => a.date.localeCompare(b.date))
-                .map(r => (
-                  <div key={r.id} className="flex items-center justify-between px-4 py-3">
-                    <span className="text-sm text-gray-700">
-                      {new Date(r.date + 'T00:00:00').toLocaleDateString('zh-HK', { month: 'short', day: 'numeric', weekday: 'short' })}
-                    </span>
+              {allDetailEntries.map(r => (
+                  <div key={r.id} className={`flex items-center justify-between px-4 py-3 ${r.isPrefill ? 'opacity-60' : ''}`}>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-700">
+                        {new Date(r.date + 'T00:00:00').toLocaleDateString('zh-HK', { month: 'short', day: 'numeric', weekday: 'short' })}
+                      </span>
+                      {r.isPrefill && <span className="text-xs text-gray-400">根據排班</span>}
+                    </div>
                     <div className="flex items-center gap-2">
                       {(r.type === 'OT' || r.type === 'SPECIAL') && r.durationMinutes != null && r.durationMinutes > 0 && (
                         <span className="text-xs text-gray-500">{formatDuration(r.durationMinutes)}</span>

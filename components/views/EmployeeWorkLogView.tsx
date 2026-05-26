@@ -27,21 +27,26 @@ function Skeleton() {
 
 export default function EmployeeWorkLogView() {
   const today = new Date()
-  const [data, setData] = useState<WorkLog[] | null>(null)
   const year = today.getFullYear()
   const month = today.getMonth() + 1
+  const [logs, setLogs] = useState<WorkLog[] | null>(null)
+  const [attendanceDates, setAttendanceDates] = useState<string[] | null>(null)
 
   useEffect(() => {
-    fetch(`/api/worklog?year=${year}&month=${month}`)
-      .then(r => r.json())
-      .then((logs: WorkLog[]) =>
-        setData(logs.map(l => ({ ...l, date: l.date.slice(0, 10) })))
-      )
+    Promise.all([
+      fetch(`/api/worklog?year=${year}&month=${month}`).then(r => r.json()),
+      fetch(`/api/attendance?year=${year}&month=${month}`).then(r => r.json()),
+    ]).then(([wl, att]) => {
+      setLogs((wl as WorkLog[]).map(l => ({ ...l, date: l.date.slice(0, 10) })))
+      setAttendanceDates((att as { date: string; type: string }[])
+        .filter(r => ['A', 'B', 'C'].includes(r.type))
+        .map(r => r.date.slice(0, 10)))
+    })
   }, [])
 
-  if (!data) return <Skeleton />
+  if (!logs || !attendanceDates) return <Skeleton />
 
   return (
-    <WorkLogClient initialYear={year} initialMonth={month} initialLogs={data} />
+    <WorkLogClient initialYear={year} initialMonth={month} initialLogs={logs} initialAttendanceDates={attendanceDates} />
   )
 }

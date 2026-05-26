@@ -32,6 +32,7 @@ interface Props {
   employees: Employee[]
   initialLogs: WorkLog[]
   onMonthChange?: (year: number, month: number) => void
+  onRefresh?: () => void
 }
 
 const TYPE_COLORS: Record<string, string> = {
@@ -45,7 +46,7 @@ const TYPE_COLORS: Record<string, string> = {
 const WORK_TYPES = ['A', 'B', 'C', 'D', 'E'] as const
 
 export default function AdminWorkLogsClient({
-  year, month, employees, initialLogs, onMonthChange,
+  year, month, employees, initialLogs, onMonthChange, onRefresh,
 }: Props) {
   const [logs, setLogs] = useState<WorkLog[]>(initialLogs)
   const [selectedEmployee, setSelectedEmployee] = useState<string>('all')
@@ -139,6 +140,9 @@ export default function AdminWorkLogsClient({
           >
             + 新增記錄
           </button>
+          {onRefresh && (
+            <button onClick={onRefresh} className="px-2.5 py-1.5 rounded-lg border hover:bg-gray-100 text-gray-500 transition text-sm" title="重新整理">↺</button>
+          )}
         </div>
         <MonthPicker year={year} month={month} onChange={onMonthChange} basePath={onMonthChange ? undefined : '/admin/worklogs'} />
       </div>
@@ -163,13 +167,17 @@ export default function AdminWorkLogsClient({
           )}
         </div>
 
-        {selectedEmployee === 'all' && empSummary.size > 0 && (
+        {empSummary.size > 0 && (
           <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t">
             {[...empSummary.entries()].sort((a, b) => b[1].total - a[1].total).map(([id, s]) => (
               <button
                 key={id}
-                onClick={() => setSelectedEmployee(id)}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gray-100 hover:bg-blue-50 hover:text-blue-700 text-xs text-gray-600 transition-colors"
+                onClick={() => setSelectedEmployee(selectedEmployee === id ? 'all' : id)}
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs transition-colors ${
+                  selectedEmployee === id
+                    ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                    : 'bg-gray-100 hover:bg-blue-50 hover:text-blue-700 text-gray-600'
+                }`}
               >
                 <span className="font-medium">{s.name}</span>
                 <span className="text-gray-400">{s.total}分</span>
