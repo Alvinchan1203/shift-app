@@ -14,13 +14,30 @@ export async function DELETE(
 
     const log = await prisma.workLog.findUnique({ where: { id } })
     if (!log) return NextResponse.json({ error: '找不到記錄' }, { status: 404 })
+    if (log.deletedAt) return NextResponse.json({ error: '記錄已刪除' }, { status: 410 })
 
     if (session.user.role !== 'ADMIN' && log.userId !== session.user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    await prisma.workLog.delete({ where: { id } })
-    return NextResponse.json({ ok: true })
+    const deleted = await prisma.workLog.update({
+      where: { id },
+      data: {
+        deletedAt: new Date(),
+        deletedById: session.user.id,
+        deletedByName: session.user.name,
+      },
+    })
+
+    return NextResponse.json({
+      ok: true,
+      deleted: {
+        ...deleted,
+        date: deleted.date.toISOString(),
+        deletedAt: deleted.deletedAt!.toISOString(),
+        createdAt: deleted.createdAt.toISOString(),
+      },
+    })
   } catch (e: any) {
     console.error('DELETE /api/worklog/[id] error:', e)
     return NextResponse.json({ error: e?.message ?? 'Unknown error' }, { status: 500 })

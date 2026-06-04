@@ -9,44 +9,42 @@ export default async function WorkLogPage() {
   const year = now.getUTCFullYear()
   const month = now.getUTCMonth() + 1
 
-  const [logs, attendance] = await Promise.all([
+  const dateFilter = {
+    gte: new Date(Date.UTC(year, month - 1, 1)),
+    lt: new Date(Date.UTC(year, month, 1)),
+  }
+
+  const baseWhere = { userId: session.user.id, source: 'EMPLOYEE' as const, date: dateFilter }
+
+  const [activeLogs, deletedLogs, attendance] = await Promise.all([
     prisma.workLog.findMany({
-      where: {
-        userId: session.user.id,
-        date: {
-          gte: new Date(Date.UTC(year, month - 1, 1)),
-          lt: new Date(Date.UTC(year, month, 1)),
-        },
-      },
+      where: { ...baseWhere, deletedAt: null },
+      orderBy: [{ date: 'asc' }, { createdAt: 'asc' }],
+    }),
+    prisma.workLog.findMany({
+      where: { ...baseWhere, deletedAt: { not: null } },
       orderBy: [{ date: 'asc' }, { createdAt: 'asc' }],
     }),
     prisma.attendanceRecord.findMany({
-      where: {
-        userId: session.user.id,
-        type: { in: ['A', 'B', 'C'] },
-        date: {
-          gte: new Date(Date.UTC(year, month - 1, 1)),
-          lt: new Date(Date.UTC(year, month, 1)),
-        },
-      },
+      where: { userId: session.user.id, type: { in: ['A', 'B', 'C'] }, date: dateFilter },
       select: { date: true },
     }),
   ])
 
-  const serialized = logs.map(l => ({
+  const serialize = (l: any) => ({
     ...l,
     date: l.date.toISOString(),
     createdAt: l.createdAt.toISOString(),
-  }))
-
-  const attendanceDates = attendance.map(a => a.date.toISOString().slice(0, 10))
+    deletedAt: l.deletedAt?.toISOString() ?? null,
+  })
 
   return (
     <WorkLogClient
       initialYear={year}
       initialMonth={month}
-      initialLogs={serialized}
-      initialAttendanceDates={attendanceDates}
+      initialLogs={activeLogs.map(serialize)}
+      initialDeletedLogs={deletedLogs.map(serialize)}
+      initialAttendanceDates={attendance.map(a => a.date.toISOString().slice(0, 10))}
     />
   )
 }

@@ -186,6 +186,10 @@ export const WorkLogScalarFieldEnum = {
   workType: 'workType',
   description: 'description',
   points: 'points',
+  source: 'source',
+  deletedAt: 'deletedAt',
+  deletedById: 'deletedById',
+  deletedByName: 'deletedByName',
   createdAt: 'createdAt'
 } as const
 

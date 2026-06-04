@@ -140,15 +140,24 @@ enum WorkType {
   E
 }
 
+enum WorkLogSource {
+  EMPLOYEE
+  ADMIN
+}
+
 model WorkLog {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  date        DateTime @db.Date
-  workType    WorkType
-  description String?
-  points      Int
-  createdAt   DateTime @default(now())
+  id            String        @id @default(cuid())
+  userId        String
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date          DateTime      @db.Date
+  workType      WorkType
+  description   String?
+  points        Int
+  source        WorkLogSource @default(EMPLOYEE)
+  deletedAt     DateTime?
+  deletedById   String?
+  deletedByName String?
+  createdAt     DateTime      @default(now())
 }
 
 model MonthlyScore {

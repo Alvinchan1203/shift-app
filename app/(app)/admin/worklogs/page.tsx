@@ -21,20 +21,25 @@ export default async function AdminWorkLogsPage({
     lt: new Date(Date.UTC(year, month, 1)),
   }
 
-  const [employees, workLogs] = await Promise.all([
+  const [employees, workLogs, deletedLogs] = await Promise.all([
     prisma.user.findMany({
       where: { role: 'EMPLOYEE' },
       select: { id: true, name: true },
       orderBy: { name: 'asc' },
     }),
     prisma.workLog.findMany({
-      where: { date: dateFilter },
+      where: { date: dateFilter, deletedAt: null },
+      include: { user: { select: { id: true, name: true } } },
+      orderBy: [{ date: 'asc' }, { createdAt: 'asc' }],
+    }),
+    prisma.workLog.findMany({
+      where: { date: dateFilter, deletedAt: { not: null } },
       include: { user: { select: { id: true, name: true } } },
       orderBy: [{ date: 'asc' }, { createdAt: 'asc' }],
     }),
   ])
 
-  const serialized = workLogs.map(l => ({
+  const serialize = (l: any) => ({
     id: l.id,
     userId: l.userId,
     userName: l.user.name,
@@ -42,8 +47,19 @@ export default async function AdminWorkLogsPage({
     workType: l.workType,
     description: l.description,
     points: l.points,
+    source: l.source,
     createdAt: l.createdAt.toISOString(),
-  }))
+    deletedAt: l.deletedAt?.toISOString() ?? null,
+    deletedByName: l.deletedByName ?? null,
+  })
 
-  return <AdminWorkLogsClient year={year} month={month} employees={employees} initialLogs={serialized} />
+  return (
+    <AdminWorkLogsClient
+      year={year}
+      month={month}
+      employees={employees}
+      initialLogs={workLogs.map(serialize)}
+      initialDeletedLogs={deletedLogs.map(serialize)}
+    />
+  )
 }

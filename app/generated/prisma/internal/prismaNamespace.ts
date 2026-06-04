@@ -1447,6 +1447,10 @@ export const WorkLogScalarFieldEnum = {
   workType: 'workType',
   description: 'description',
   points: 'points',
+  source: 'source',
+  deletedAt: 'deletedAt',
+  deletedById: 'deletedById',
+  deletedByName: 'deletedByName',
   createdAt: 'createdAt'
 } as const
 
@@ -1626,6 +1630,20 @@ export type EnumWorkTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
  * Reference to a field of type 'WorkType[]'
  */
 export type ListEnumWorkTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'WorkType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'WorkLogSource'
+ */
+export type EnumWorkLogSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'WorkLogSource'>
+    
+
+
+/**
+ * Reference to a field of type 'WorkLogSource[]'
+ */
+export type ListEnumWorkLogSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'WorkLogSource[]'>
     
 
 

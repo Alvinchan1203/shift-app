@@ -54,6 +54,14 @@ export const WorkType = {
 export type WorkType = (typeof WorkType)[keyof typeof WorkType]
 
 
+export const WorkLogSource = {
+  EMPLOYEE: 'EMPLOYEE',
+  ADMIN: 'ADMIN'
+} as const
+
+export type WorkLogSource = (typeof WorkLogSource)[keyof typeof WorkLogSource]
+
+
 export const DeductionType = {
   LATE: 'LATE',
   ABSENCE: 'ABSENCE',

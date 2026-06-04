@@ -3,6 +3,15 @@ import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
 import { WORK_TYPE_POINTS } from '@/lib/scoring'
 
+function serializeLog(l: any) {
+  return {
+    ...l,
+    date: typeof l.date === 'string' ? l.date : l.date.toISOString(),
+    createdAt: typeof l.createdAt === 'string' ? l.createdAt : l.createdAt.toISOString(),
+    deletedAt: l.deletedAt ? (typeof l.deletedAt === 'string' ? l.deletedAt : l.deletedAt.toISOString()) : null,
+  }
+}
+
 export async function GET(req: NextRequest) {
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -12,30 +21,51 @@ export async function GET(req: NextRequest) {
   const month = searchParams.get('month') ? parseInt(searchParams.get('month')!) : null
   const targetUserId = searchParams.get('userId')
 
-  const userId = session.user.role === 'ADMIN' && targetUserId
-    ? targetUserId
-    : session.user.id
-
   const dateFilter = year && month ? {
     gte: new Date(Date.UTC(year, month - 1, 1)),
     lt: new Date(Date.UTC(year, month, 1)),
   } : null
 
-  if (session.user.role === 'ADMIN' && !targetUserId) {
-    const logs = await prisma.workLog.findMany({
-      where: { ...(dateFilter ? { date: dateFilter } : {}) },
-      include: { user: { select: { name: true } } },
-      orderBy: [{ date: 'asc' }, { createdAt: 'asc' }],
+  const isAdminAll = session.user.role === 'ADMIN' && !targetUserId
+
+  if (isAdminAll) {
+    const baseWhere = { ...(dateFilter ? { date: dateFilter } : {}) }
+    const [active, deleted] = await Promise.all([
+      prisma.workLog.findMany({
+        where: { ...baseWhere, deletedAt: null },
+        include: { user: { select: { name: true } } },
+        orderBy: [{ date: 'asc' }, { createdAt: 'asc' }],
+      }),
+      prisma.workLog.findMany({
+        where: { ...baseWhere, deletedAt: { not: null } },
+        include: { user: { select: { name: true } } },
+        orderBy: [{ date: 'asc' }, { createdAt: 'asc' }],
+      }),
+    ])
+    return NextResponse.json({
+      active: active.map(l => serializeLog({ ...l, userName: l.user.name })),
+      deleted: deleted.map(l => serializeLog({ ...l, userName: l.user.name })),
     })
-    return NextResponse.json(logs.map(l => ({ ...l, userName: l.user.name })))
   }
 
-  const logs = await prisma.workLog.findMany({
-    where: { userId, ...(dateFilter ? { date: dateFilter } : {}) },
-    orderBy: [{ date: 'asc' }, { createdAt: 'asc' }],
-  })
+  const userId = session.user.role === 'ADMIN' && targetUserId ? targetUserId : session.user.id
+  const baseWhere = { userId, source: 'EMPLOYEE' as const, ...(dateFilter ? { date: dateFilter } : {}) }
 
-  return NextResponse.json(logs)
+  const [active, deleted] = await Promise.all([
+    prisma.workLog.findMany({
+      where: { ...baseWhere, deletedAt: null },
+      orderBy: [{ date: 'asc' }, { createdAt: 'asc' }],
+    }),
+    prisma.workLog.findMany({
+      where: { ...baseWhere, deletedAt: { not: null } },
+      orderBy: [{ date: 'asc' }, { createdAt: 'asc' }],
+    }),
+  ])
+
+  return NextResponse.json({
+    active: active.map(serializeLog),
+    deleted: deleted.map(serializeLog),
+  })
 }
 
 export async function POST(req: NextRequest) {
@@ -59,9 +89,8 @@ export async function POST(req: NextRequest) {
       if (points === undefined) return NextResponse.json({ error: '無效工作類型' }, { status: 400 })
     }
 
-    const userId = session.user.role === 'ADMIN' && body.userId
-      ? body.userId
-      : session.user.id
+    const userId = session.user.role === 'ADMIN' && body.userId ? body.userId : session.user.id
+    const source = session.user.role === 'ADMIN' ? 'ADMIN' : 'EMPLOYEE'
 
     const log = await prisma.workLog.create({
       data: {
@@ -70,10 +99,11 @@ export async function POST(req: NextRequest) {
         workType: workType as any,
         description: description ?? null,
         points,
+        source: source as any,
       },
     })
 
-    return NextResponse.json(log)
+    return NextResponse.json(serializeLog(log))
   } catch (e: any) {
     console.error('POST /api/worklog error:', e)
     return NextResponse.json({ error: e?.message ?? 'Unknown error' }, { status: 500 })

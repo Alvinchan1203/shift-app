@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
       select: { userId: true, type: true, durationMinutes: true },
     }),
     prisma.workLog.findMany({
-      where: { date: dateFilter },
+      where: { date: dateFilter, deletedAt: null },
       select: { userId: true, points: true },
     }),
     prisma.monthlyDeduction.findMany({

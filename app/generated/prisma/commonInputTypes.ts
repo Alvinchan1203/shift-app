@@ -260,6 +260,13 @@ export type EnumWorkTypeFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumWorkTypeFilter<$PrismaModel> | $Enums.WorkType
 }
 
+export type EnumWorkLogSourceFilter<$PrismaModel = never> = {
+  equals?: $Enums.WorkLogSource | Prisma.EnumWorkLogSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.WorkLogSource[] | Prisma.ListEnumWorkLogSourceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.WorkLogSource[] | Prisma.ListEnumWorkLogSourceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumWorkLogSourceFilter<$PrismaModel> | $Enums.WorkLogSource
+}
+
 export type EnumWorkTypeWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.WorkType | Prisma.EnumWorkTypeFieldRefInput<$PrismaModel>
   in?: $Enums.WorkType[] | Prisma.ListEnumWorkTypeFieldRefInput<$PrismaModel>
@@ -268,6 +275,16 @@ export type EnumWorkTypeWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumWorkTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumWorkTypeFilter<$PrismaModel>
+}
+
+export type EnumWorkLogSourceWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.WorkLogSource | Prisma.EnumWorkLogSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.WorkLogSource[] | Prisma.ListEnumWorkLogSourceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.WorkLogSource[] | Prisma.ListEnumWorkLogSourceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumWorkLogSourceWithAggregatesFilter<$PrismaModel> | $Enums.WorkLogSource
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumWorkLogSourceFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumWorkLogSourceFilter<$PrismaModel>
 }
 
 export type EnumDeductionTypeFilter<$PrismaModel = never> = {
@@ -546,6 +563,13 @@ export type NestedEnumWorkTypeFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumWorkTypeFilter<$PrismaModel> | $Enums.WorkType
 }
 
+export type NestedEnumWorkLogSourceFilter<$PrismaModel = never> = {
+  equals?: $Enums.WorkLogSource | Prisma.EnumWorkLogSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.WorkLogSource[] | Prisma.ListEnumWorkLogSourceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.WorkLogSource[] | Prisma.ListEnumWorkLogSourceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumWorkLogSourceFilter<$PrismaModel> | $Enums.WorkLogSource
+}
+
 export type NestedEnumWorkTypeWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.WorkType | Prisma.EnumWorkTypeFieldRefInput<$PrismaModel>
   in?: $Enums.WorkType[] | Prisma.ListEnumWorkTypeFieldRefInput<$PrismaModel>
@@ -554,6 +578,16 @@ export type NestedEnumWorkTypeWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumWorkTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumWorkTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumWorkLogSourceWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.WorkLogSource | Prisma.EnumWorkLogSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.WorkLogSource[] | Prisma.ListEnumWorkLogSourceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.WorkLogSource[] | Prisma.ListEnumWorkLogSourceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumWorkLogSourceWithAggregatesFilter<$PrismaModel> | $Enums.WorkLogSource
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumWorkLogSourceFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumWorkLogSourceFilter<$PrismaModel>
 }
 
 export type NestedEnumDeductionTypeFilter<$PrismaModel = never> = {

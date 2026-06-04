@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import ShiftBadge from '@/components/ShiftBadge'
-import { ShiftKey, SHIFT_HOURS } from '@/lib/constants'
+import { ShiftKey, SHIFT_HOURS, SHIFTS } from '@/lib/constants'
 
 type Assignment = { id: string; date: string; shift: string; userId: string }
 type PublishedMonth = { id: string; year: number; month: number; publishedAt: string }
@@ -158,6 +158,54 @@ export default function EmployeeScheduleView() {
           })}
         </div>
       </div>
+
+      {isPublished && monthAssignments.length > 0 && (
+        <div className="mt-6">
+          <h3 className="text-sm font-semibold text-gray-600 mb-2">本月排班紀錄</h3>
+          <div className="bg-white rounded-xl border overflow-hidden shadow-sm">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-gray-50 border-b text-xs text-gray-500">
+                  <th className="text-left px-4 py-2 font-medium">日期</th>
+                  <th className="text-left px-4 py-2 font-medium">星期</th>
+                  <th className="text-left px-4 py-2 font-medium">班次</th>
+                  <th className="text-left px-4 py-2 font-medium">時間</th>
+                  <th className="text-right px-4 py-2 font-medium">工時</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[...monthAssignments]
+                  .sort((a, b) => a.date.localeCompare(b.date))
+                  .map((a, idx) => {
+                    const d = new Date(a.date)
+                    const shift = SHIFTS[a.shift as ShiftKey]
+                    const hours = SHIFT_HOURS[a.shift as ShiftKey] ?? 0
+                    const isWeekend = d.getDay() === 0 || d.getDay() === 6
+                    return (
+                      <tr key={a.id} className={`border-b last:border-0 ${idx % 2 === 0 ? '' : 'bg-gray-50/50'}`}>
+                        <td className="px-4 py-2 text-gray-700 tabular-nums">{a.date}</td>
+                        <td className={`px-4 py-2 ${isWeekend ? 'text-pink-500' : 'text-gray-500'}`}>
+                          {['日', '一', '二', '三', '四', '五', '六'][d.getDay()]}
+                        </td>
+                        <td className="px-4 py-2">
+                          <ShiftBadge shift={a.shift as ShiftKey} />
+                        </td>
+                        <td className="px-4 py-2 text-gray-500 tabular-nums">{shift?.time ?? '—'}</td>
+                        <td className="px-4 py-2 text-right text-gray-600 tabular-nums">{hours}h</td>
+                      </tr>
+                    )
+                  })}
+              </tbody>
+              <tfoot>
+                <tr className="bg-gray-50 border-t">
+                  <td colSpan={4} className="px-4 py-2 text-xs text-gray-500 font-medium">合計 {monthAssignments.length} 天</td>
+                  <td className="px-4 py-2 text-right text-sm font-semibold text-blue-600 tabular-nums">{monthHours}h</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      )}
     </main>
   )
 }

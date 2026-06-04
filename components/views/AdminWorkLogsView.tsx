@@ -6,7 +6,8 @@ import AdminWorkLogsClient from '@/app/(app)/admin/worklogs/client'
 type Employee = { id: string; name: string }
 type WorkLog = {
   id: string; userId: string; userName: string; date: string
-  workType: string; description: string | null; points: number; createdAt: string
+  workType: string; description: string | null; points: number
+  source: string; createdAt: string; deletedAt: string | null; deletedByName: string | null
 }
 
 function Skeleton() {
@@ -35,6 +36,7 @@ export default function AdminWorkLogsView() {
   const [month, setMonth] = useState(today.getMonth() + 1)
   const [employees, setEmployees] = useState<Employee[] | null>(null)
   const [logs, setLogs] = useState<WorkLog[] | null>(null)
+  const [deletedLogs, setDeletedLogs] = useState<WorkLog[] | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
@@ -42,13 +44,15 @@ export default function AdminWorkLogsView() {
     Promise.all([
       fetch('/api/admin/users').then(r => r.json()),
       fetch(`/api/worklog?year=${year}&month=${month}`).then(r => r.json()),
-    ]).then(([empData, logsData]) => {
+    ]).then(([empData, wlData]) => {
+      const normalize = (l: WorkLog) => ({ ...l, date: l.date.slice(0, 10) })
       setEmployees(empData.map((e: Employee) => ({ id: e.id, name: e.name })))
-      setLogs(logsData.map((l: WorkLog) => ({ ...l, date: l.date.slice(0, 10) })))
+      setLogs((wlData.active as WorkLog[]).map(normalize))
+      setDeletedLogs((wlData.deleted as WorkLog[]).map(normalize))
     })
   }, [year, month, refreshKey])
 
-  if (!employees || !logs) return <Skeleton />
+  if (!employees || !logs || !deletedLogs) return <Skeleton />
 
   return (
     <AdminWorkLogsClient
@@ -57,6 +61,7 @@ export default function AdminWorkLogsView() {
       month={month}
       employees={employees}
       initialLogs={logs}
+      initialDeletedLogs={deletedLogs}
       onMonthChange={(y, m) => { setYear(y); setMonth(m) }}
       onRefresh={() => setRefreshKey(k => k + 1)}
     />

@@ -12,10 +12,13 @@ type WorkLog = {
   workType: string
   description: string | null
   points: number
+  source: string
   createdAt: string
+  deletedAt: string | null
+  deletedByName: string | null
 }
 
-function fmtCreatedAt(iso: string) {
+function fmtTime(iso: string) {
   const d = new Date(iso)
   return d.toLocaleString('zh-HK', {
     month: 'numeric', day: 'numeric',
@@ -31,6 +34,7 @@ interface Props {
   month: number
   employees: Employee[]
   initialLogs: WorkLog[]
+  initialDeletedLogs: WorkLog[]
   onMonthChange?: (year: number, month: number) => void
   onRefresh?: () => void
 }
@@ -46,9 +50,10 @@ const TYPE_COLORS: Record<string, string> = {
 const WORK_TYPES = ['A', 'B', 'C', 'D', 'E'] as const
 
 export default function AdminWorkLogsClient({
-  year, month, employees, initialLogs, onMonthChange, onRefresh,
+  year, month, employees, initialLogs, initialDeletedLogs, onMonthChange, onRefresh,
 }: Props) {
   const [logs, setLogs] = useState<WorkLog[]>(initialLogs)
+  const [deletedLogs, setDeletedLogs] = useState<WorkLog[]>(initialDeletedLogs)
   const [selectedEmployee, setSelectedEmployee] = useState<string>('all')
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
@@ -62,9 +67,8 @@ export default function AdminWorkLogsClient({
   const [adding, setAdding] = useState(false)
   const [addError, setAddError] = useState('')
 
-  const filtered = selectedEmployee === 'all'
-    ? logs
-    : logs.filter(l => l.userId === selectedEmployee)
+  const filtered = selectedEmployee === 'all' ? logs : logs.filter(l => l.userId === selectedEmployee)
+  const filteredDeleted = selectedEmployee === 'all' ? deletedLogs : deletedLogs.filter(l => l.userId === selectedEmployee)
 
   const grouped = new Map<string, WorkLog[]>()
   for (const log of filtered) {
@@ -73,6 +77,14 @@ export default function AdminWorkLogsClient({
     grouped.get(key)!.push(log)
   }
   const sortedDates = [...grouped.keys()].sort()
+
+  const groupedDeleted = new Map<string, WorkLog[]>()
+  for (const log of filteredDeleted) {
+    const key = log.date.slice(0, 10)
+    if (!groupedDeleted.has(key)) groupedDeleted.set(key, [])
+    groupedDeleted.get(key)!.push(log)
+  }
+  const sortedDeletedDates = [...groupedDeleted.keys()].sort()
 
   const empSummary = new Map<string, { name: string; total: number; count: number }>()
   for (const log of logs) {
@@ -87,7 +99,16 @@ export default function AdminWorkLogsClient({
     setDeletingId(id)
     const res = await fetch(`/api/worklog/${id}`, { method: 'DELETE' })
     if (res.ok) {
+      const data = await res.json()
+      const target = logs.find(l => l.id === id)
       setLogs(prev => prev.filter(l => l.id !== id))
+      if (target && data.deleted) {
+        setDeletedLogs(prev => [...prev, {
+          ...target,
+          deletedAt: data.deleted.deletedAt,
+          deletedByName: data.deleted.deletedByName,
+        }].sort((a, b) => a.date.localeCompare(b.date)))
+      }
     }
     setDeletingId(null)
   }
@@ -187,6 +208,7 @@ export default function AdminWorkLogsClient({
         )}
       </div>
 
+      {/* Active logs */}
       <div className="space-y-4">
         {sortedDates.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-sm border p-8 text-center text-gray-400 text-sm">
@@ -217,8 +239,11 @@ export default function AdminWorkLogsClient({
                         <span className="text-xs text-gray-600 block truncate">
                           {log.description || WORK_TYPE_LABELS[log.workType]}
                         </span>
-                        <span className="text-xs text-gray-400">錄入於 {fmtCreatedAt(log.createdAt)}</span>
+                        <span className="text-xs text-gray-400">錄入於 {fmtTime(log.createdAt)}</span>
                       </span>
+                      {log.source === 'ADMIN' && (
+                        <span className="text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-medium shrink-0">管理員</span>
+                      )}
                       <span className="text-sm font-medium text-gray-700 shrink-0">{log.points} 分</span>
                       <button
                         onClick={() => handleDelete(log.id)}
@@ -236,6 +261,56 @@ export default function AdminWorkLogsClient({
           })
         )}
       </div>
+
+      {/* Deleted logs */}
+      {sortedDeletedDates.length > 0 && (
+        <details className="group mt-6">
+          <summary className="cursor-pointer text-xs text-gray-400 hover:text-gray-500 select-none flex items-center gap-1 py-1">
+            <span className="transition-transform group-open:rotate-90 inline-block">›</span>
+            已刪除記錄（{filteredDeleted.length}）
+          </summary>
+          <div className="space-y-3 mt-2">
+            {sortedDeletedDates.map(dateKey => {
+              const dayLogs = groupedDeleted.get(dateKey)!
+              const d = new Date(dateKey + 'T00:00:00Z')
+              const dayLabel = d.toLocaleDateString('zh-HK', { month: 'long', day: 'numeric', weekday: 'short' })
+              return (
+                <div key={dateKey} className="bg-gray-50 rounded-xl border border-dashed border-gray-200 overflow-hidden">
+                  <div className="px-4 py-2 border-b border-dashed border-gray-200">
+                    <span className="text-xs font-medium text-gray-400">{dayLabel}</span>
+                  </div>
+                  <div className="divide-y divide-gray-100">
+                    {dayLogs.map(log => (
+                      <div key={log.id} className="flex items-center gap-3 px-4 py-2.5 opacity-70">
+                        {selectedEmployee === 'all' && (
+                          <span className="text-xs font-medium text-gray-400 w-20 shrink-0 truncate">{log.userName}</span>
+                        )}
+                        <span className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold grayscale ${TYPE_COLORS[log.workType] ?? 'bg-gray-100 text-gray-700'}`}>
+                          {log.workType}
+                        </span>
+                        <span className="flex-1 min-w-0">
+                          <span className="text-xs text-gray-500 line-through block truncate">
+                            {log.description || WORK_TYPE_LABELS[log.workType]}
+                          </span>
+                          <span className="text-xs text-gray-400">
+                            {log.deletedByName
+                              ? `由 ${log.deletedByName} 於 ${fmtTime(log.deletedAt!)} 刪除`
+                              : `已於 ${fmtTime(log.deletedAt!)} 刪除`}
+                          </span>
+                        </span>
+                        {log.source === 'ADMIN' && (
+                          <span className="text-xs bg-amber-50 text-amber-500 px-1.5 py-0.5 rounded font-medium shrink-0">管理員</span>
+                        )}
+                        <span className="text-xs text-gray-400 shrink-0">{log.points} 分</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </details>
+      )}
 
       {showAdd && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">

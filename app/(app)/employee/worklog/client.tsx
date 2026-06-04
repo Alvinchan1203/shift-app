@@ -10,7 +10,10 @@ type WorkLog = {
   workType: string
   description: string | null
   points: number
+  source: string
   createdAt: string
+  deletedAt: string | null
+  deletedByName: string | null
 }
 
 const WORK_TYPES = ['A', 'B', 'C', 'D', 'E'] as const
@@ -20,6 +23,7 @@ interface Props {
   initialYear: number
   initialMonth: number
   initialLogs: WorkLog[]
+  initialDeletedLogs: WorkLog[]
   initialAttendanceDates: string[]
 }
 
@@ -27,7 +31,7 @@ function toDateStr(d: Date) {
   return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`
 }
 
-function fmtCreatedAt(iso: string) {
+function fmtTime(iso: string) {
   const d = new Date(iso)
   return d.toLocaleString('zh-HK', {
     month: 'numeric', day: 'numeric',
@@ -36,10 +40,19 @@ function fmtCreatedAt(iso: string) {
   })
 }
 
-export default function WorkLogClient({ initialYear, initialMonth, initialLogs, initialAttendanceDates }: Props) {
+const TYPE_COLOR: Record<string, string> = {
+  A: 'bg-blue-100 text-blue-700',
+  B: 'bg-green-100 text-green-700',
+  C: 'bg-purple-100 text-purple-700',
+  D: 'bg-orange-100 text-orange-700',
+  E: 'bg-gray-100 text-gray-700',
+}
+
+export default function WorkLogClient({ initialYear, initialMonth, initialLogs, initialDeletedLogs, initialAttendanceDates }: Props) {
   const [year, setYear] = useState(initialYear)
   const [month, setMonth] = useState(initialMonth)
   const [logs, setLogs] = useState<WorkLog[]>(initialLogs)
+  const [deletedLogs, setDeletedLogs] = useState<WorkLog[]>(initialDeletedLogs)
   const [attendanceDates, setAttendanceDates] = useState<string[]>(initialAttendanceDates)
   const [loadingMonth, setLoadingMonth] = useState(false)
   const isInitialMount = useRef(true)
@@ -58,8 +71,10 @@ export default function WorkLogClient({ initialYear, initialMonth, initialLogs, 
     Promise.all([
       fetch(`/api/worklog?year=${year}&month=${month}`).then(r => r.json()),
       fetch(`/api/attendance?year=${year}&month=${month}`).then(r => r.json()),
-    ]).then(([wl, att]) => {
-      setLogs(wl)
+    ]).then(([wlData, att]) => {
+      const normalize = (l: WorkLog) => ({ ...l, date: l.date.slice(0, 10) })
+      setLogs((wlData.active as WorkLog[]).map(normalize))
+      setDeletedLogs((wlData.deleted as WorkLog[]).map(normalize))
       setAttendanceDates((att as { date: string; type: string }[])
         .filter(r => ['A', 'B', 'C'].includes(r.type))
         .map(r => r.date.slice(0, 10)))
@@ -90,7 +105,7 @@ export default function WorkLogClient({ initialYear, initialMonth, initialLogs, 
     const logYear = logDate.getUTCFullYear()
     const logMonth = logDate.getUTCMonth() + 1
     if (logYear === year && logMonth === month) {
-      setLogs(prev => [...prev, data].sort((a, b) => {
+      setLogs(prev => [...prev, { ...data, date: data.date.slice(0, 10) }].sort((a, b) => {
         if (a.date < b.date) return -1
         if (a.date > b.date) return 1
         return a.createdAt < b.createdAt ? -1 : 1
@@ -104,10 +119,19 @@ export default function WorkLogClient({ initialYear, initialMonth, initialLogs, 
 
   async function handleDelete(id: string) {
     const res = await fetch(`/api/worklog/${id}`, { method: 'DELETE' })
-    if (res.ok) setLogs(prev => prev.filter(l => l.id !== id))
+    if (res.ok) {
+      const data = await res.json()
+      const target = logs.find(l => l.id === id)
+      setLogs(prev => prev.filter(l => l.id !== id))
+      if (target && data.deleted) {
+        setDeletedLogs(prev => [
+          ...prev,
+          { ...target, deletedAt: data.deleted.deletedAt, deletedByName: data.deleted.deletedByName },
+        ].sort((a, b) => a.date.localeCompare(b.date)))
+      }
+    }
   }
 
-  // Group logs by date
   const grouped = new Map<string, WorkLog[]>()
   for (const log of logs) {
     const key = log.date.slice(0, 10)
@@ -116,6 +140,14 @@ export default function WorkLogClient({ initialYear, initialMonth, initialLogs, 
   }
   const sortedDates = [...grouped.keys()].sort()
   const totalPoints = logs.reduce((sum, l) => sum + l.points, 0)
+
+  const groupedDeleted = new Map<string, WorkLog[]>()
+  for (const log of deletedLogs) {
+    const key = log.date.slice(0, 10)
+    if (!groupedDeleted.has(key)) groupedDeleted.set(key, [])
+    groupedDeleted.get(key)!.push(log)
+  }
+  const sortedDeletedDates = [...groupedDeleted.keys()].sort()
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-6 sm:py-8">
@@ -212,7 +244,7 @@ export default function WorkLogClient({ initialYear, initialMonth, initialLogs, 
         </button>
       </form>
 
-      {/* Logs list */}
+      {/* Active logs */}
       <div className={`space-y-4 transition-opacity ${loadingMonth ? 'opacity-50' : ''}`}>
         {sortedDates.length === 0 ? (
           <div className="bg-white rounded-2xl shadow-sm border p-8 text-center text-gray-400 text-sm">
@@ -235,16 +267,10 @@ export default function WorkLogClient({ initialYear, initialMonth, initialLogs, 
                     {dayLogs.map(log => (
                       <div key={log.id} className="flex items-center justify-between px-4 py-3 gap-3">
                         <div className="flex items-center gap-2 min-w-0">
-                          <span className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                            log.workType === 'A' ? 'bg-blue-100 text-blue-700' :
-                            log.workType === 'B' ? 'bg-green-100 text-green-700' :
-                            log.workType === 'C' ? 'bg-purple-100 text-purple-700' :
-                            log.workType === 'D' ? 'bg-orange-100 text-orange-700' :
-                            'bg-gray-100 text-gray-700'
-                          }`}>{log.workType}</span>
+                          <span className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${TYPE_COLOR[log.workType] ?? 'bg-gray-100 text-gray-700'}`}>{log.workType}</span>
                           <span className="min-w-0">
                             <span className="text-xs text-gray-500 truncate block">{log.description || WORK_TYPE_LABELS[log.workType]}</span>
-                            <span className="text-xs text-gray-400">錄入於 {fmtCreatedAt(log.createdAt)}</span>
+                            <span className="text-xs text-gray-400">錄入於 {fmtTime(log.createdAt)}</span>
                           </span>
                         </div>
                         <div className="flex items-center gap-3 flex-shrink-0">
@@ -265,6 +291,46 @@ export default function WorkLogClient({ initialYear, initialMonth, initialLogs, 
               <span className="text-lg font-bold text-blue-700">{totalPoints} 分</span>
             </div>
           </>
+        )}
+
+        {/* Deleted logs */}
+        {sortedDeletedDates.length > 0 && (
+          <details className="group mt-2">
+            <summary className="cursor-pointer text-xs text-gray-400 hover:text-gray-500 select-none flex items-center gap-1 py-1">
+              <span className="transition-transform group-open:rotate-90 inline-block">›</span>
+              已刪除記錄（{deletedLogs.length}）
+            </summary>
+            <div className="space-y-3 mt-2">
+              {sortedDeletedDates.map(dateKey => {
+                const dayLogs = groupedDeleted.get(dateKey)!
+                const d = new Date(dateKey + 'T00:00:00Z')
+                const dayLabel = d.toLocaleDateString('zh-HK', { month: 'long', day: 'numeric', weekday: 'short' })
+                return (
+                  <div key={dateKey} className="bg-gray-50 rounded-xl border border-dashed border-gray-200 overflow-hidden">
+                    <div className="px-4 py-2 border-b border-dashed border-gray-200">
+                      <span className="text-xs font-medium text-gray-400">{dayLabel}</span>
+                    </div>
+                    <div className="divide-y divide-gray-100">
+                      {dayLogs.map(log => (
+                        <div key={log.id} className="flex items-center gap-3 px-4 py-2.5 opacity-60">
+                          <span className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold grayscale ${TYPE_COLOR[log.workType] ?? 'bg-gray-100 text-gray-700'}`}>{log.workType}</span>
+                          <span className="flex-1 min-w-0">
+                            <span className="text-xs text-gray-500 line-through truncate block">{log.description || WORK_TYPE_LABELS[log.workType]}</span>
+                            <span className="text-xs text-gray-400">
+                              {log.deletedByName && log.deletedByName !== (log as any).userId
+                                ? `管理員已於 ${fmtTime(log.deletedAt!)} 刪除`
+                                : `已於 ${fmtTime(log.deletedAt!)} 刪除`}
+                            </span>
+                          </span>
+                          <span className="text-xs text-gray-400 flex-shrink-0">{log.points} 分</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </details>
         )}
       </div>
 

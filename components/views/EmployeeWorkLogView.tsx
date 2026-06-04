@@ -3,7 +3,10 @@
 import { useEffect, useState } from 'react'
 import WorkLogClient from '@/app/(app)/employee/worklog/client'
 
-type WorkLog = { id: string; date: string; workType: string; description: string | null; points: number; createdAt: string }
+type WorkLog = {
+  id: string; date: string; workType: string; description: string | null
+  points: number; source: string; createdAt: string; deletedAt: string | null; deletedByName: string | null
+}
 
 function Skeleton() {
   return (
@@ -30,23 +33,32 @@ export default function EmployeeWorkLogView() {
   const year = today.getFullYear()
   const month = today.getMonth() + 1
   const [logs, setLogs] = useState<WorkLog[] | null>(null)
+  const [deletedLogs, setDeletedLogs] = useState<WorkLog[] | null>(null)
   const [attendanceDates, setAttendanceDates] = useState<string[] | null>(null)
 
   useEffect(() => {
     Promise.all([
       fetch(`/api/worklog?year=${year}&month=${month}`).then(r => r.json()),
       fetch(`/api/attendance?year=${year}&month=${month}`).then(r => r.json()),
-    ]).then(([wl, att]) => {
-      setLogs((wl as WorkLog[]).map(l => ({ ...l, date: l.date.slice(0, 10) })))
+    ]).then(([wlData, att]) => {
+      const normalize = (l: WorkLog) => ({ ...l, date: l.date.slice(0, 10) })
+      setLogs((wlData.active as WorkLog[]).map(normalize))
+      setDeletedLogs((wlData.deleted as WorkLog[]).map(normalize))
       setAttendanceDates((att as { date: string; type: string }[])
         .filter(r => ['A', 'B', 'C'].includes(r.type))
         .map(r => r.date.slice(0, 10)))
     })
   }, [])
 
-  if (!logs || !attendanceDates) return <Skeleton />
+  if (!logs || !deletedLogs || !attendanceDates) return <Skeleton />
 
   return (
-    <WorkLogClient initialYear={year} initialMonth={month} initialLogs={logs} initialAttendanceDates={attendanceDates} />
+    <WorkLogClient
+      initialYear={year}
+      initialMonth={month}
+      initialLogs={logs}
+      initialDeletedLogs={deletedLogs}
+      initialAttendanceDates={attendanceDates}
+    />
   )
 }
