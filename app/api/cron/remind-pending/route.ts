@@ -14,17 +14,53 @@ export async function GET(req: NextRequest) {
   const todayMonth = hktNow.getUTCMonth()
   const todayDate = hktNow.getUTCDate()
 
-  // 只在 24、25、26 日執行
-  const daysLeft = 26 - todayDate
-  if (todayDate < 24 || todayDate > 26) {
-    return NextResponse.json({ ok: true, message: `Not reminder day. Today: ${todayDate}` })
-  }
-
   // 目標月份（下個月）
   const targetYear = todayMonth === 11 ? todayYear + 1 : todayYear
   const targetMonth = todayMonth === 11 ? 1 : todayMonth + 2 // 1-indexed
   const targetLabel = new Date(Date.UTC(targetYear, targetMonth - 1, 1))
     .toLocaleDateString('zh-HK', { year: 'numeric', month: 'long' })
+
+  // 讀取本月假期，用於判斷工作日
+  const monthHolidays = await prisma.holiday.findMany({
+    where: {
+      date: {
+        gte: new Date(Date.UTC(todayYear, todayMonth, 1)),
+        lt: new Date(Date.UTC(todayYear, todayMonth + 1, 1)),
+      },
+    },
+    select: { date: true },
+  })
+  const holidaySet = new Set(
+    monthHolidays.map(h => {
+      const d = h.date
+      return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`
+    })
+  )
+
+  function isWorkingDay(day: number): boolean {
+    const dow = new Date(Date.UTC(todayYear, todayMonth, day)).getUTCDay()
+    if (dow === 0 || dow === 6) return false
+    const key = `${todayYear}-${String(todayMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+    return !holidaySet.has(key)
+  }
+
+  // 計算每個提醒日（24、25、26）的「實際發送日」：若當天非工作日，往前找最近工作日
+  function effectiveSendDay(target: number): number {
+    let d = target
+    while (d >= 1 && !isWorkingDay(d)) d--
+    return d
+  }
+
+  // 找出今天對應哪些原始提醒日
+  const matchingReminders = [24, 25, 26].filter(d => effectiveSendDay(d) === todayDate)
+
+  if (matchingReminders.length === 0) {
+    return NextResponse.json({ ok: true, message: `Not reminder day. Today: ${todayDate}` })
+  }
+
+  // 取最緊急的（最大的原始提醒日，即 daysLeft 最小）
+  const originalReminderDay = Math.max(...matchingReminders)
+  const daysLeft = 26 - originalReminderDay
 
   // 所有需要提交意願的員工
   const employees = await prisma.user.findMany({
