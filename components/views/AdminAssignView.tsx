@@ -30,7 +30,6 @@ export default function AdminAssignView() {
   const month = today.getMonth()
   const month1 = month + 1
   const [initialData, setInitialData] = useState<null | object>(null)
-  const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
     setInitialData(null)
@@ -52,16 +51,12 @@ export default function AdminAssignView() {
         initialMonth: month,
       })
     })
-  }, [refreshKey])
+  }, [])
 
   if (!initialData) return <Skeleton />
 
   return (
     <main className="max-w-7xl mx-auto px-6 py-8">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-gray-800">分配排班</h2>
-        <button onClick={() => setRefreshKey(k => k + 1)} className="px-2.5 py-1.5 rounded-lg border hover:bg-gray-100 text-gray-500 transition" title="重新整理">↺</button>
-      </div>
       <AdminAssignClient initialData={initialData as Parameters<typeof AdminAssignClient>[0]['initialData']} />
     </main>
   )
