@@ -44,22 +44,25 @@ export async function GET(req: NextRequest) {
     return !holidaySet.has(key)
   }
 
-  // 計算每個提醒日（24、25、26）的「實際發送日」：若當天非工作日，往前找最近工作日
-  function effectiveSendDay(target: number): number {
-    let d = target
+  // 為每個提醒日（26、25、24）各自分配一個獨立工作日
+  // 從 26 倒推：26 取最近工作日，25 取其前一個工作日，24 再往前一個
+  const effectiveMap = new Map<number, number>() // 原始提醒日 -> 實際發送日
+  let ceiling = 26
+  for (const reminderDay of [26, 25, 24]) {
+    let d = Math.min(reminderDay, ceiling)
     while (d >= 1 && !isWorkingDay(d)) d--
-    return d
+    effectiveMap.set(reminderDay, d)
+    ceiling = d - 1
   }
 
-  // 找出今天對應哪些原始提醒日
-  const matchingReminders = [24, 25, 26].filter(d => effectiveSendDay(d) === todayDate)
+  // 找出今天對應哪個原始提醒日
+  const matched = [...effectiveMap.entries()].find(([, effective]) => effective === todayDate)
 
-  if (matchingReminders.length === 0) {
+  if (!matched) {
     return NextResponse.json({ ok: true, message: `Not reminder day. Today: ${todayDate}` })
   }
 
-  // 取最緊急的（最大的原始提醒日，即 daysLeft 最小）
-  const originalReminderDay = Math.max(...matchingReminders)
+  const [originalReminderDay] = matched
   const daysLeft = 26 - originalReminderDay
 
   // 所有需要提交意願的員工
