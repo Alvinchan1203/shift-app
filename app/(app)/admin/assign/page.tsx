@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { requireAuth } from '@/lib/require-auth'
 import { prisma } from '@/lib/prisma'
 import AdminAssignClient from './client'
+import FeishuToggle from '@/components/FeishuToggle'
 import { ShiftKey } from '@/lib/constants'
 
 export default async function AdminAssignPage() {
@@ -13,7 +14,7 @@ export default async function AdminAssignPage() {
   const month = today.getMonth()
   const month1 = month + 1
 
-  const [prefs, assignments, holidays, submissions, publishRecord] = await Promise.all([
+  const [prefs, assignments, holidays, submissions, publishRecord, notifySetting] = await Promise.all([
     prisma.shiftPreference.findMany({
       include: { user: { select: { id: true, name: true } } },
       orderBy: [{ date: 'asc' }, { shift: 'asc' }],
@@ -25,6 +26,7 @@ export default async function AdminAssignPage() {
     prisma.holiday.findMany(),
     prisma.preferenceSubmission.findMany({ where: { year, month: month1 } }),
     prisma.schedulePublish.findUnique({ where: { year_month: { year, month: month1 } } }),
+    prisma.systemSetting.findUnique({ where: { key: 'feishu_notifications_enabled' } }),
   ])
 
   const initialData = {
@@ -38,10 +40,14 @@ export default async function AdminAssignPage() {
     initialMonth: month,
   }
 
+  const notifyEnabled = notifySetting?.value === 'true'
+
   return (
     <main className="max-w-7xl mx-auto px-6 py-8">
-        <h2 className="text-xl font-bold text-gray-800 mb-6">分配排班</h2>
-        <AdminAssignClient initialData={initialData} />
+      <div className="flex justify-end mb-3">
+        <FeishuToggle initialEnabled={notifyEnabled} />
+      </div>
+      <AdminAssignClient initialData={initialData} />
     </main>
   )
 }

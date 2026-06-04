@@ -59,6 +59,7 @@ export const ModelName = {
   AttendanceLog: 'AttendanceLog',
   PreferenceSubmission: 'PreferenceSubmission',
   SchedulePublish: 'SchedulePublish',
+  SystemSetting: 'SystemSetting',
   WorkLog: 'WorkLog',
   MonthlyScore: 'MonthlyScore',
   AdminScoreAdjustment: 'AdminScoreAdjustment',
@@ -178,6 +179,15 @@ export const SchedulePublishScalarFieldEnum = {
 } as const
 
 export type SchedulePublishScalarFieldEnum = (typeof SchedulePublishScalarFieldEnum)[keyof typeof SchedulePublishScalarFieldEnum]
+
+
+export const SystemSettingScalarFieldEnum = {
+  key: 'key',
+  value: 'value',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SystemSettingScalarFieldEnum = (typeof SystemSettingScalarFieldEnum)[keyof typeof SystemSettingScalarFieldEnum]
 
 
 export const WorkLogScalarFieldEnum = {

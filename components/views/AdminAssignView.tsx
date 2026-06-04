@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import AdminAssignClient from '@/app/(app)/admin/assign/client'
+import FeishuToggle from '@/components/FeishuToggle'
 import { ShiftKey } from '@/lib/constants'
 
 type Pref = { id: string; date: string; shift: ShiftKey; user: { id: string; name: string } }
@@ -30,6 +31,7 @@ export default function AdminAssignView() {
   const month = today.getMonth()
   const month1 = month + 1
   const [initialData, setInitialData] = useState<null | object>(null)
+  const [notifyEnabled, setNotifyEnabled] = useState(false)
 
   useEffect(() => {
     setInitialData(null)
@@ -39,7 +41,8 @@ export default function AdminAssignView() {
       fetch('/api/holidays').then(r => r.json()),
       fetch(`/api/preferences/submit?year=${year}&month=${month1}`).then(r => r.json()),
       fetch(`/api/schedule-publish?year=${year}&month=${month1}`).then(r => r.json()),
-    ]).then(([prefs, assignments, holidays, subs, publishData]) => {
+      fetch('/api/admin/settings').then(r => r.json()),
+    ]).then(([prefs, assignments, holidays, subs, publishData, settings]) => {
       setInitialData({
         prefs: prefs.map((p: Pref) => ({ ...p, date: p.date.slice(0, 10) })),
         assignments: assignments.map((a: Assignment) => ({ ...a, date: a.date.slice(0, 10) })),
@@ -50,6 +53,7 @@ export default function AdminAssignView() {
         initialYear: year,
         initialMonth: month,
       })
+      setNotifyEnabled(settings?.feishu_notifications_enabled === 'true')
     })
   }, [])
 
@@ -57,6 +61,9 @@ export default function AdminAssignView() {
 
   return (
     <main className="max-w-7xl mx-auto px-6 py-8">
+      <div className="flex justify-end mb-3">
+        <FeishuToggle initialEnabled={notifyEnabled} />
+      </div>
       <AdminAssignClient initialData={initialData as Parameters<typeof AdminAssignClient>[0]['initialData']} />
     </main>
   )

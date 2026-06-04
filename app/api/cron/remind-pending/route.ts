@@ -8,6 +8,12 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  // 檢查飛書通知開關
+  const notifySetting = await prisma.systemSetting.findUnique({ where: { key: 'feishu_notifications_enabled' } })
+  if (notifySetting?.value !== 'true') {
+    return NextResponse.json({ ok: true, message: 'Feishu notifications disabled' })
+  }
+
   // 取得今天香港時間 (UTC+8)
   const hktNow = new Date(Date.now() + 8 * 60 * 60 * 1000)
   const todayYear = hktNow.getUTCFullYear()

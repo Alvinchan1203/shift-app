@@ -58,6 +58,11 @@ export type PreferenceSubmission = Prisma.PreferenceSubmissionModel
  */
 export type SchedulePublish = Prisma.SchedulePublishModel
 /**
+ * Model SystemSetting
+ * 
+ */
+export type SystemSetting = Prisma.SystemSettingModel
+/**
  * Model WorkLog
  * 
  */

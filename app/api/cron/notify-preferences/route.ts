@@ -27,6 +27,12 @@ export async function GET(req: NextRequest) {
   const todayMonth = hktNow.getUTCMonth()
   const todayDate = hktNow.getUTCDate()
 
+  // 檢查飛書通知開關
+  const notifySetting = await prisma.systemSetting.findUnique({ where: { key: 'feishu_notifications_enabled' } })
+  if (notifySetting?.value !== 'true') {
+    return NextResponse.json({ ok: true, message: 'Feishu notifications disabled' })
+  }
+
   // 讀取本月假期
   const holidays = await prisma.holiday.findMany({
     where: {

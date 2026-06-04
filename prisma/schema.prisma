@@ -133,6 +133,12 @@ model SchedulePublish {
   @@unique([year, month])
 }
 
+model SystemSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
 enum WorkType {
   A
   B
