@@ -129,6 +129,26 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
     return total
   }
 
+  // Estimated hours = ALL assigned shifts for the month (past + future)
+  function calcEstimatedMinutes(userId: string): number {
+    let total = 0
+    const monthRecords = records.filter(r => r.userId === userId && r.date.startsWith(monthPrefix))
+    const recordedDates = new Set(monthRecords.map(r => r.date))
+    for (const r of monthRecords) {
+      if (r.type === 'OT' || r.type === 'SPECIAL') {
+        total += r.durationMinutes ?? 0
+      } else {
+        total += SHIFT_DURATIONS[r.type] ?? 0
+      }
+    }
+    for (const a of assignments.filter(a => a.userId === userId && a.date.startsWith(monthPrefix))) {
+      if (!recordedDates.has(a.date)) {
+        total += SHIFT_DURATIONS[a.shift as AttendanceTypeKey] ?? 0
+      }
+    }
+    return total
+  }
+
   function openModal(userId: string, userName: string, dateStr: string) {
     const existingRecords = getRecords(userId, dateStr)
     const existing = existingRecords.map(r => r.type)
@@ -338,6 +358,7 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
 
   const monthRecordsEmployee = records.filter(r => r.date.startsWith(monthPrefix))
   const totalMinutesEmployee = calcMonthlyMinutes(currentUserId)
+  const estimatedMinutesEmployee = calcEstimatedMinutes(currentUserId)
 
   const todayStr = toDateStr(new Date())
   const assignPrefillEntries = assignments
@@ -492,9 +513,9 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
           )}
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-medium text-gray-700">本月出勤明細</h3>
-            {totalMinutesEmployee > 0 && (
+            {estimatedMinutesEmployee > 0 && (
               <span className="text-sm font-semibold text-blue-700">
-                估算工時 {formatDuration(totalMinutesEmployee)}
+                估算工時 {formatDuration(estimatedMinutesEmployee)}
               </span>
             )}
           </div>
