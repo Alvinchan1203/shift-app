@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import ShiftBadge from '@/components/ShiftBadge'
 import { ShiftKey } from '@/lib/constants'
 import MonthPicker from '@/components/MonthPicker'
+import RefreshButton from '@/components/RefreshButton'
 
 export default async function AdminPreferencesPage({
   searchParams,
@@ -71,7 +72,10 @@ export default async function AdminPreferencesPage({
               </span>
             )}
           </div>
-          <MonthPicker year={year} month={month} basePath="/admin/preferences" />
+          <div className="flex items-center gap-2">
+            <MonthPicker year={year} month={month} basePath="/admin/preferences" />
+            <RefreshButton />
+          </div>
         </div>
 
         {allEmployees.length === 0 ? (
