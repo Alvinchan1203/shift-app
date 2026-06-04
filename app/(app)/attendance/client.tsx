@@ -119,8 +119,9 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
         total += SHIFT_DURATIONS[r.type] ?? 0
       }
     }
-    // Also count assignment prefill for days with no saved records
-    for (const a of assignments.filter(a => a.userId === userId && a.date.startsWith(monthPrefix))) {
+    // Only count past assignment prefills (no saved records) to match the detail view
+    const today = toDateStr(new Date())
+    for (const a of assignments.filter(a => a.userId === userId && a.date.startsWith(monthPrefix) && a.date < today)) {
       if (!recordedDates.has(a.date)) {
         total += SHIFT_DURATIONS[a.shift as AttendanceTypeKey] ?? 0
       }
