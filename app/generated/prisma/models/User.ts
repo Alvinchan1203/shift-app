@@ -32,6 +32,7 @@ export type UserMinAggregateOutputType = {
   role: $Enums.Role | null
   preferenceEnabled: boolean | null
   extraSubmitEnabled: boolean | null
+  canDeleteAdmin: boolean | null
   createdAt: Date | null
 }
 
@@ -43,6 +44,7 @@ export type UserMaxAggregateOutputType = {
   role: $Enums.Role | null
   preferenceEnabled: boolean | null
   extraSubmitEnabled: boolean | null
+  canDeleteAdmin: boolean | null
   createdAt: Date | null
 }
 
@@ -54,6 +56,7 @@ export type UserCountAggregateOutputType = {
   role: number
   preferenceEnabled: number
   extraSubmitEnabled: number
+  canDeleteAdmin: number
   createdAt: number
   _all: number
 }
@@ -67,6 +70,7 @@ export type UserMinAggregateInputType = {
   role?: true
   preferenceEnabled?: true
   extraSubmitEnabled?: true
+  canDeleteAdmin?: true
   createdAt?: true
 }
 
@@ -78,6 +82,7 @@ export type UserMaxAggregateInputType = {
   role?: true
   preferenceEnabled?: true
   extraSubmitEnabled?: true
+  canDeleteAdmin?: true
   createdAt?: true
 }
 
@@ -89,6 +94,7 @@ export type UserCountAggregateInputType = {
   role?: true
   preferenceEnabled?: true
   extraSubmitEnabled?: true
+  canDeleteAdmin?: true
   createdAt?: true
   _all?: true
 }
@@ -173,6 +179,7 @@ export type UserGroupByOutputType = {
   role: $Enums.Role
   preferenceEnabled: boolean
   extraSubmitEnabled: boolean
+  canDeleteAdmin: boolean
   createdAt: Date
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
@@ -205,6 +212,7 @@ export type UserWhereInput = {
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   preferenceEnabled?: Prisma.BoolFilter<"User"> | boolean
   extraSubmitEnabled?: Prisma.BoolFilter<"User"> | boolean
+  canDeleteAdmin?: Prisma.BoolFilter<"User"> | boolean
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   preferences?: Prisma.ShiftPreferenceListRelationFilter
   assignments?: Prisma.ShiftAssignmentListRelationFilter
@@ -223,6 +231,7 @@ export type UserOrderByWithRelationInput = {
   role?: Prisma.SortOrder
   preferenceEnabled?: Prisma.SortOrder
   extraSubmitEnabled?: Prisma.SortOrder
+  canDeleteAdmin?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   preferences?: Prisma.ShiftPreferenceOrderByRelationAggregateInput
   assignments?: Prisma.ShiftAssignmentOrderByRelationAggregateInput
@@ -244,6 +253,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   preferenceEnabled?: Prisma.BoolFilter<"User"> | boolean
   extraSubmitEnabled?: Prisma.BoolFilter<"User"> | boolean
+  canDeleteAdmin?: Prisma.BoolFilter<"User"> | boolean
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   preferences?: Prisma.ShiftPreferenceListRelationFilter
   assignments?: Prisma.ShiftAssignmentListRelationFilter
@@ -262,6 +272,7 @@ export type UserOrderByWithAggregationInput = {
   role?: Prisma.SortOrder
   preferenceEnabled?: Prisma.SortOrder
   extraSubmitEnabled?: Prisma.SortOrder
+  canDeleteAdmin?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
@@ -279,6 +290,7 @@ export type UserScalarWhereWithAggregatesInput = {
   role?: Prisma.EnumRoleWithAggregatesFilter<"User"> | $Enums.Role
   preferenceEnabled?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   extraSubmitEnabled?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  canDeleteAdmin?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
 
@@ -290,6 +302,7 @@ export type UserCreateInput = {
   role?: $Enums.Role
   preferenceEnabled?: boolean
   extraSubmitEnabled?: boolean
+  canDeleteAdmin?: boolean
   createdAt?: Date | string
   preferences?: Prisma.ShiftPreferenceCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentCreateNestedManyWithoutUserInput
@@ -308,6 +321,7 @@ export type UserUncheckedCreateInput = {
   role?: $Enums.Role
   preferenceEnabled?: boolean
   extraSubmitEnabled?: boolean
+  canDeleteAdmin?: boolean
   createdAt?: Date | string
   preferences?: Prisma.ShiftPreferenceUncheckedCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentUncheckedCreateNestedManyWithoutUserInput
@@ -326,6 +340,7 @@ export type UserUpdateInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   preferenceEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   extraSubmitEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   preferences?: Prisma.ShiftPreferenceUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUpdateManyWithoutUserNestedInput
@@ -344,6 +359,7 @@ export type UserUncheckedUpdateInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   preferenceEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   extraSubmitEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   preferences?: Prisma.ShiftPreferenceUncheckedUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUncheckedUpdateManyWithoutUserNestedInput
@@ -362,6 +378,7 @@ export type UserCreateManyInput = {
   role?: $Enums.Role
   preferenceEnabled?: boolean
   extraSubmitEnabled?: boolean
+  canDeleteAdmin?: boolean
   createdAt?: Date | string
 }
 
@@ -373,6 +390,7 @@ export type UserUpdateManyMutationInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   preferenceEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   extraSubmitEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -384,6 +402,7 @@ export type UserUncheckedUpdateManyInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   preferenceEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   extraSubmitEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -395,6 +414,7 @@ export type UserCountOrderByAggregateInput = {
   role?: Prisma.SortOrder
   preferenceEnabled?: Prisma.SortOrder
   extraSubmitEnabled?: Prisma.SortOrder
+  canDeleteAdmin?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -406,6 +426,7 @@ export type UserMaxOrderByAggregateInput = {
   role?: Prisma.SortOrder
   preferenceEnabled?: Prisma.SortOrder
   extraSubmitEnabled?: Prisma.SortOrder
+  canDeleteAdmin?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -417,6 +438,7 @@ export type UserMinOrderByAggregateInput = {
   role?: Prisma.SortOrder
   preferenceEnabled?: Prisma.SortOrder
   extraSubmitEnabled?: Prisma.SortOrder
+  canDeleteAdmin?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -547,6 +569,7 @@ export type UserCreateWithoutPreferencesInput = {
   role?: $Enums.Role
   preferenceEnabled?: boolean
   extraSubmitEnabled?: boolean
+  canDeleteAdmin?: boolean
   createdAt?: Date | string
   assignments?: Prisma.ShiftAssignmentCreateNestedManyWithoutUserInput
   attendances?: Prisma.AttendanceRecordCreateNestedManyWithoutUserInput
@@ -564,6 +587,7 @@ export type UserUncheckedCreateWithoutPreferencesInput = {
   role?: $Enums.Role
   preferenceEnabled?: boolean
   extraSubmitEnabled?: boolean
+  canDeleteAdmin?: boolean
   createdAt?: Date | string
   assignments?: Prisma.ShiftAssignmentUncheckedCreateNestedManyWithoutUserInput
   attendances?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutUserInput
@@ -597,6 +621,7 @@ export type UserUpdateWithoutPreferencesInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   preferenceEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   extraSubmitEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignments?: Prisma.ShiftAssignmentUpdateManyWithoutUserNestedInput
   attendances?: Prisma.AttendanceRecordUpdateManyWithoutUserNestedInput
@@ -614,6 +639,7 @@ export type UserUncheckedUpdateWithoutPreferencesInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   preferenceEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   extraSubmitEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   assignments?: Prisma.ShiftAssignmentUncheckedUpdateManyWithoutUserNestedInput
   attendances?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutUserNestedInput
@@ -631,6 +657,7 @@ export type UserCreateWithoutAssignmentsInput = {
   role?: $Enums.Role
   preferenceEnabled?: boolean
   extraSubmitEnabled?: boolean
+  canDeleteAdmin?: boolean
   createdAt?: Date | string
   preferences?: Prisma.ShiftPreferenceCreateNestedManyWithoutUserInput
   attendances?: Prisma.AttendanceRecordCreateNestedManyWithoutUserInput
@@ -648,6 +675,7 @@ export type UserUncheckedCreateWithoutAssignmentsInput = {
   role?: $Enums.Role
   preferenceEnabled?: boolean
   extraSubmitEnabled?: boolean
+  canDeleteAdmin?: boolean
   createdAt?: Date | string
   preferences?: Prisma.ShiftPreferenceUncheckedCreateNestedManyWithoutUserInput
   attendances?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutUserInput
@@ -681,6 +709,7 @@ export type UserUpdateWithoutAssignmentsInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   preferenceEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   extraSubmitEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   preferences?: Prisma.ShiftPreferenceUpdateManyWithoutUserNestedInput
   attendances?: Prisma.AttendanceRecordUpdateManyWithoutUserNestedInput
@@ -698,6 +727,7 @@ export type UserUncheckedUpdateWithoutAssignmentsInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   preferenceEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   extraSubmitEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   preferences?: Prisma.ShiftPreferenceUncheckedUpdateManyWithoutUserNestedInput
   attendances?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutUserNestedInput
@@ -715,6 +745,7 @@ export type UserCreateWithoutAttendancesInput = {
   role?: $Enums.Role
   preferenceEnabled?: boolean
   extraSubmitEnabled?: boolean
+  canDeleteAdmin?: boolean
   createdAt?: Date | string
   preferences?: Prisma.ShiftPreferenceCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentCreateNestedManyWithoutUserInput
@@ -732,6 +763,7 @@ export type UserUncheckedCreateWithoutAttendancesInput = {
   role?: $Enums.Role
   preferenceEnabled?: boolean
   extraSubmitEnabled?: boolean
+  canDeleteAdmin?: boolean
   createdAt?: Date | string
   preferences?: Prisma.ShiftPreferenceUncheckedCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentUncheckedCreateNestedManyWithoutUserInput
@@ -765,6 +797,7 @@ export type UserUpdateWithoutAttendancesInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   preferenceEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   extraSubmitEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   preferences?: Prisma.ShiftPreferenceUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUpdateManyWithoutUserNestedInput
@@ -782,6 +815,7 @@ export type UserUncheckedUpdateWithoutAttendancesInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   preferenceEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   extraSubmitEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   preferences?: Prisma.ShiftPreferenceUncheckedUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUncheckedUpdateManyWithoutUserNestedInput
@@ -799,6 +833,7 @@ export type UserCreateWithoutSubmissionsInput = {
   role?: $Enums.Role
   preferenceEnabled?: boolean
   extraSubmitEnabled?: boolean
+  canDeleteAdmin?: boolean
   createdAt?: Date | string
   preferences?: Prisma.ShiftPreferenceCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentCreateNestedManyWithoutUserInput
@@ -816,6 +851,7 @@ export type UserUncheckedCreateWithoutSubmissionsInput = {
   role?: $Enums.Role
   preferenceEnabled?: boolean
   extraSubmitEnabled?: boolean
+  canDeleteAdmin?: boolean
   createdAt?: Date | string
   preferences?: Prisma.ShiftPreferenceUncheckedCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentUncheckedCreateNestedManyWithoutUserInput
@@ -849,6 +885,7 @@ export type UserUpdateWithoutSubmissionsInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   preferenceEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   extraSubmitEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   preferences?: Prisma.ShiftPreferenceUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUpdateManyWithoutUserNestedInput
@@ -866,6 +903,7 @@ export type UserUncheckedUpdateWithoutSubmissionsInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   preferenceEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   extraSubmitEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   preferences?: Prisma.ShiftPreferenceUncheckedUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUncheckedUpdateManyWithoutUserNestedInput
@@ -883,6 +921,7 @@ export type UserCreateWithoutWorkLogsInput = {
   role?: $Enums.Role
   preferenceEnabled?: boolean
   extraSubmitEnabled?: boolean
+  canDeleteAdmin?: boolean
   createdAt?: Date | string
   preferences?: Prisma.ShiftPreferenceCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentCreateNestedManyWithoutUserInput
@@ -900,6 +939,7 @@ export type UserUncheckedCreateWithoutWorkLogsInput = {
   role?: $Enums.Role
   preferenceEnabled?: boolean
   extraSubmitEnabled?: boolean
+  canDeleteAdmin?: boolean
   createdAt?: Date | string
   preferences?: Prisma.ShiftPreferenceUncheckedCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentUncheckedCreateNestedManyWithoutUserInput
@@ -933,6 +973,7 @@ export type UserUpdateWithoutWorkLogsInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   preferenceEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   extraSubmitEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   preferences?: Prisma.ShiftPreferenceUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUpdateManyWithoutUserNestedInput
@@ -950,6 +991,7 @@ export type UserUncheckedUpdateWithoutWorkLogsInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   preferenceEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   extraSubmitEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   preferences?: Prisma.ShiftPreferenceUncheckedUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUncheckedUpdateManyWithoutUserNestedInput
@@ -967,6 +1009,7 @@ export type UserCreateWithoutMonthlyScoresInput = {
   role?: $Enums.Role
   preferenceEnabled?: boolean
   extraSubmitEnabled?: boolean
+  canDeleteAdmin?: boolean
   createdAt?: Date | string
   preferences?: Prisma.ShiftPreferenceCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentCreateNestedManyWithoutUserInput
@@ -984,6 +1027,7 @@ export type UserUncheckedCreateWithoutMonthlyScoresInput = {
   role?: $Enums.Role
   preferenceEnabled?: boolean
   extraSubmitEnabled?: boolean
+  canDeleteAdmin?: boolean
   createdAt?: Date | string
   preferences?: Prisma.ShiftPreferenceUncheckedCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentUncheckedCreateNestedManyWithoutUserInput
@@ -1017,6 +1061,7 @@ export type UserUpdateWithoutMonthlyScoresInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   preferenceEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   extraSubmitEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   preferences?: Prisma.ShiftPreferenceUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUpdateManyWithoutUserNestedInput
@@ -1034,6 +1079,7 @@ export type UserUncheckedUpdateWithoutMonthlyScoresInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   preferenceEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   extraSubmitEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   preferences?: Prisma.ShiftPreferenceUncheckedUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUncheckedUpdateManyWithoutUserNestedInput
@@ -1051,6 +1097,7 @@ export type UserCreateWithoutMonthlyDeductionsInput = {
   role?: $Enums.Role
   preferenceEnabled?: boolean
   extraSubmitEnabled?: boolean
+  canDeleteAdmin?: boolean
   createdAt?: Date | string
   preferences?: Prisma.ShiftPreferenceCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentCreateNestedManyWithoutUserInput
@@ -1068,6 +1115,7 @@ export type UserUncheckedCreateWithoutMonthlyDeductionsInput = {
   role?: $Enums.Role
   preferenceEnabled?: boolean
   extraSubmitEnabled?: boolean
+  canDeleteAdmin?: boolean
   createdAt?: Date | string
   preferences?: Prisma.ShiftPreferenceUncheckedCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentUncheckedCreateNestedManyWithoutUserInput
@@ -1101,6 +1149,7 @@ export type UserUpdateWithoutMonthlyDeductionsInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   preferenceEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   extraSubmitEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   preferences?: Prisma.ShiftPreferenceUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUpdateManyWithoutUserNestedInput
@@ -1118,6 +1167,7 @@ export type UserUncheckedUpdateWithoutMonthlyDeductionsInput = {
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   preferenceEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   extraSubmitEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   preferences?: Prisma.ShiftPreferenceUncheckedUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUncheckedUpdateManyWithoutUserNestedInput
@@ -1220,6 +1270,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   role?: boolean
   preferenceEnabled?: boolean
   extraSubmitEnabled?: boolean
+  canDeleteAdmin?: boolean
   createdAt?: boolean
   preferences?: boolean | Prisma.User$preferencesArgs<ExtArgs>
   assignments?: boolean | Prisma.User$assignmentsArgs<ExtArgs>
@@ -1239,6 +1290,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   role?: boolean
   preferenceEnabled?: boolean
   extraSubmitEnabled?: boolean
+  canDeleteAdmin?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["user"]>
 
@@ -1250,6 +1302,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   role?: boolean
   preferenceEnabled?: boolean
   extraSubmitEnabled?: boolean
+  canDeleteAdmin?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["user"]>
 
@@ -1261,10 +1314,11 @@ export type UserSelectScalar = {
   role?: boolean
   preferenceEnabled?: boolean
   extraSubmitEnabled?: boolean
+  canDeleteAdmin?: boolean
   createdAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "role" | "preferenceEnabled" | "extraSubmitEnabled" | "createdAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "role" | "preferenceEnabled" | "extraSubmitEnabled" | "canDeleteAdmin" | "createdAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   preferences?: boolean | Prisma.User$preferencesArgs<ExtArgs>
   assignments?: boolean | Prisma.User$assignmentsArgs<ExtArgs>
@@ -1297,6 +1351,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     role: $Enums.Role
     preferenceEnabled: boolean
     extraSubmitEnabled: boolean
+    canDeleteAdmin: boolean
     createdAt: Date
   }, ExtArgs["result"]["user"]>
   composites: {}
@@ -1735,6 +1790,7 @@ export interface UserFieldRefs {
   readonly role: Prisma.FieldRef<"User", 'Role'>
   readonly preferenceEnabled: Prisma.FieldRef<"User", 'Boolean'>
   readonly extraSubmitEnabled: Prisma.FieldRef<"User", 'Boolean'>
+  readonly canDeleteAdmin: Prisma.FieldRef<"User", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
 }
     
