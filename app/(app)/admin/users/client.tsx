@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 
-type Employee = { id: string; name: string; email: string; role: string; extraSubmitEnabled: boolean; createdAt: string }
+type Employee = { id: string; name: string; email: string; role: string; extraSubmitEnabled: boolean; canDeleteAdmin: boolean; createdAt: string }
 
 const inputCls = 'w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300'
 
-export default function UsersClient({ currentUserName, initialData }: { currentUserName: string; initialData: Employee[] }) {
+export default function UsersClient({ currentUserName, currentUserCanDeleteAdmin, initialData }: { currentUserName: string; currentUserCanDeleteAdmin: boolean; initialData: Employee[] }) {
   const [employees, setEmployees] = useState<Employee[]>(initialData)
 
   const [addModal, setAddModal] = useState(false)
@@ -92,6 +92,15 @@ export default function UsersClient({ currentUserName, initialData }: { currentU
     setEmployees(prev => prev.map(e => e.id === emp.id ? { ...e, extraSubmitEnabled: updated.extraSubmitEnabled } : e))
   }
 
+  async function toggleCanDeleteAdmin(emp: Employee) {
+    const updated = await fetch('/api/admin/users', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: emp.id, canDeleteAdmin: !emp.canDeleteAdmin }),
+    }).then(r => r.json())
+    setEmployees(prev => prev.map(e => e.id === emp.id ? { ...e, canDeleteAdmin: updated.canDeleteAdmin } : e))
+  }
+
   async function resetEmployeePassword() {
     setResetError('')
     setResetSuccess(false)
@@ -153,13 +162,27 @@ export default function UsersClient({ currentUserName, initialData }: { currentU
                         額外報更
                       </button>
                     )}
+                    {emp.role === 'ADMIN' && currentUserCanDeleteAdmin && (
+                      <button
+                        onClick={() => toggleCanDeleteAdmin(emp)}
+                        title={emp.canDeleteAdmin ? '點擊撤銷刪除管理員權限' : '點擊授予刪除管理員權限'}
+                        className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg border transition ${
+                          emp.canDeleteAdmin
+                            ? 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100'
+                            : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100'
+                        }`}
+                      >
+                        <span className={`w-2 h-2 rounded-full ${emp.canDeleteAdmin ? 'bg-purple-500' : 'bg-gray-300'}`} />
+                        刪管理員
+                      </button>
+                    )}
                     <button
                       onClick={() => { setResetModal(emp); setResetPassword(''); setResetNewPassword(''); setResetError(''); setResetSuccess(false) }}
                       className="text-xs text-amber-600 hover:text-amber-800 border border-amber-200 rounded-lg px-2.5 py-1 hover:bg-amber-50 transition"
                     >
                       重置密碼
                     </button>
-                    {(emp.role === 'EMPLOYEE' || currentUserName === 'nicochen') && (
+                    {(emp.role === 'EMPLOYEE' || currentUserCanDeleteAdmin) && (
                       <button
                         onClick={() => { setDeleteModal(emp); setDeletePassword(''); setDeleteError('') }}
                         className="text-xs text-red-500 hover:text-red-700 border border-red-200 rounded-lg px-2.5 py-1 hover:bg-red-50 transition"

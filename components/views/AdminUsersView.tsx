@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import UsersClient from '@/app/(app)/admin/users/client'
 
-type Employee = { id: string; name: string; email: string; role: string; extraSubmitEnabled: boolean; createdAt: string }
+type Employee = { id: string; name: string; email: string; role: string; extraSubmitEnabled: boolean; canDeleteAdmin: boolean; createdAt: string }
 
 function Skeleton() {
   return (
@@ -34,12 +34,14 @@ export default function AdminUsersView({ userName }: { userName: string }) {
 
   if (!data) return <Skeleton />
 
+  const currentUserCanDeleteAdmin = data.find(e => e.name === userName)?.canDeleteAdmin ?? false
+
   return (
     <main className="max-w-2xl mx-auto px-4 py-6">
       <div className="flex justify-end mb-2">
         <button onClick={() => setRefreshKey(k => k + 1)} className="px-2.5 py-1.5 rounded-lg border hover:bg-gray-100 text-gray-500 transition" title="重新整理">↺</button>
       </div>
-      <UsersClient currentUserName={userName} initialData={data} />
+      <UsersClient currentUserName={userName} currentUserCanDeleteAdmin={currentUserCanDeleteAdmin} initialData={data} />
     </main>
   )
 }

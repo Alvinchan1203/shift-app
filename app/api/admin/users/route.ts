@@ -10,7 +10,7 @@ export async function GET() {
   }
 
   const users = await prisma.user.findMany({
-    select: { id: true, name: true, email: true, role: true, extraSubmitEnabled: true, createdAt: true },
+    select: { id: true, name: true, email: true, role: true, extraSubmitEnabled: true, canDeleteAdmin: true, createdAt: true },
     orderBy: { name: 'asc' },
   })
   return NextResponse.json(users)
@@ -22,14 +22,33 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  const { userId, extraSubmitEnabled } = await req.json()
-  if (!userId || typeof extraSubmitEnabled !== 'boolean') {
-    return NextResponse.json({ error: '缺少資料' }, { status: 400 })
+  const body = await req.json()
+  const { userId } = body
+
+  if (!userId) return NextResponse.json({ error: '缺少資料' }, { status: 400 })
+
+  if ('canDeleteAdmin' in body) {
+    if (typeof body.canDeleteAdmin !== 'boolean') {
+      return NextResponse.json({ error: '缺少資料' }, { status: 400 })
+    }
+    const admin = await prisma.user.findUnique({ where: { id: session.user.id }, select: { canDeleteAdmin: true } })
+    if (!admin?.canDeleteAdmin) {
+      return NextResponse.json({ error: '無權限修改此設定' }, { status: 403 })
+    }
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: { canDeleteAdmin: body.canDeleteAdmin },
+      select: { id: true, canDeleteAdmin: true },
+    })
+    return NextResponse.json(user)
   }
 
+  if (typeof body.extraSubmitEnabled !== 'boolean') {
+    return NextResponse.json({ error: '缺少資料' }, { status: 400 })
+  }
   const user = await prisma.user.update({
     where: { id: userId },
-    data: { extraSubmitEnabled },
+    data: { extraSubmitEnabled: body.extraSubmitEnabled },
     select: { id: true, extraSubmitEnabled: true },
   })
   return NextResponse.json(user)
@@ -113,8 +132,8 @@ export async function DELETE(req: NextRequest) {
     if (!valid) return NextResponse.json({ error: '管理員密碼錯誤' }, { status: 401 })
 
     const target = await prisma.user.findUnique({ where: { id: userId } })
-    if (target?.role === 'ADMIN' && admin.name !== 'nicochen') {
-      return NextResponse.json({ error: '只有 nicochen 可以刪除管理員帳號' }, { status: 403 })
+    if (target?.role === 'ADMIN' && !admin.canDeleteAdmin) {
+      return NextResponse.json({ error: '您沒有刪除管理員帳號的權限' }, { status: 403 })
     }
 
     await prisma.user.delete({ where: { id: userId } })
