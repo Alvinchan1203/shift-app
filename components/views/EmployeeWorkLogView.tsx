@@ -35,8 +35,10 @@ export default function EmployeeWorkLogView() {
   const [logs, setLogs] = useState<WorkLog[] | null>(null)
   const [deletedLogs, setDeletedLogs] = useState<WorkLog[] | null>(null)
   const [attendanceDates, setAttendanceDates] = useState<string[] | null>(null)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
+    setLogs(null)
     Promise.all([
       fetch(`/api/worklog?year=${year}&month=${month}`).then(r => r.json()),
       fetch(`/api/attendance?year=${year}&month=${month}`).then(r => r.json()),
@@ -51,7 +53,7 @@ export default function EmployeeWorkLogView() {
       const assignmentDates = (asgn as { date: string }[]).map(r => r.date.slice(0, 10))
       setAttendanceDates([...new Set([...attendanceDates, ...assignmentDates])])
     })
-  }, [])
+  }, [refreshKey])
 
   if (!logs || !deletedLogs || !attendanceDates) return <Skeleton />
 
@@ -62,6 +64,7 @@ export default function EmployeeWorkLogView() {
       initialLogs={logs}
       initialDeletedLogs={deletedLogs}
       initialAttendanceDates={attendanceDates}
+      onRefresh={() => setRefreshKey(k => k + 1)}
     />
   )
 }

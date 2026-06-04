@@ -30,23 +30,25 @@ export default function AdminScoresView() {
   const [year, setYear] = useState(today.getFullYear())
   const [month, setMonth] = useState(today.getMonth() + 1)
   const [employeeData, setEmployeeData] = useState<object[] | null>(null)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
     setEmployeeData(null)
     fetch(`/api/admin/scores?year=${year}&month=${month}`)
       .then(r => r.json())
       .then(setEmployeeData)
-  }, [year, month])
+  }, [year, month, refreshKey])
 
   if (!employeeData) return <Skeleton />
 
   return (
     <AdminScoresClient
-      key={`${year}-${month}`}
+      key={`${year}-${month}-${refreshKey}`}
       year={year}
       month={month}
       employeeData={employeeData as Parameters<typeof AdminScoresClient>[0]['employeeData']}
       onMonthChange={(y, m) => { setYear(y); setMonth(m) }}
+      onRefresh={() => setRefreshKey(k => k + 1)}
     />
   )
 }

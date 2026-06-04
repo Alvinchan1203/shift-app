@@ -23,17 +23,22 @@ function Skeleton() {
 
 export default function AdminUsersView({ userName }: { userName: string }) {
   const [data, setData] = useState<Employee[] | null>(null)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
+    setData(null)
     fetch('/api/admin/users')
       .then(r => r.json())
       .then(setData)
-  }, [])
+  }, [refreshKey])
 
   if (!data) return <Skeleton />
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-6">
+      <div className="flex justify-end mb-2">
+        <button onClick={() => setRefreshKey(k => k + 1)} className="px-2.5 py-1.5 rounded-lg border hover:bg-gray-100 text-gray-500 transition" title="重新整理">↺</button>
+      </div>
       <UsersClient currentUserName={userName} initialData={data} />
     </main>
   )

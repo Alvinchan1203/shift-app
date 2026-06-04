@@ -25,6 +25,7 @@ interface Props {
   initialLogs: WorkLog[]
   initialDeletedLogs: WorkLog[]
   initialAttendanceDates: string[]
+  onRefresh?: () => void
 }
 
 function toDateStr(d: Date) {
@@ -48,7 +49,7 @@ const TYPE_COLOR: Record<string, string> = {
   E: 'bg-gray-100 text-gray-700',
 }
 
-export default function WorkLogClient({ initialYear, initialMonth, initialLogs, initialDeletedLogs, initialAttendanceDates }: Props) {
+export default function WorkLogClient({ initialYear, initialMonth, initialLogs, initialDeletedLogs, initialAttendanceDates, onRefresh }: Props) {
   const [year, setYear] = useState(initialYear)
   const [month, setMonth] = useState(initialMonth)
   const [logs, setLogs] = useState<WorkLog[]>(initialLogs)
@@ -155,7 +156,12 @@ export default function WorkLogClient({ initialYear, initialMonth, initialLogs, 
   return (
     <main className="max-w-2xl mx-auto px-4 py-6 sm:py-8">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-gray-800">工作記錄</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="text-xl font-bold text-gray-800">工作記錄</h2>
+          {onRefresh && (
+            <button onClick={onRefresh} className="px-2.5 py-1.5 rounded-lg border hover:bg-gray-100 text-gray-500 transition" title="重新整理">↺</button>
+          )}
+        </div>
         <MonthPicker year={year} month={month} onChange={(y, m) => { setYear(y); setMonth(m) }} />
       </div>
 

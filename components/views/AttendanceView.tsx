@@ -31,8 +31,10 @@ export default function AttendanceView({ isAdmin, userId, userName }: Props) {
   const [loaded, setLoaded] = useState(false)
   const [users, setUsers] = useState<User[]>([])
   const [initialData, setInitialData] = useState<object | null>(null)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
+    setLoaded(false)
     const today = new Date()
     const year = today.getFullYear()
     const month = today.getMonth()
@@ -69,15 +71,18 @@ export default function AttendanceView({ isAdmin, userId, userName }: Props) {
         setLoaded(true)
       }
     )
-  }, [])
+  }, [refreshKey])
 
   if (!loaded || !initialData) return <Skeleton />
 
   return (
     <main className="px-4 py-6">
-      <h2 className="text-xl font-bold text-gray-800 mb-6">
-        {isAdmin ? '實際出勤管理' : '我的出勤記錄'}
-      </h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-bold text-gray-800">
+          {isAdmin ? '實際出勤管理' : '我的出勤記錄'}
+        </h2>
+        <button onClick={() => setRefreshKey(k => k + 1)} className="px-2.5 py-1.5 rounded-lg border hover:bg-gray-100 text-gray-500 transition" title="重新整理">↺</button>
+      </div>
       <AttendanceClient
         isAdmin={isAdmin}
         users={users}

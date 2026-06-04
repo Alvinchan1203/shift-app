@@ -28,8 +28,10 @@ export default function EmployeePreferencesView({ userName }: { userName: string
   const [holidays, setHolidays] = useState<Holiday[]>([])
   const [submission, setSubmission] = useState<{ submittedAt: string } | null>(null)
   const [extraSubmitEnabled, setExtraSubmitEnabled] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
+    setLoaded(false)
     const today = new Date()
     const nextMonth = today.getMonth() + 2
     const nextYear = nextMonth > 12 ? today.getFullYear() + 1 : today.getFullYear()
@@ -47,12 +49,15 @@ export default function EmployeePreferencesView({ userName }: { userName: string
       setExtraSubmitEnabled(me.extraSubmitEnabled ?? false)
       setLoaded(true)
     })
-  }, [])
+  }, [refreshKey])
 
   if (!loaded) return <Skeleton />
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-8">
+      <div className="flex justify-end mb-2">
+        <button onClick={() => setRefreshKey(k => k + 1)} className="px-2.5 py-1.5 rounded-lg border hover:bg-gray-100 text-gray-500 transition" title="重新整理">↺</button>
+      </div>
       <EmployeePreferencesClient
         userName={userName}
         extraSubmitEnabled={extraSubmitEnabled}

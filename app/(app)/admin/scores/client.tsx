@@ -57,6 +57,7 @@ interface Props {
   month: number
   employeeData: EmployeeScore[]
   onMonthChange?: (year: number, month: number) => void
+  onRefresh?: () => void
 }
 
 function MultiplierBadge({ multiplier }: { multiplier: number }) {
@@ -73,7 +74,7 @@ function MultiplierBadge({ multiplier }: { multiplier: number }) {
 }
 
 export default function AdminScoresClient({
-  year, month, employeeData, onMonthChange,
+  year, month, employeeData, onMonthChange, onRefresh,
 }: Props) {
   const [data, setData] = useState<EmployeeScore[]>(employeeData)
 
@@ -206,7 +207,12 @@ export default function AdminScoresClient({
   return (
     <main className="max-w-7xl mx-auto px-4 py-6 sm:py-8">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-gray-800">員工評分</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="text-xl font-bold text-gray-800">員工評分</h2>
+          {onRefresh && (
+            <button onClick={onRefresh} className="px-2.5 py-1.5 rounded-lg border hover:bg-gray-100 text-gray-500 transition" title="重新整理">↺</button>
+          )}
+        </div>
         <MonthPicker year={year} month={month} onChange={onMonthChange} basePath={onMonthChange ? undefined : '/admin/scores'} />
       </div>
 
