@@ -30,7 +30,7 @@ function Skeleton() {
         <div className="h-10 bg-gray-50 border-b animate-pulse" />
         <div className="grid grid-cols-7">
           {[...Array(35)].map((_, i) => (
-            <div key={i} className="border-b border-r min-h-[80px] bg-gray-50 animate-pulse" />
+            <div key={i} className="border-b border-r min-h-[110px] bg-gray-50 animate-pulse" />
           ))}
         </div>
       </div>
@@ -94,7 +94,7 @@ export default function EmployeeScheduleView() {
   }
 
   return (
-    <main className="max-w-3xl mx-auto px-4 py-6 sm:py-8">
+    <main className="max-w-5xl mx-auto px-4 py-6 sm:py-8">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold text-gray-800">我的排班</h2>
         <button
@@ -126,7 +126,7 @@ export default function EmployeeScheduleView() {
         </div>
         <div className="grid grid-cols-7">
           {Array.from({ length: firstDow }).map((_, i) => (
-            <div key={`e-${i}`} className="border-b border-r min-h-[80px]" />
+            <div key={`e-${i}`} className="border-b border-r min-h-[110px]" />
           ))}
           {days.map(day => {
             const dateStr = toDateStr(day)
@@ -137,7 +137,7 @@ export default function EmployeeScheduleView() {
             return (
               <div
                 key={dateStr}
-                className={`border-b border-r min-h-[80px] p-1.5 ${isRest ? 'bg-pink-50' : 'bg-white'}`}
+                className={`border-b border-r min-h-[110px] p-1.5 ${isRest ? 'bg-pink-50' : 'bg-white'}`}
               >
                 <div className={`text-xs mb-1 font-medium ${isRest ? 'text-pink-400' : 'text-gray-600'}`}>
                   {day.getDate()}
