@@ -16,7 +16,7 @@ export default async function WorkLogPage() {
 
   const baseWhere = { userId: session.user.id, source: 'EMPLOYEE' as const, date: dateFilter }
 
-  const [activeLogs, deletedLogs, attendance] = await Promise.all([
+  const [activeLogs, deletedLogs, attendance, assignments] = await Promise.all([
     prisma.workLog.findMany({
       where: { ...baseWhere, deletedAt: null },
       orderBy: [{ date: 'asc' }, { createdAt: 'asc' }],
@@ -29,6 +29,10 @@ export default async function WorkLogPage() {
       where: { userId: session.user.id, type: { in: ['A', 'B', 'C'] }, date: dateFilter },
       select: { date: true },
     }),
+    prisma.shiftAssignment.findMany({
+      where: { userId: session.user.id, date: dateFilter },
+      select: { date: true },
+    }),
   ])
 
   const serialize = (l: any) => ({
@@ -38,13 +42,19 @@ export default async function WorkLogPage() {
     deletedAt: l.deletedAt?.toISOString() ?? null,
   })
 
+  const validDates = [
+    ...attendance.map(a => a.date.toISOString().slice(0, 10)),
+    ...assignments.map(a => a.date.toISOString().slice(0, 10)),
+  ]
+  const uniqueValidDates = [...new Set(validDates)]
+
   return (
     <WorkLogClient
       initialYear={year}
       initialMonth={month}
       initialLogs={activeLogs.map(serialize)}
       initialDeletedLogs={deletedLogs.map(serialize)}
-      initialAttendanceDates={attendance.map(a => a.date.toISOString().slice(0, 10))}
+      initialAttendanceDates={uniqueValidDates}
     />
   )
 }

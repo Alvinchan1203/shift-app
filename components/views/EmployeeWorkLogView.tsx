@@ -40,13 +40,16 @@ export default function EmployeeWorkLogView() {
     Promise.all([
       fetch(`/api/worklog?year=${year}&month=${month}`).then(r => r.json()),
       fetch(`/api/attendance?year=${year}&month=${month}`).then(r => r.json()),
-    ]).then(([wlData, att]) => {
+      fetch(`/api/assignments?year=${year}&month=${month}`).then(r => r.json()),
+    ]).then(([wlData, att, asgn]) => {
       const normalize = (l: WorkLog) => ({ ...l, date: l.date.slice(0, 10) })
       setLogs((wlData.active as WorkLog[]).map(normalize))
       setDeletedLogs((wlData.deleted as WorkLog[]).map(normalize))
-      setAttendanceDates((att as { date: string; type: string }[])
+      const attendanceDates = (att as { date: string; type: string }[])
         .filter(r => ['A', 'B', 'C'].includes(r.type))
-        .map(r => r.date.slice(0, 10)))
+        .map(r => r.date.slice(0, 10))
+      const assignmentDates = (asgn as { date: string }[]).map(r => r.date.slice(0, 10))
+      setAttendanceDates([...new Set([...attendanceDates, ...assignmentDates])])
     })
   }, [])
 
