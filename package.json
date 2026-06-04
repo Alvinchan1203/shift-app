@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "rm -rf app/generated/prisma && prisma generate && next build",
+    "build": "rm -rf app/generated/prisma && prisma generate && grep -c canDeleteAdmin app/generated/prisma/models/User.ts && next build",
     "start": "next start",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
