@@ -31,8 +31,8 @@ export async function PUT(req: NextRequest) {
     if (typeof body.canDeleteAdmin !== 'boolean') {
       return NextResponse.json({ error: '缺少資料' }, { status: 400 })
     }
-    const admin = await prisma.user.findUnique({ where: { id: session.user.id }, select: { canDeleteAdmin: true } })
-    if (!admin?.canDeleteAdmin) {
+    const admin = await prisma.user.findUnique({ where: { id: session.user.id }, select: { name: true } })
+    if (admin?.name !== 'alvinchan') {
       return NextResponse.json({ error: '無權限修改此設定' }, { status: 403 })
     }
     const user = await prisma.user.update({

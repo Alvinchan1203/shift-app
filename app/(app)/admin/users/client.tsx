@@ -162,7 +162,7 @@ export default function UsersClient({ currentUserName, currentUserCanDeleteAdmin
                         額外報更
                       </button>
                     )}
-                    {emp.role === 'ADMIN' && currentUserCanDeleteAdmin && (
+                    {emp.role === 'ADMIN' && currentUserName === 'alvinchan' && (
                       <button
                         onClick={() => toggleCanDeleteAdmin(emp)}
                         title={emp.canDeleteAdmin ? '點擊撤銷刪除管理員權限' : '點擊授予刪除管理員權限'}
