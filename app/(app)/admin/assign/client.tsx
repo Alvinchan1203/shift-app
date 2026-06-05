@@ -48,6 +48,10 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
   const [published, setPublished] = useState(initialData.published)
   const [publishedAt, setPublishedAt] = useState<string | null>(initialData.publishedAt)
   const [publishing, setPublishing] = useState(false)
+  const [autoAssignOpen, setAutoAssignOpen] = useState(false)
+  const [quota, setQuota] = useState(3)
+  const [autoAssigning, setAutoAssigning] = useState(false)
+  const [autoAssignResult, setAutoAssignResult] = useState<number | null>(null)
 
   const days = getMonthDays(year, month)
   const [refreshing, setRefreshing] = useState(false)
@@ -99,6 +103,19 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
     setPublished(true)
     setPublishedAt(data.publishedAt)
     setPublishing(false)
+  }
+
+  async function handleAutoAssign() {
+    setAutoAssigning(true)
+    const res = await fetch('/api/admin/auto-assign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ year, month: month + 1, dailyQuota: quota }),
+    })
+    const data = await res.json()
+    setAutoAssignResult(data.added ?? 0)
+    setAutoAssigning(false)
+    await fetchData(true)
   }
 
   async function handleUnpublish() {
@@ -246,14 +263,24 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
       {/* 月份導航 + 發布狀態列 */}
       <div className="flex items-center justify-between mb-3">
         <MonthPicker year={year} month={month + 1} onChange={(y, m) => { setYear(y); setMonth(m - 1) }} />
-        <button
-          onClick={() => fetchData(true)}
-          disabled={refreshing}
-          title="重新整理意願資料"
-          className="px-3 py-2 rounded-lg border hover:bg-gray-100 text-gray-500 disabled:opacity-50 transition"
-        >
-          {refreshing ? '⟳' : '↺'}
-        </button>
+        <div className="flex items-center gap-2">
+          {!published && (
+            <button
+              onClick={() => { setAutoAssignOpen(true); setAutoAssignResult(null) }}
+              className="text-sm px-3 py-2 rounded-lg border bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 transition"
+            >
+              自動排班
+            </button>
+          )}
+          <button
+            onClick={() => fetchData(true)}
+            disabled={refreshing}
+            title="重新整理意願資料"
+            className="px-3 py-2 rounded-lg border hover:bg-gray-100 text-gray-500 disabled:opacity-50 transition"
+          >
+            {refreshing ? '⟳' : '↺'}
+          </button>
+        </div>
       </div>
       <div className="flex items-center justify-between mb-4 bg-gray-50 rounded-xl px-4 py-3 border gap-3">
         <div className="flex items-center gap-2 min-w-0">
@@ -456,6 +483,58 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
           </>
         )}
       </div>
+
+      {/* ── 自動排班 Modal ── */}
+      {autoAssignOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setAutoAssignOpen(false)} />
+          <div className="relative bg-white rounded-2xl p-6 w-80 shadow-xl">
+            <h3 className="font-semibold text-gray-800 text-lg mb-4">自動排班</h3>
+            {autoAssignResult === null ? (
+              <>
+                <label className="block text-sm text-gray-600 mb-1">每天所需員工人數</label>
+                <div className="flex items-center gap-2 mb-4">
+                  <input
+                    type="number" min={1} max={20} value={quota}
+                    onChange={e => setQuota(Math.max(1, Number(e.target.value)))}
+                    className="w-20 border rounded-lg px-3 py-2 text-center text-lg font-medium"
+                  />
+                  <span className="text-sm text-gray-500">人</span>
+                </div>
+                <div className="bg-gray-50 rounded-xl p-3 mb-5 text-xs text-gray-500 space-y-1">
+                  <div>優先：最早提交＋相連班次 → 目標80小時</div>
+                  <div>其次：最早提交＋獨立班次 → 目標80小時</div>
+                  <div>最後：隨機補足（C班優先）</div>
+                  <div className="pt-1 text-gray-400">⚠ 已有排班不受影響</div>
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <button onClick={() => setAutoAssignOpen(false)}
+                    className="px-4 py-2 text-sm rounded-lg border hover:bg-gray-50 transition">
+                    取消
+                  </button>
+                  <button onClick={handleAutoAssign} disabled={autoAssigning}
+                    className="px-4 py-2 text-sm rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition disabled:opacity-50">
+                    {autoAssigning ? '排班中...' : '確認執行'}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="text-center py-4">
+                  <div className="text-4xl mb-3">✓</div>
+                  <div className="text-gray-700 font-medium">已新增 {autoAssignResult} 筆排班</div>
+                </div>
+                <div className="flex justify-end">
+                  <button onClick={() => setAutoAssignOpen(false)}
+                    className="px-4 py-2 text-sm rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition">
+                    完成
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ── 手機底部面板（bottom sheet）── */}
       {sheetDate && (
