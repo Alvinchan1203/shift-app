@@ -502,8 +502,8 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
                   <span className="text-sm text-gray-500">人</span>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-3 mb-5 text-xs text-gray-500 space-y-1">
-                  <div>優先：最早提交＋相連班次 → 目標80小時</div>
-                  <div>其次：最早提交＋獨立班次 → 目標80小時</div>
+                  <div>優先：最早提交＋相連班次，C班優先 → 目標80小時</div>
+                  <div>其次：最早提交＋獨立班次，C班優先 → 目標80小時</div>
                   <div>最後：隨機補足（C班優先）</div>
                   <div className="pt-1 text-gray-400">⚠ 已有排班不受影響</div>
                 </div>
