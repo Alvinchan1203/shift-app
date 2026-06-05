@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
 
   const [employees, submissions, prefs, holidays, existingAssignments] = await Promise.all([
     prisma.user.findMany({
-      where: { role: 'EMPLOYEE', NOT: { name: { startsWith: 'testing-' } } },
+      where: { role: 'EMPLOYEE' },
       select: { id: true, name: true },
     }),
     prisma.preferenceSubmission.findMany({
