@@ -106,7 +106,7 @@ export async function GET(req: NextRequest) {
     : `距截止日期還有 ${daysLeft} 天`
 
   const nameList = pending.map(e => `• ${e.name}`).join('\n')
-  const text = `⚠️ 排班意願提交提醒\n\n${targetLabel}排班意願截止日為本月 26 日，${deadlineText}。\n\n以下同事尚未提交排班意願：\n${nameList}\n\n請盡快登入系統提交，謝謝！`
+  const text = `⚠️ 排班意願提交提醒\n\n${targetLabel}排班意願截止日為本月 26 日，${deadlineText}。\n\n以下同事尚未提交排班意願：\n${nameList}\n\n🔗 https://shift-app-omega-tan.vercel.app/app\n\n請盡快登入系統提交，謝謝！`
 
   const res = await fetch(webhookUrl, {
     method: 'POST',

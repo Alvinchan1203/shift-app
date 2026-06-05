@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'FEISHU_WEBHOOK_URL not configured' }, { status: 500 })
   }
 
-  const text = `📅 排班意願提交開放通知\n\n各位同事，${targetMonthLabel}排班意願提交現已開放！\n請於本月 26 日前登入系統提交上班意願。\n\n⚠️ 提醒：選好班次後，必須按下「確認提交」或「確認更新」按鈕，意願才會正式生效。\n\n謝謝！`
+  const text = `📅 排班意願提交開放通知\n\n各位同事，${targetMonthLabel}排班意願提交現已開放！\n請於本月 26 日前登入系統提交上班意願。\n\n🔗 https://shift-app-omega-tan.vercel.app/app\n\n⚠️ 提醒：選好班次後，必須按下「確認提交」或「確認更新」按鈕，意願才會正式生效。\n\n謝謝！`
 
   const res = await fetch(webhookUrl, {
     method: 'POST',
