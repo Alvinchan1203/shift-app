@@ -197,3 +197,24 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ added: newAssignments.length })
 }
+
+export async function DELETE(req: NextRequest) {
+  const session = await auth()
+  if (!session || session.user.role !== 'ADMIN') {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
+  const { year, month } = await req.json()
+  if (!year || !month) {
+    return NextResponse.json({ error: '缺少資料' }, { status: 400 })
+  }
+
+  const monthStart = new Date(Date.UTC(year, month - 1, 1))
+  const monthEnd = new Date(Date.UTC(year, month, 1))
+
+  const result = await prisma.shiftAssignment.deleteMany({
+    where: { date: { gte: monthStart, lt: monthEnd } },
+  })
+
+  return NextResponse.json({ deleted: result.count })
+}

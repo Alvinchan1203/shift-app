@@ -52,6 +52,8 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
   const [quota, setQuota] = useState(3)
   const [autoAssigning, setAutoAssigning] = useState(false)
   const [autoAssignResult, setAutoAssignResult] = useState<number | null>(null)
+  const [clearConfirm, setClearConfirm] = useState(false)
+  const [clearing, setClearing] = useState(false)
 
   const days = getMonthDays(year, month)
   const [refreshing, setRefreshing] = useState(false)
@@ -103,6 +105,18 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
     setPublished(true)
     setPublishedAt(data.publishedAt)
     setPublishing(false)
+  }
+
+  async function handleClearAssignments() {
+    setClearing(true)
+    await fetch('/api/admin/auto-assign', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ year, month: month + 1 }),
+    })
+    setClearing(false)
+    setClearConfirm(false)
+    await fetchData(true)
   }
 
   async function handleAutoAssign() {
@@ -265,12 +279,32 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
         <MonthPicker year={year} month={month + 1} onChange={(y, m) => { setYear(y); setMonth(m - 1) }} />
         <div className="flex items-center gap-2">
           {!published && (
-            <button
-              onClick={() => { setAutoAssignOpen(true); setAutoAssignResult(null) }}
-              className="text-sm px-3 py-2 rounded-lg border bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 transition"
-            >
-              自動排班
-            </button>
+            <>
+              {clearConfirm ? (
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs text-red-600">確定清除本月所有排班？</span>
+                  <button onClick={handleClearAssignments} disabled={clearing}
+                    className="text-xs px-2.5 py-1.5 rounded-lg bg-red-600 text-white hover:bg-red-700 transition disabled:opacity-50">
+                    {clearing ? '清除中...' : '確定'}
+                  </button>
+                  <button onClick={() => setClearConfirm(false)}
+                    className="text-xs px-2.5 py-1.5 rounded-lg border hover:bg-gray-50 transition">
+                    取消
+                  </button>
+                </div>
+              ) : (
+                <button onClick={() => setClearConfirm(true)}
+                  className="text-sm px-3 py-2 rounded-lg border bg-red-50 text-red-600 border-red-200 hover:bg-red-100 transition">
+                  清除草稿
+                </button>
+              )}
+              <button
+                onClick={() => { setAutoAssignOpen(true); setAutoAssignResult(null) }}
+                className="text-sm px-3 py-2 rounded-lg border bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 transition"
+              >
+                自動排班
+              </button>
+            </>
           )}
           <button
             onClick={() => fetchData(true)}
