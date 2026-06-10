@@ -1,13 +1,5 @@
-import { requireAuth } from '@/lib/require-auth'
-import PasswordClient from './client'
+import { redirect } from 'next/navigation'
 
-export default async function PasswordPage() {
-  const session = await requireAuth()
-
-  return (
-    <main className="max-w-md mx-auto px-4 py-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-6">修改密碼</h2>
-        <PasswordClient />
-    </main>
-  )
+export default function Page() {
+  redirect('/app')
 }
