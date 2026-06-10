@@ -45,6 +45,7 @@ export default function AttendanceView({ isAdmin, userId, userName }: Props) {
       fetch(`/api/assignments?year=${year}&month=${m1}`).then(r => r.json()),
       fetch('/api/holidays').then(r => r.json()),
       fetch(`/api/attendance/confirm-hours?year=${year}&month=${m1}`).then(r => r.json()),
+      fetch(`/api/schedule-publish?year=${year}&month=${m1}`).then(r => r.json()),
     ]
 
     const adminPromises = isAdmin
@@ -55,11 +56,12 @@ export default function AttendanceView({ isAdmin, userId, userName }: Props) {
       : [Promise.resolve(null), Promise.resolve(null)]
 
     Promise.all([...basePromises, ...adminPromises]).then(
-      ([records, assignments, holidays, confirmedMins, usersData, logsData]) => {
+      ([records, assignments, holidays, confirmedMins, publishData, usersData, logsData]) => {
         setUsers(isAdmin ? usersData : [{ id: userId, name: userName }])
         setInitialData({
           initialYear: year,
           initialMonth: month,
+          isPublished: !!publishData?.published,
           records: records.map((r: { date: string } & object) => ({ ...r, date: r.date.slice(0, 10) })),
           assignments: assignments.map((a: { date: string } & object) => ({ ...a, date: a.date.slice(0, 10) })),
           holidays: holidays.map((h: { date: string } & object) => ({ ...h, date: h.date.slice(0, 10) })),

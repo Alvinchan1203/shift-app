@@ -53,9 +53,14 @@ export default async function AttendancePage() {
     confirmedMinutesMap[s.userId] = s.confirmedMinutes ?? null
   }
 
+  const publishRecord = await prisma.schedulePublish.findUnique({
+    where: { year_month: { year: currentYear, month: currentMonth + 1 } },
+  })
+
   const initialData = {
     initialYear: currentYear,
     initialMonth: currentMonth,
+    isPublished: !!publishRecord,
     records: records.map(r => ({
       id: r.id,
       userId: r.userId,

@@ -22,6 +22,7 @@ const DURATION_TYPES: DurationType[] = ['OT', 'SPECIAL']
 type InitialData = {
   initialYear: number
   initialMonth: number
+  isPublished: boolean
   records: { id: string; userId: string; date: string; type: string; note: string | null; durationMinutes: number | null }[]
   assignments: { userId: string; date: string; shift: string }[]
   holidays: { id: string; date: string; name: string }[]
@@ -53,6 +54,7 @@ interface Props {
 export default function AttendanceClient({ isAdmin, users, currentUserId, initialData }: Props) {
   const [year, setYear] = useState(initialData.initialYear)
   const [month, setMonth] = useState(initialData.initialMonth)
+  const [isPublished, setIsPublished] = useState(initialData.isPublished)
   const [records, setRecords] = useState<AttendanceRecord[]>(initialData.records as AttendanceRecord[])
   const [assignments, setAssignments] = useState<Assignment[]>(initialData.assignments)
   const [holidays] = useState<Holiday[]>(initialData.holidays)
@@ -79,12 +81,14 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
       fetch(`/api/attendance?year=${year}&month=${m1}`).then(r => r.json()),
       fetch(`/api/assignments?year=${year}&month=${m1}`).then(r => r.json()),
       fetch(`/api/attendance/confirm-hours?year=${year}&month=${m1}`).then(r => r.json()),
+      fetch(`/api/schedule-publish?year=${year}&month=${m1}`).then(r => r.json()),
     ]
     if (isAdmin) promises.push(fetch(`/api/attendance/log?year=${year}&month=${m1}`).then(r => r.json()))
-    Promise.all(promises).then(([att, asgn, confirmMap, logsData]) => {
+    Promise.all(promises).then(([att, asgn, confirmMap, publishData, logsData]) => {
       setRecords(att.map((r: AttendanceRecord) => ({ ...r, date: r.date.slice(0, 10) })))
       setAssignments(asgn.map((a: Assignment) => ({ ...a, date: a.date.slice(0, 10) })))
       setConfirmedMins(confirmMap)
+      setIsPublished(!!publishData?.published)
       if (isAdmin && logsData) setLogs(logsData.map((l: AttendanceLog) => ({ ...l, date: l.date.slice(0, 10) })))
       setLoadingMonth(false)
     })
@@ -119,11 +123,13 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
         total += SHIFT_DURATIONS[r.type] ?? 0
       }
     }
-    // Only count past assignment prefills (no saved records) to match the detail view
-    const today = toDateStr(new Date())
-    for (const a of assignments.filter(a => a.userId === userId && a.date.startsWith(monthPrefix) && a.date < today)) {
-      if (!recordedDates.has(a.date)) {
-        total += SHIFT_DURATIONS[a.shift as AttendanceTypeKey] ?? 0
+    // Only count past assignment prefills (no saved records) to match the detail view, and only when published
+    if (isPublished) {
+      const today = toDateStr(new Date())
+      for (const a of assignments.filter(a => a.userId === userId && a.date.startsWith(monthPrefix) && a.date < today)) {
+        if (!recordedDates.has(a.date)) {
+          total += SHIFT_DURATIONS[a.shift as AttendanceTypeKey] ?? 0
+        }
       }
     }
     return total
@@ -309,7 +315,7 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
   function Cell({ userId, userName, dateStr, restDay }: { userId: string; userName: string; dateStr: string; restDay: boolean }) {
     const dayRecords = getRecords(userId, dateStr)
     const assignment = getAssignment(userId, dateStr)
-    const prefill = dayRecords.length === 0 && assignment ? assignment.shift as AttendanceTypeKey : null
+    const prefill = dayRecords.length === 0 && assignment && isPublished ? assignment.shift as AttendanceTypeKey : null
 
     if (restDay) return <td className="border border-gray-400 bg-pink-50 w-9" />
 
@@ -361,15 +367,17 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
   const estimatedMinutesEmployee = calcEstimatedMinutes(currentUserId)
 
   const todayStr = toDateStr(new Date())
-  const assignPrefillEntries = assignments
-    .filter(a =>
-      a.userId === currentUserId &&
-      a.date.startsWith(monthPrefix) &&
-      a.date < todayStr &&
-      ['A', 'B', 'C'].includes(a.shift) &&
-      !monthRecordsEmployee.some(r => r.date === a.date)
-    )
-    .map(a => ({ id: `pf-${a.date}`, date: a.date, type: a.shift as AttendanceTypeKey, durationMinutes: null as number | null, isPrefill: true }))
+  const assignPrefillEntries = isPublished
+    ? assignments
+        .filter(a =>
+          a.userId === currentUserId &&
+          a.date.startsWith(monthPrefix) &&
+          a.date < todayStr &&
+          ['A', 'B', 'C'].includes(a.shift) &&
+          !monthRecordsEmployee.some(r => r.date === a.date)
+        )
+        .map(a => ({ id: `pf-${a.date}`, date: a.date, type: a.shift as AttendanceTypeKey, durationMinutes: null as number | null, isPrefill: true }))
+    : []
   const allDetailEntries = [
     ...monthRecordsEmployee.map(r => ({ ...r, isPrefill: false })),
     ...assignPrefillEntries,
@@ -389,12 +397,14 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
               fetch(`/api/attendance?year=${year}&month=${m1}`).then(r => r.json()),
               fetch(`/api/assignments?year=${year}&month=${m1}`).then(r => r.json()),
               fetch(`/api/attendance/confirm-hours?year=${year}&month=${m1}`).then(r => r.json()),
+              fetch(`/api/schedule-publish?year=${year}&month=${m1}`).then(r => r.json()),
             ]
             if (isAdmin) promises.push(fetch(`/api/attendance/log?year=${year}&month=${m1}`).then(r => r.json()))
-            Promise.all(promises).then(([att, asgn, confirmMap, logsData]) => {
+            Promise.all(promises).then(([att, asgn, confirmMap, publishData, logsData]) => {
               setRecords(att.map((r: AttendanceRecord) => ({ ...r, date: r.date.slice(0, 10) })))
               setAssignments(asgn.map((a: Assignment) => ({ ...a, date: a.date.slice(0, 10) })))
               setConfirmedMins(confirmMap)
+              setIsPublished(!!publishData?.published)
               if (isAdmin && logsData) setLogs(logsData.map((l: AttendanceLog) => ({ ...l, date: l.date.slice(0, 10) })))
             })
           }}
