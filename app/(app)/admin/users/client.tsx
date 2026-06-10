@@ -83,6 +83,15 @@ export default function UsersClient({ currentUserName, currentUserCanDeleteAdmin
     }
   }
 
+  async function toggleAllExtraSubmit(enable: boolean) {
+    await fetch('/api/admin/users', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: '_bulk', bulkAllEmployees: true, extraSubmitEnabled: enable }),
+    })
+    setEmployees(prev => prev.map(e => e.role === 'EMPLOYEE' ? { ...e, extraSubmitEnabled: enable } : e))
+  }
+
   async function toggleExtraSubmit(emp: Employee) {
     const updated = await fetch('/api/admin/users', {
       method: 'PUT',
@@ -138,7 +147,24 @@ export default function UsersClient({ currentUserName, currentUserCanDeleteAdmin
         const group = employees.filter(e => e.role === role)
         return (
           <div key={role} className="mb-6">
-            <h3 className="text-sm font-semibold text-gray-500 mb-2">{role === 'ADMIN' ? '管理員' : 'Bee'}</h3>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold text-gray-500">{role === 'ADMIN' ? '管理員' : 'Bee'}</h3>
+              {role === 'EMPLOYEE' && group.length > 0 && (() => {
+                const allOn = group.every(e => e.extraSubmitEnabled)
+                return (
+                  <button
+                    onClick={() => toggleAllExtraSubmit(!allOn)}
+                    className={`text-xs px-2.5 py-1 rounded-lg border transition ${
+                      allOn
+                        ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100'
+                        : 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100'
+                    }`}
+                  >
+                    {allOn ? '全關額外報更' : '全開額外報更'}
+                  </button>
+                )
+              })()}
+            </div>
             <div className="bg-white rounded-2xl border shadow-sm divide-y">
               {group.length === 0 ? (
                 <p className="text-gray-400 text-sm px-4 py-6 text-center">暫無{role === 'ADMIN' ? '管理員' : 'Bee'}帳號</p>

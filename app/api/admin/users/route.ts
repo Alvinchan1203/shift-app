@@ -46,6 +46,15 @@ export async function PUT(req: NextRequest) {
   if (typeof body.extraSubmitEnabled !== 'boolean') {
     return NextResponse.json({ error: '缺少資料' }, { status: 400 })
   }
+
+  if (body.bulkAllEmployees === true) {
+    await prisma.user.updateMany({
+      where: { role: 'EMPLOYEE' },
+      data: { extraSubmitEnabled: body.extraSubmitEnabled },
+    })
+    return NextResponse.json({ ok: true, extraSubmitEnabled: body.extraSubmitEnabled })
+  }
+
   const user = await prisma.user.update({
     where: { id: userId },
     data: { extraSubmitEnabled: body.extraSubmitEnabled },
