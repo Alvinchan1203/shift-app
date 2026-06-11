@@ -57,7 +57,7 @@ export default function AttendanceView({ isAdmin, userId, userName }: Props) {
 
     Promise.all([...basePromises, ...adminPromises]).then(
       ([records, assignments, holidays, confirmedMins, publishData, usersData, logsData]) => {
-        setUsers(isAdmin ? usersData : [{ id: userId, name: userName }])
+        setUsers(isAdmin ? usersData.filter((u: { role: string }) => u.role === 'EMPLOYEE') : [{ id: userId, name: userName }])
         setInitialData({
           initialYear: year,
           initialMonth: month,
