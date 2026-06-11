@@ -31,7 +31,6 @@ export default function AttendanceView({ isAdmin, userId, userName }: Props) {
   const [loaded, setLoaded] = useState(false)
   const [users, setUsers] = useState<User[]>([])
   const [initialData, setInitialData] = useState<object | null>(null)
-  const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
     setLoaded(false)
@@ -73,7 +72,7 @@ export default function AttendanceView({ isAdmin, userId, userName }: Props) {
         setLoaded(true)
       }
     )
-  }, [refreshKey])
+  }, [])
 
   if (!loaded || !initialData) return <Skeleton />
 
@@ -83,7 +82,6 @@ export default function AttendanceView({ isAdmin, userId, userName }: Props) {
         <h2 className="text-xl font-bold text-gray-800">
           {isAdmin ? '實際出勤管理' : '我的出勤記錄'}
         </h2>
-        <button onClick={() => setRefreshKey(k => k + 1)} className="px-2.5 py-1.5 rounded-lg border hover:bg-gray-100 text-gray-500 transition" title="重新整理">↺</button>
       </div>
       <AttendanceClient
         isAdmin={isAdmin}

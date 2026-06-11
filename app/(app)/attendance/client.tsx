@@ -390,27 +390,6 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
       {/* 月份導航 */}
       <div className="flex justify-center items-center gap-2 mb-4">
         <MonthPicker year={year} month={month + 1} onChange={(y, m) => { setYear(y); setMonth(m - 1) }} />
-        <button
-          onClick={() => {
-            const m1 = month + 1
-            const promises: Promise<any>[] = [
-              fetch(`/api/attendance?year=${year}&month=${m1}`).then(r => r.json()),
-              fetch(`/api/assignments?year=${year}&month=${m1}`).then(r => r.json()),
-              fetch(`/api/attendance/confirm-hours?year=${year}&month=${m1}`).then(r => r.json()),
-              fetch(`/api/schedule-publish?year=${year}&month=${m1}`).then(r => r.json()),
-            ]
-            if (isAdmin) promises.push(fetch(`/api/attendance/log?year=${year}&month=${m1}`).then(r => r.json()))
-            Promise.all(promises).then(([att, asgn, confirmMap, publishData, logsData]) => {
-              setRecords(att.map((r: AttendanceRecord) => ({ ...r, date: r.date.slice(0, 10) })))
-              setAssignments(asgn.map((a: Assignment) => ({ ...a, date: a.date.slice(0, 10) })))
-              setConfirmedMins(confirmMap)
-              setIsPublished(!!publishData?.published)
-              if (isAdmin && logsData) setLogs(logsData.map((l: AttendanceLog) => ({ ...l, date: l.date.slice(0, 10) })))
-            })
-          }}
-          className="px-2.5 py-1.5 rounded-lg border hover:bg-gray-100 text-gray-500 transition"
-          title="重新整理"
-        >↺</button>
       </div>
 
       {/* ── Roster 表格（橫向捲動）── */}
