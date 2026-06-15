@@ -114,6 +114,16 @@ export default function EmployeeScheduleView() {
           {!isPublished && (
             <span className="ml-2 text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">未發布</span>
           )}
+          {isPublished && monthAssignments.length > 0 && (
+            <div className="mt-1">
+              <a
+                href={`/api/schedule/export?year=${year}&month=${month + 1}`}
+                className="text-xs text-blue-500 hover:text-blue-700 hover:underline transition"
+              >
+                📅 匯出到手機日曆
+              </a>
+            </div>
+          )}
         </div>
         <button onClick={nextMonth} className="px-3 py-2 rounded-lg border hover:bg-gray-100 text-gray-600">›</button>
       </div>
