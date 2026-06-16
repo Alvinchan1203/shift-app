@@ -47,6 +47,26 @@ export default function EmployeeScheduleView() {
   const [assignments, setAssignments] = useState<Assignment[]>([])
   const [holidays, setHolidays] = useState<Holiday[]>([])
   const [refreshKey, setRefreshKey] = useState(0)
+  const [exporting, setExporting] = useState(false)
+
+  async function handleExport() {
+    setExporting(true)
+    try {
+      const res = await fetch(`/api/schedule/export?year=${year}&month=${month + 1}`)
+      if (!res.ok) return
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `schedule-${year}-${String(month + 1).padStart(2, '0')}.ics`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      setTimeout(() => URL.revokeObjectURL(url), 1000)
+    } finally {
+      setExporting(false)
+    }
+  }
 
   useEffect(() => {
     setLoaded(false)
@@ -116,12 +136,13 @@ export default function EmployeeScheduleView() {
           )}
           {isPublished && monthAssignments.length > 0 && (
             <div className="mt-1">
-              <a
-                href={`/api/schedule/export?year=${year}&month=${month + 1}`}
-                className="text-xs text-blue-500 hover:text-blue-700 hover:underline transition"
+              <button
+                onClick={handleExport}
+                disabled={exporting}
+                className="text-xs text-blue-500 hover:text-blue-700 hover:underline transition disabled:opacity-50"
               >
-                📅 匯出到手機日曆
-              </a>
+                {exporting ? '處理中…' : '📅 匯出到手機日曆'}
+              </button>
             </div>
           )}
         </div>
