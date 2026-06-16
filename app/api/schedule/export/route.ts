@@ -1,5 +1,26 @@
+import { NextRequest } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
+import { createHmac } from 'crypto'
+
+function getSecret() {
+  return process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET ?? ''
+}
+
+function verifyToken(token: string): { userId: string; year: number; month: number } | null {
+  const dotIdx = token.lastIndexOf('.')
+  if (dotIdx === -1) return null
+  const payloadB64 = token.slice(0, dotIdx)
+  const sig = token.slice(dotIdx + 1)
+  const payload = Buffer.from(payloadB64, 'base64url').toString()
+  const expectedSig = createHmac('sha256', getSecret()).update(payload).digest('base64url')
+  if (sig !== expectedSig) return null
+  const parts = payload.split(':')
+  if (parts.length !== 4) return null
+  const [userId, year, month, exp] = parts
+  if (Date.now() > parseInt(exp)) return null
+  return { userId, year: parseInt(year), month: parseInt(month) }
+}
 
 const SHIFT_TIMES: Record<string, { start: string; end: string; label: string }> = {
   A: { start: '010000', end: '060000', label: 'A班' },
@@ -7,17 +28,7 @@ const SHIFT_TIMES: Record<string, { start: string; end: string; label: string }>
   C: { start: '010000', end: '100000', label: 'C班' },
 }
 
-export const GET = auth(async (req) => {
-  if (!req.auth) return new Response('Unauthorized', { status: 401 })
-
-  const url = new URL(req.url)
-  const year = parseInt(url.searchParams.get('year') ?? '')
-  const month = parseInt(url.searchParams.get('month') ?? '')
-
-  if (!year || !month) return new Response('Bad Request', { status: 400 })
-
-  const userId = req.auth.user.id
-
+async function buildICS(userId: string, year: number, month: number): Promise<string> {
   const assignments = await prisma.shiftAssignment.findMany({
     where: {
       userId,
@@ -47,7 +58,7 @@ export const GET = auth(async (req) => {
     ].join('\r\n')
   }).join('\r\n')
 
-  const ics = [
+  return [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
     'PRODID:-//金鐘辦公室Bee報更系統//排班//ZH',
@@ -55,6 +66,30 @@ export const GET = auth(async (req) => {
     events,
     'END:VCALENDAR',
   ].join('\r\n')
+}
+
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url)
+  const token = searchParams.get('token')
+
+  let userId: string
+  let year: number
+  let month: number
+
+  if (token) {
+    const verified = verifyToken(token)
+    if (!verified) return new Response('Invalid or expired token', { status: 401 })
+    ;({ userId, year, month } = verified)
+  } else {
+    const session = await auth()
+    if (!session?.user?.id) return new Response('Unauthorized', { status: 401 })
+    userId = session.user.id
+    year = parseInt(searchParams.get('year') ?? '')
+    month = parseInt(searchParams.get('month') ?? '')
+    if (!year || !month) return new Response('Bad Request', { status: 400 })
+  }
+
+  const ics = await buildICS(userId, year, month)
 
   return new Response(ics, {
     headers: {
@@ -62,4 +97,4 @@ export const GET = auth(async (req) => {
       'Content-Disposition': `inline; filename="schedule-${year}-${String(month).padStart(2, '0')}.ics"`,
     },
   })
-})
+}

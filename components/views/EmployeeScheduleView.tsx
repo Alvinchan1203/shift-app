@@ -53,7 +53,7 @@ export default function EmployeeScheduleView() {
     C: { start: '010000', end: '100000', label: 'C班' },
   }
 
-  function handleExport() {
+  async function handleExport() {
     const now = new Date().toISOString().replace(/[-:.]/g, '').slice(0, 15) + 'Z'
     const events = monthAssignments.map(a => {
       const dateStr = a.date.replace(/-/g, '')
@@ -81,7 +81,10 @@ export default function EmployeeScheduleView() {
 
     const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent)
     if (isIOS) {
-      window.location.href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics)
+      const res = await fetch(`/api/schedule/export-token?year=${year}&month=${month + 1}`)
+      if (!res.ok) return
+      const { token } = await res.json()
+      window.location.href = `/api/schedule/export?token=${token}`
     } else {
       const blob = new Blob([ics], { type: 'text/calendar; charset=utf-8' })
       const url = URL.createObjectURL(blob)
