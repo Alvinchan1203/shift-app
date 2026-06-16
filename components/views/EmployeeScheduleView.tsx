@@ -81,13 +81,18 @@ export default function EmployeeScheduleView() {
 
     const blob = new Blob([ics], { type: 'text/calendar; charset=utf-8' })
     const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `schedule-${year}-${String(month + 1).padStart(2, '0')}.ics`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    setTimeout(() => URL.revokeObjectURL(url), 1000)
+    const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent)
+    if (isIOS) {
+      window.location.href = url
+    } else {
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `schedule-${year}-${String(month + 1).padStart(2, '0')}.ics`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      setTimeout(() => URL.revokeObjectURL(url), 1000)
+    }
   }
 
   useEffect(() => {
