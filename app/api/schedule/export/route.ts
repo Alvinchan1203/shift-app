@@ -1,6 +1,5 @@
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
-import { NextRequest } from 'next/server'
 
 const SHIFT_TIMES: Record<string, { start: string; end: string; label: string }> = {
   A: { start: '010000', end: '060000', label: 'A班' },
@@ -8,12 +7,12 @@ const SHIFT_TIMES: Record<string, { start: string; end: string; label: string }>
   C: { start: '010000', end: '100000', label: 'C班' },
 }
 
-export const GET = auth(async function GET(req: NextRequest & { auth: { user: { id: string } } | null }) {
+export const GET = auth(async (req) => {
   if (!req.auth) return new Response('Unauthorized', { status: 401 })
 
-  const { searchParams } = new URL(req.url)
-  const year = parseInt(searchParams.get('year') ?? '')
-  const month = parseInt(searchParams.get('month') ?? '')
+  const url = new URL(req.url)
+  const year = parseInt(url.searchParams.get('year') ?? '')
+  const month = parseInt(url.searchParams.get('month') ?? '')
 
   if (!year || !month) return new Response('Bad Request', { status: 400 })
 

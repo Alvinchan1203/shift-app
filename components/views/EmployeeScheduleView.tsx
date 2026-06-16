@@ -81,7 +81,7 @@ export default function EmployeeScheduleView() {
 
     const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent)
     if (isIOS) {
-      window.location.href = `/api/schedule/export?year=${year}&month=${month + 1}`
+      window.location.href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics)
     } else {
       const blob = new Blob([ics], { type: 'text/calendar; charset=utf-8' })
       const url = URL.createObjectURL(blob)
