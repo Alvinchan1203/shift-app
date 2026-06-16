@@ -79,12 +79,12 @@ export default function EmployeeScheduleView() {
       'END:VCALENDAR',
     ].join('\r\n')
 
-    const blob = new Blob([ics], { type: 'text/calendar; charset=utf-8' })
-    const url = URL.createObjectURL(blob)
     const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent)
     if (isIOS) {
-      window.location.href = url
+      window.location.href = `/api/schedule/export?year=${year}&month=${month + 1}`
     } else {
+      const blob = new Blob([ics], { type: 'text/calendar; charset=utf-8' })
+      const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
       a.download = `schedule-${year}-${String(month + 1).padStart(2, '0')}.ics`

@@ -1,6 +1,6 @@
-import { NextRequest } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
+import { NextRequest } from 'next/server'
 
 const SHIFT_TIMES: Record<string, { start: string; end: string; label: string }> = {
   A: { start: '010000', end: '060000', label: 'A班' },
@@ -8,9 +8,8 @@ const SHIFT_TIMES: Record<string, { start: string; end: string; label: string }>
   C: { start: '010000', end: '100000', label: 'C班' },
 }
 
-export async function GET(req: NextRequest) {
-  const session = await auth()
-  if (!session) return new Response('Unauthorized', { status: 401 })
+export const GET = auth(async function GET(req: NextRequest & { auth: { user: { id: string } } | null }) {
+  if (!req.auth) return new Response('Unauthorized', { status: 401 })
 
   const { searchParams } = new URL(req.url)
   const year = parseInt(searchParams.get('year') ?? '')
@@ -18,9 +17,11 @@ export async function GET(req: NextRequest) {
 
   if (!year || !month) return new Response('Bad Request', { status: 400 })
 
+  const userId = req.auth.user.id
+
   const assignments = await prisma.shiftAssignment.findMany({
     where: {
-      userId: session.user.id,
+      userId,
       date: {
         gte: new Date(Date.UTC(year, month - 1, 1)),
         lt: new Date(Date.UTC(year, month, 1)),
@@ -37,7 +38,7 @@ export async function GET(req: NextRequest) {
     const t = SHIFT_TIMES[a.shift]
     return [
       'BEGIN:VEVENT',
-      `UID:shift-${dateStr}-${a.shift}-${session.user.id}@shift-app`,
+      `UID:shift-${dateStr}-${a.shift}-${userId}@shift-app`,
       `DTSTAMP:${now}`,
       `DTSTART:${dateStr}T${t.start}Z`,
       `DTEND:${dateStr}T${t.end}Z`,
@@ -59,7 +60,7 @@ export async function GET(req: NextRequest) {
   return new Response(ics, {
     headers: {
       'Content-Type': 'text/calendar; charset=utf-8',
-      'Content-Disposition': `attachment; filename="schedule-${year}-${String(month).padStart(2, '0')}.ics"`,
+      'Content-Disposition': `inline; filename="schedule-${year}-${String(month).padStart(2, '0')}.ics"`,
     },
   })
-}
+})
