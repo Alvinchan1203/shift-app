@@ -47,25 +47,47 @@ export default function EmployeeScheduleView() {
   const [assignments, setAssignments] = useState<Assignment[]>([])
   const [holidays, setHolidays] = useState<Holiday[]>([])
   const [refreshKey, setRefreshKey] = useState(0)
-  const [exporting, setExporting] = useState(false)
+  const SHIFT_TIMES: Record<string, { start: string; end: string; label: string }> = {
+    A: { start: '010000', end: '060000', label: 'A班' },
+    B: { start: '050000', end: '100000', label: 'B班' },
+    C: { start: '010000', end: '100000', label: 'C班' },
+  }
 
-  async function handleExport() {
-    setExporting(true)
-    try {
-      const res = await fetch(`/api/schedule/export?year=${year}&month=${month + 1}`)
-      if (!res.ok) return
-      const blob = await res.blob()
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `schedule-${year}-${String(month + 1).padStart(2, '0')}.ics`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      setTimeout(() => URL.revokeObjectURL(url), 1000)
-    } finally {
-      setExporting(false)
-    }
+  function handleExport() {
+    const now = new Date().toISOString().replace(/[-:.]/g, '').slice(0, 15) + 'Z'
+    const events = monthAssignments.map(a => {
+      const dateStr = a.date.replace(/-/g, '')
+      const t = SHIFT_TIMES[a.shift]
+      return [
+        'BEGIN:VEVENT',
+        `UID:shift-${dateStr}-${a.shift}@shift-app`,
+        `DTSTAMP:${now}`,
+        `DTSTART:${dateStr}T${t.start}Z`,
+        `DTEND:${dateStr}T${t.end}Z`,
+        `SUMMARY:${t.label}`,
+        'LOCATION:金鐘辦公室',
+        'END:VEVENT',
+      ].join('\r\n')
+    }).join('\r\n')
+
+    const ics = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//金鐘辦公室Bee報更系統//排班//ZH',
+      'CALSCALE:GREGORIAN',
+      events,
+      'END:VCALENDAR',
+    ].join('\r\n')
+
+    const blob = new Blob([ics], { type: 'text/calendar; charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `schedule-${year}-${String(month + 1).padStart(2, '0')}.ics`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
   }
 
   useEffect(() => {
@@ -138,10 +160,9 @@ export default function EmployeeScheduleView() {
             <div className="mt-1">
               <button
                 onClick={handleExport}
-                disabled={exporting}
-                className="text-xs text-blue-500 hover:text-blue-700 hover:underline transition disabled:opacity-50"
+                className="text-xs text-blue-500 hover:text-blue-700 hover:underline transition"
               >
-                {exporting ? '處理中…' : '📅 匯出到手機日曆'}
+                📅 匯出到手機日曆
               </button>
             </div>
           )}
