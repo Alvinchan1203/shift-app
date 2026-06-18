@@ -156,7 +156,7 @@ export async function POST(req: NextRequest) {
     tryAssign(emp.id, false)
   }
 
-  // Phase 3b: random fill — for dates still below quota, pick from employees with preferences for that date
+  // Phase 3b: fill remaining slots in three priority passes
   const datePrefMap = new Map<string, { userId: string; shift: ShiftKey }[]>()
   for (const [userId, userPrefs] of empPrefs) {
     for (const pref of userPrefs) {
@@ -164,23 +164,64 @@ export async function POST(req: NextRequest) {
       datePrefMap.get(pref.date)!.push({ userId, shift: pref.shift })
     }
   }
-  for (const [date, rem] of slotsRemaining) {
-    if (rem <= 0) continue
-    const candidates = (datePrefMap.get(date) ?? []).filter(c => !assignedDates.get(c.userId)?.has(date))
-    // Shuffle then sort: C first within shuffled groups
-    for (let i = candidates.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1))
-      ;[candidates[i], candidates[j]] = [candidates[j], candidates[i]]
-    }
-    candidates.sort((a, b) => (a.shift === 'C' ? 0 : 1) - (b.shift === 'C' ? 0 : 1))
-    let slots = rem
+
+  const totalPrefMinutesMap = new Map<string, number>()
+  for (const [userId, userPrefs] of empPrefs) {
+    totalPrefMinutesMap.set(userId, userPrefs.reduce((sum, p) => sum + SHIFT_MINUTES[p.shift], 0))
+  }
+
+  function doFill(date: string, candidates: { userId: string; shift: ShiftKey }[]) {
+    let slots = slotsRemaining.get(date) ?? 0
     for (const c of candidates) {
       if (slots <= 0) break
       if (assignedDates.get(c.userId)?.has(date)) continue
       newAssignments.push({ userId: c.userId, date, shift: c.shift })
       assignedDates.get(c.userId)!.add(date)
+      assignedMinutes.set(c.userId, (assignedMinutes.get(c.userId) ?? 0) + SHIFT_MINUTES[c.shift])
+      slotsRemaining.set(date, slots - 1)
       slots--
     }
+  }
+
+  // Pass 1: employees with fewest preference hours (< 80h submitted), sorted ascending, C first
+  for (const [date] of slotsRemaining) {
+    if ((slotsRemaining.get(date) ?? 0) <= 0) continue
+    const candidates = (datePrefMap.get(date) ?? [])
+      .filter(c => !assignedDates.get(c.userId)?.has(date) && (totalPrefMinutesMap.get(c.userId) ?? 0) < TARGET_MINUTES)
+    candidates.sort((a, b) => {
+      const aPref = totalPrefMinutesMap.get(a.userId) ?? 0
+      const bPref = totalPrefMinutesMap.get(b.userId) ?? 0
+      if (aPref !== bPref) return aPref - bPref
+      return (a.shift === 'C' ? 0 : 1) - (b.shift === 'C' ? 0 : 1)
+    })
+    doFill(date, candidates)
+  }
+
+  // Pass 2: employees under 80h assigned, sorted by fewest assigned hours first, C first
+  for (const [date] of slotsRemaining) {
+    if ((slotsRemaining.get(date) ?? 0) <= 0) continue
+    const candidates = (datePrefMap.get(date) ?? [])
+      .filter(c => !assignedDates.get(c.userId)?.has(date) && (assignedMinutes.get(c.userId) ?? 0) < TARGET_MINUTES)
+    candidates.sort((a, b) => {
+      const aMin = assignedMinutes.get(a.userId) ?? 0
+      const bMin = assignedMinutes.get(b.userId) ?? 0
+      if (aMin !== bMin) return aMin - bMin
+      return (a.shift === 'C' ? 0 : 1) - (b.shift === 'C' ? 0 : 1)
+    })
+    doFill(date, candidates)
+  }
+
+  // Pass 3: truly random, C first
+  for (const [date] of slotsRemaining) {
+    if ((slotsRemaining.get(date) ?? 0) <= 0) continue
+    const candidates = (datePrefMap.get(date) ?? [])
+      .filter(c => !assignedDates.get(c.userId)?.has(date))
+    for (let i = candidates.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[candidates[i], candidates[j]] = [candidates[j], candidates[i]]
+    }
+    candidates.sort((a, b) => (a.shift === 'C' ? 0 : 1) - (b.shift === 'C' ? 0 : 1))
+    doFill(date, candidates)
   }
 
   if (newAssignments.length > 0) {
