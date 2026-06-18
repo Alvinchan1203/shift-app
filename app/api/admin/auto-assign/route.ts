@@ -184,15 +184,15 @@ export async function POST(req: NextRequest) {
   }
 
   if (newAssignments.length > 0) {
-    await prisma.$transaction(
-      newAssignments.map(a =>
-        prisma.shiftAssignment.upsert({
-          where: { userId_date_shift: { userId: a.userId, date: new Date(a.date + 'T00:00:00Z'), shift: a.shift } },
-          update: { assignedBy: session.user.id },
-          create: { userId: a.userId, date: new Date(a.date + 'T00:00:00Z'), shift: a.shift, assignedBy: session.user.id },
-        })
-      )
-    )
+    await prisma.shiftAssignment.createMany({
+      data: newAssignments.map(a => ({
+        userId: a.userId,
+        date: new Date(a.date + 'T00:00:00Z'),
+        shift: a.shift,
+        assignedBy: session.user.id,
+      })),
+      skipDuplicates: true,
+    })
   }
 
   return NextResponse.json({ added: newAssignments.length })
