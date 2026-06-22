@@ -200,6 +200,16 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
     totalHours: s.records.reduce((sum, r) => sum + SHIFT_HOURS[r.shift as ShiftKey], 0),
   })).sort((a, b) => a.name.localeCompare(b.name))
 
+  const monthPrefEntries = prefs.filter(p => p.date.startsWith(monthPrefix) && submittedUserIds.has(p.user.id))
+  const prefDaysMap = new Map<string, { name: string; uniqueDays: Set<string> }>()
+  for (const p of monthPrefEntries) {
+    if (!prefDaysMap.has(p.user.id)) prefDaysMap.set(p.user.id, { name: p.user.name, uniqueDays: new Set() })
+    prefDaysMap.get(p.user.id)!.uniqueDays.add(p.date)
+  }
+  const prefSummaryRows = [...prefDaysMap.values()]
+    .map(s => ({ name: s.name, days: s.uniqueDays.size }))
+    .sort((a, b) => b.days - a.days)
+
   // 排班面板內容（桌面側邊欄 / 手機底部面板共用）
   function DayPanel({ dateStr, panelPrefs, panelAssignments }: {
     dateStr: string
@@ -426,7 +436,16 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
                     className={`border-b border-r p-2 min-h-[100px] text-left w-full hover:bg-blue-50 transition ${isSelected ? 'bg-blue-50 ring-2 ring-inset ring-blue-400' : ''}`}
                   >
                     <div className="text-sm text-gray-500 mb-1">{day.getDate()}</div>
-                    {dayPrefs.length > 0 && <div className="text-xs text-blue-500 mb-0.5">{dayPrefs.length} 意願</div>}
+                    {dayPrefs.length > 0 && (
+                      <>
+                        <div className="text-xs text-blue-500 mb-0.5">{dayPrefs.length} 意願</div>
+                        {[...new Map(dayPrefs.map(p => [p.user.id, p.user.name])).entries()].map(([uid, name]) => (
+                          <div key={uid} className="text-xs text-blue-700 bg-blue-50 rounded px-1 py-0.5 mt-0.5 truncate">
+                            {name}
+                          </div>
+                        ))}
+                      </>
+                    )}
                     {dayAssign.map((a) => (
                       <div key={a.id} className={`text-xs rounded px-1.5 py-0.5 mt-0.5 truncate ${SHIFTS[a.shift as ShiftKey].color}`}>
                         {a.user.name} · {SHIFTS[a.shift as ShiftKey].label}
@@ -451,6 +470,31 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
           )}
         </div>
       </div>
+
+      {/* ── 員工意願摘要 ── */}
+      {prefSummaryRows.length > 0 && (
+        <div className="mt-8">
+          <h3 className="font-semibold text-gray-800 mb-4">本月員工報更意願摘要</h3>
+          <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 border-b">
+                <tr>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600">員工</th>
+                  <th className="text-center px-4 py-3 font-medium text-gray-600">意願日數</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {prefSummaryRows.map((row) => (
+                  <tr key={row.name} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 font-medium text-gray-800">{row.name}</td>
+                    <td className="px-4 py-3 text-center text-blue-600 font-medium">{row.days} 天</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* ── 員工排班統計 ── */}
       <div className="mt-8">
