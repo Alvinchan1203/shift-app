@@ -46,7 +46,7 @@ export default function AdminWorkLogsView() {
       fetch(`/api/worklog?year=${year}&month=${month}`).then(r => r.json()),
     ]).then(([empData, wlData]) => {
       const normalize = (l: WorkLog) => ({ ...l, date: l.date.slice(0, 10) })
-      setEmployees(empData.map((e: Employee) => ({ id: e.id, name: e.name })))
+      setEmployees(empData.filter((e: Employee & { role: string }) => e.role === 'EMPLOYEE').map((e: Employee) => ({ id: e.id, name: e.name })))
       setLogs((wlData.active as WorkLog[]).map(normalize))
       setDeletedLogs((wlData.deleted as WorkLog[]).map(normalize))
     })

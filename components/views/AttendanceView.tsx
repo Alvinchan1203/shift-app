@@ -32,6 +32,7 @@ export default function AttendanceView({ isAdmin, userId, userName }: Props) {
   const [users, setUsers] = useState<User[]>([])
   const [initialData, setInitialData] = useState<object | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [hideTesting, setHideTesting] = useState(true)
 
   useEffect(() => {
     setLoaded(false)
@@ -83,11 +84,19 @@ export default function AttendanceView({ isAdmin, userId, userName }: Props) {
         <h2 className="text-xl font-bold text-gray-800">
           {isAdmin ? '實際出勤管理' : '我的出勤記錄'}
         </h2>
+        {isAdmin && (
+          <button
+            onClick={() => setHideTesting(h => !h)}
+            className={`text-xs px-3 py-1.5 rounded-lg border transition ${hideTesting ? 'bg-gray-100 text-gray-500 border-gray-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200 hover:bg-yellow-100'}`}
+          >
+            {hideTesting ? '顯示測試帳戶' : '隱藏測試帳戶'}
+          </button>
+        )}
         <button onClick={() => setRefreshKey(k => k + 1)} className="px-2.5 py-1.5 rounded-lg border hover:bg-gray-100 text-gray-500 transition" title="重新整理">↺</button>
       </div>
       <AttendanceClient
         isAdmin={isAdmin}
-        users={users}
+        users={hideTesting ? users.filter(u => !u.name.toLowerCase().startsWith('testing')) : users}
         currentUserId={userId}
         initialData={initialData as Parameters<typeof AttendanceClient>[0]['initialData']}
       />

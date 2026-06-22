@@ -31,6 +31,7 @@ export default function AdminScoresView() {
   const [month, setMonth] = useState(today.getMonth() + 1)
   const [employeeData, setEmployeeData] = useState<object[] | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [hideTesting, setHideTesting] = useState(true)
 
   useEffect(() => {
     setEmployeeData(null)
@@ -41,14 +42,28 @@ export default function AdminScoresView() {
 
   if (!employeeData) return <Skeleton />
 
+  const filteredData = hideTesting
+    ? employeeData.filter(e => !(e as { employeeName: string }).employeeName?.toLowerCase().startsWith('testing'))
+    : employeeData
+
   return (
-    <AdminScoresClient
-      key={`${year}-${month}-${refreshKey}`}
-      year={year}
-      month={month}
-      employeeData={employeeData as Parameters<typeof AdminScoresClient>[0]['employeeData']}
-      onMonthChange={(y, m) => { setYear(y); setMonth(m) }}
-      onRefresh={() => setRefreshKey(k => k + 1)}
-    />
+    <div>
+      <div className="flex justify-end px-6 pt-6 pb-0">
+        <button
+          onClick={() => setHideTesting(h => !h)}
+          className={`text-xs px-3 py-1.5 rounded-lg border transition ${hideTesting ? 'bg-gray-100 text-gray-500 border-gray-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200 hover:bg-yellow-100'}`}
+        >
+          {hideTesting ? '顯示測試帳戶' : '隱藏測試帳戶'}
+        </button>
+      </div>
+      <AdminScoresClient
+        key={`${year}-${month}-${refreshKey}`}
+        year={year}
+        month={month}
+        employeeData={filteredData as Parameters<typeof AdminScoresClient>[0]['employeeData']}
+        onMonthChange={(y, m) => { setYear(y); setMonth(m) }}
+        onRefresh={() => setRefreshKey(k => k + 1)}
+      />
+    </div>
   )
 }
