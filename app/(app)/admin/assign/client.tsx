@@ -207,7 +207,16 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
     if (!prefDaysMap.has(p.user.id)) prefDaysMap.set(p.user.id, { name: p.user.name, days: 0 })
     prefDaysMap.get(p.user.id)!.days += PREF_DAY_VALUE[p.shift as ShiftKey] ?? 0
   }
-  const prefSummaryRows = [...prefDaysMap.values()]
+  const assignedDaysMap = new Map<string, number>()
+  for (const a of monthAssignments) {
+    assignedDaysMap.set(a.userId, (assignedDaysMap.get(a.userId) ?? 0) + (PREF_DAY_VALUE[a.shift as ShiftKey] ?? 0))
+  }
+  const prefSummaryRows = [...prefDaysMap.entries()]
+    .map(([userId, s]) => ({
+      name: s.name,
+      days: s.days,
+      remaining: Math.max(0, s.days - (assignedDaysMap.get(userId) ?? 0)),
+    }))
     .sort((a, b) => b.days - a.days)
 
   // 排班面板內容（桌面側邊欄 / 手機底部面板共用）
@@ -471,12 +480,18 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
             <div className="bg-white rounded-2xl shadow-sm border p-4">
               <h3 className="font-semibold text-gray-700 text-sm mb-2">本月報更意願摘要</h3>
               <div className="divide-y">
-                {prefSummaryRows.map(row => (
-                  <div key={row.name} className="flex justify-between items-center py-2">
-                    <span className="text-sm text-gray-700">{row.name}</span>
-                    <span className="text-sm font-medium text-blue-600">{Number.isInteger(row.days) ? row.days : row.days.toFixed(1)} 天</span>
-                  </div>
-                ))}
+                {prefSummaryRows.map(row => {
+                  const fmt = (n: number) => Number.isInteger(n) ? String(n) : n.toFixed(1)
+                  return (
+                    <div key={row.name} className="flex justify-between items-center py-2">
+                      <span className="text-sm text-gray-700">{row.name}</span>
+                      <div className="flex items-center gap-1.5 text-right">
+                        <span className="text-xs text-gray-400">剩 {fmt(row.remaining)}</span>
+                        <span className="text-sm font-medium text-blue-600">/ {fmt(row.days)} 天</span>
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
             </div>
           )}
