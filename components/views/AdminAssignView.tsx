@@ -60,7 +60,7 @@ export default function AdminAssignView() {
   if (!initialData) return <Skeleton />
 
   return (
-    <main className="max-w-7xl mx-auto px-6 py-8">
+    <main className="px-6 py-8">
       <div className="flex justify-end mb-3">
         <FeishuToggle initialEnabled={notifyEnabled} />
       </div>

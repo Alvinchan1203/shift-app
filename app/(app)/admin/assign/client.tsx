@@ -437,25 +437,13 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
                   >
                     <div className="text-sm text-gray-500 mb-1">{day.getDate()}</div>
                     {dayPrefs.length > 0 && (
-                      <>
-                        {(() => {
-                          const unique = [...new Map(dayPrefs.map(p => [p.user.id, p.user.name])).entries()]
-                          const visible = unique.slice(0, 3)
-                          const extra = unique.length - 3
-                          return (
-                            <>
-                              {visible.map(([uid, name]) => (
-                                <div key={uid} className="text-xs text-blue-700 bg-blue-50 rounded px-1 py-0.5 mt-0.5 truncate">
-                                  {name}
-                                </div>
-                              ))}
-                              {extra > 0 && (
-                                <div className="text-xs text-blue-400 mt-0.5">+{extra} 人</div>
-                              )}
-                            </>
-                          )
-                        })()}
-                      </>
+                      <div className="grid grid-cols-2 gap-0.5 mt-0.5">
+                        {[...new Map(dayPrefs.map(p => [p.user.id, p.user.name])).entries()].map(([uid, name]) => (
+                          <div key={uid} className="text-xs text-blue-700 bg-blue-50 rounded px-1 py-0.5 truncate">
+                            {name}
+                          </div>
+                        ))}
+                      </div>
                     )}
                     {dayAssign.map((a) => (
                       <div key={a.id} className={`text-xs rounded px-1.5 py-0.5 mt-0.5 truncate ${SHIFTS[a.shift as ShiftKey].color}`}>
