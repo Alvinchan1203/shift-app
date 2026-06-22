@@ -218,7 +218,7 @@ export default function AdminScoresClient({
 
       <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[780px] text-sm">
             <thead>
               <tr className="bg-gray-50 border-b text-xs">
                 <th className="text-left px-4 py-2 font-medium text-gray-600">姓名</th>
