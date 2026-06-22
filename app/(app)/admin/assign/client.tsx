@@ -230,63 +230,67 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
         <h3 className="font-semibold text-gray-800 text-base mb-3">
           {new Date(dateStr + 'T00:00:00').toLocaleDateString('zh-HK', { month: 'long', day: 'numeric', weekday: 'short' })}
         </h3>
-        {panelPrefs.length === 0 ? (
-          <p className="text-sm text-gray-400">無員工提交意願</p>
-        ) : (
-          <div className="space-y-3">
-            {(Object.keys(SHIFTS) as ShiftKey[]).map((shift) => {
-              const shiftPrefs = panelPrefs.filter((p) => p.shift === shift)
-              if (shiftPrefs.length === 0) return null
-              return (
-                <div key={shift}>
-                  <div className="mb-1"><ShiftBadge shift={shift} /></div>
-                  <div className="space-y-1 pl-2">
-                    {shiftPrefs.map((p) => {
-                      const assigned = isAssigned(dateStr, p.user.id, shift)
-                      return (
-                        <div key={p.id} className="flex items-center justify-between">
-                          <span className="text-sm text-gray-700">{p.user.name}</span>
-                          <button
-                            onClick={() => !published && toggleAssign(dateStr, p.user.id, p.user.name, shift)}
-                            disabled={published}
-                            className={`text-xs px-2.5 py-1 rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed ${
-                              assigned
-                                ? 'bg-green-100 text-green-700 hover:bg-red-100 hover:text-red-700'
-                                : 'bg-gray-100 text-gray-600 hover:bg-green-100 hover:text-green-700'
-                            }`}
-                          >
-                            {assigned ? '已排班 ✓' : '排班'}
-                          </button>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        )}
-        {panelAssignments.length > 0 && (
-          <div className="mt-3 pt-3 border-t">
-            <p className="text-xs font-medium text-gray-500 mb-2">已確認排班</p>
-            {panelAssignments.map((a) => (
-              <div key={a.id} className="flex items-center justify-between mb-1">
-                <span className="text-sm text-gray-700">{a.user.name}</span>
-                <div className="flex items-center gap-1.5">
-                  <ShiftBadge shift={a.shift as ShiftKey} />
-                  {!published && (
-                    <button
-                      onClick={() => toggleAssign(dateStr, a.userId, a.user.name, a.shift as ShiftKey)}
-                      className="text-xs text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg px-2 py-1 transition"
-                    >
-                      刪除
-                    </button>
-                  )}
-                </div>
+        <div className="flex gap-3">
+          <div className="flex-1 min-w-0">
+            {panelPrefs.length === 0 ? (
+              <p className="text-sm text-gray-400">無員工提交意願</p>
+            ) : (
+              <div className="space-y-3">
+                {(Object.keys(SHIFTS) as ShiftKey[]).map((shift) => {
+                  const shiftPrefs = panelPrefs.filter((p) => p.shift === shift)
+                  if (shiftPrefs.length === 0) return null
+                  return (
+                    <div key={shift}>
+                      <div className="mb-1"><ShiftBadge shift={shift} /></div>
+                      <div className="space-y-1 pl-2">
+                        {shiftPrefs.map((p) => {
+                          const assigned = isAssigned(dateStr, p.user.id, shift)
+                          return (
+                            <div key={p.id} className="flex items-center justify-between gap-1">
+                              <span className="text-sm text-gray-700 truncate">{p.user.name}</span>
+                              <button
+                                onClick={() => !published && toggleAssign(dateStr, p.user.id, p.user.name, shift)}
+                                disabled={published}
+                                className={`text-xs px-2 py-1 rounded-lg transition shrink-0 disabled:opacity-40 disabled:cursor-not-allowed ${
+                                  assigned
+                                    ? 'bg-green-100 text-green-700 hover:bg-red-100 hover:text-red-700'
+                                    : 'bg-gray-100 text-gray-600 hover:bg-green-100 hover:text-green-700'
+                                }`}
+                              >
+                                {assigned ? '✓' : '排班'}
+                              </button>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
-            ))}
+            )}
           </div>
-        )}
+          {panelAssignments.length > 0 && (
+            <div className="border-l pl-3 min-w-[90px]">
+              <p className="text-xs font-medium text-gray-500 mb-2">已確認排班</p>
+              {panelAssignments.map((a) => (
+                <div key={a.id} className="mb-2">
+                  <div className="flex items-center justify-between gap-1 mb-0.5">
+                    <span className="text-sm text-gray-700 truncate">{a.user.name}</span>
+                    {!published && (
+                      <button
+                        onClick={() => toggleAssign(dateStr, a.userId, a.user.name, a.shift as ShiftKey)}
+                        className="text-xs text-red-400 hover:text-red-600 hover:bg-red-50 rounded px-1 py-0.5 transition shrink-0"
+                      >
+                        刪除
+                      </button>
+                    )}
+                  </div>
+                  <ShiftBadge shift={a.shift as ShiftKey} />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </>
     )
   }
