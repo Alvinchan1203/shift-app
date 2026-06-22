@@ -458,43 +458,31 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
           </div>
         </div>
 
-        <div className="w-96">
+        <div className="w-72 space-y-4 self-start sticky top-4">
           {selectedDate ? (
-            <div className="bg-white rounded-2xl shadow-sm border p-5 sticky top-4">
+            <div className="bg-white rounded-2xl shadow-sm border p-5">
               <DayPanel dateStr={selectedDate} panelPrefs={selectedPrefs} panelAssignments={selectedAssignments} />
             </div>
           ) : (
-            <div className="bg-white rounded-2xl shadow-sm border p-6 text-center text-gray-400">
+            <div className="bg-white rounded-2xl shadow-sm border p-5 text-center text-gray-400 text-sm">
               選擇日期以查看意願並分配排班
+            </div>
+          )}
+          {prefSummaryRows.length > 0 && (
+            <div className="bg-white rounded-2xl shadow-sm border p-4">
+              <h3 className="font-semibold text-gray-700 text-sm mb-2">本月報更意願摘要</h3>
+              <div className="divide-y">
+                {prefSummaryRows.map(row => (
+                  <div key={row.name} className="flex justify-between items-center py-2">
+                    <span className="text-sm text-gray-700">{row.name}</span>
+                    <span className="text-sm font-medium text-blue-600">{row.days} 天</span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
       </div>
-
-      {/* ── 員工意願摘要 ── */}
-      {prefSummaryRows.length > 0 && (
-        <div className="mt-8">
-          <h3 className="font-semibold text-gray-800 mb-4">本月員工報更意願摘要</h3>
-          <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b">
-                <tr>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">員工</th>
-                  <th className="text-center px-4 py-3 font-medium text-gray-600">意願日數</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {prefSummaryRows.map((row) => (
-                  <tr key={row.name} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium text-gray-800">{row.name}</td>
-                    <td className="px-4 py-3 text-center text-blue-600 font-medium">{row.days} 天</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
 
       {/* ── 員工排班統計 ── */}
       <div className="mt-8">
