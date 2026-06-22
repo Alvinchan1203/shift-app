@@ -200,14 +200,14 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
     totalHours: s.records.reduce((sum, r) => sum + SHIFT_HOURS[r.shift as ShiftKey], 0),
   })).sort((a, b) => a.name.localeCompare(b.name))
 
+  const PREF_DAY_VALUE: Record<ShiftKey, number> = { A: 0.5, B: 0.5, C: 1 }
   const monthPrefEntries = prefs.filter(p => p.date.startsWith(monthPrefix) && submittedUserIds.has(p.user.id))
-  const prefDaysMap = new Map<string, { name: string; uniqueDays: Set<string> }>()
+  const prefDaysMap = new Map<string, { name: string; days: number }>()
   for (const p of monthPrefEntries) {
-    if (!prefDaysMap.has(p.user.id)) prefDaysMap.set(p.user.id, { name: p.user.name, uniqueDays: new Set() })
-    prefDaysMap.get(p.user.id)!.uniqueDays.add(p.date)
+    if (!prefDaysMap.has(p.user.id)) prefDaysMap.set(p.user.id, { name: p.user.name, days: 0 })
+    prefDaysMap.get(p.user.id)!.days += PREF_DAY_VALUE[p.shift as ShiftKey] ?? 0
   }
   const prefSummaryRows = [...prefDaysMap.values()]
-    .map(s => ({ name: s.name, days: s.uniqueDays.size }))
     .sort((a, b) => b.days - a.days)
 
   // 排班面板內容（桌面側邊欄 / 手機底部面板共用）
@@ -474,7 +474,7 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
                 {prefSummaryRows.map(row => (
                   <div key={row.name} className="flex justify-between items-center py-2">
                     <span className="text-sm text-gray-700">{row.name}</span>
-                    <span className="text-sm font-medium text-blue-600">{row.days} 天</span>
+                    <span className="text-sm font-medium text-blue-600">{Number.isInteger(row.days) ? row.days : row.days.toFixed(1)} 天</span>
                   </div>
                 ))}
               </div>
