@@ -410,7 +410,7 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
             </div>
             <div className="grid grid-cols-7">
               {Array.from({ length: firstDow }).map((_, i) => (
-                <div key={`e-${i}`} className="border-b border-r p-2 min-h-[100px]" />
+                <div key={`e-${i}`} className="border-b border-r p-2 min-h-[80px]" />
               ))}
               {days.map((day) => {
                 const dateStr = toDateStr(day)
@@ -433,17 +433,28 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
                   <button
                     key={dateStr}
                     onClick={() => setSelectedDate(isSelected ? null : dateStr)}
-                    className={`border-b border-r p-2 min-h-[100px] text-left w-full hover:bg-blue-50 transition ${isSelected ? 'bg-blue-50 ring-2 ring-inset ring-blue-400' : ''}`}
+                    className={`border-b border-r p-2 min-h-[80px] text-left w-full hover:bg-blue-50 transition ${isSelected ? 'bg-blue-50 ring-2 ring-inset ring-blue-400' : ''}`}
                   >
                     <div className="text-sm text-gray-500 mb-1">{day.getDate()}</div>
                     {dayPrefs.length > 0 && (
                       <>
-                        <div className="text-xs text-blue-500 mb-0.5">{dayPrefs.length} 意願</div>
-                        {[...new Map(dayPrefs.map(p => [p.user.id, p.user.name])).entries()].map(([uid, name]) => (
-                          <div key={uid} className="text-xs text-blue-700 bg-blue-50 rounded px-1 py-0.5 mt-0.5 truncate">
-                            {name}
-                          </div>
-                        ))}
+                        {(() => {
+                          const unique = [...new Map(dayPrefs.map(p => [p.user.id, p.user.name])).entries()]
+                          const visible = unique.slice(0, 3)
+                          const extra = unique.length - 3
+                          return (
+                            <>
+                              {visible.map(([uid, name]) => (
+                                <div key={uid} className="text-xs text-blue-700 bg-blue-50 rounded px-1 py-0.5 mt-0.5 truncate">
+                                  {name}
+                                </div>
+                              ))}
+                              {extra > 0 && (
+                                <div className="text-xs text-blue-400 mt-0.5">+{extra} 人</div>
+                              )}
+                            </>
+                          )
+                        })()}
                       </>
                     )}
                     {dayAssign.map((a) => (
