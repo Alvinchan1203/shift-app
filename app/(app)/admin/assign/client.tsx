@@ -273,19 +273,19 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
             <div className="border-l pl-3 min-w-[90px]">
               <p className="text-xs font-medium text-gray-500 mb-2">已確認排班</p>
               {panelAssignments.map((a) => (
-                <div key={a.id} className="mb-2">
-                  <div className="flex items-center justify-between gap-1 mb-0.5">
-                    <span className="text-sm text-gray-700 truncate">{a.user.name}</span>
-                    {!published && (
-                      <button
-                        onClick={() => toggleAssign(dateStr, a.userId, a.user.name, a.shift as ShiftKey)}
-                        className="text-xs text-red-400 hover:text-red-600 hover:bg-red-50 rounded px-1 py-0.5 transition shrink-0"
-                      >
-                        刪除
-                      </button>
-                    )}
-                  </div>
-                  <ShiftBadge shift={a.shift as ShiftKey} />
+                <div key={a.id} className="flex items-center justify-between gap-1 mb-1">
+                  <span className="text-sm text-gray-700 truncate">
+                    {a.user.name}
+                    <span className="ml-1 text-xs text-gray-400">{SHIFTS[a.shift as ShiftKey].label}</span>
+                  </span>
+                  {!published && (
+                    <button
+                      onClick={() => toggleAssign(dateStr, a.userId, a.user.name, a.shift as ShiftKey)}
+                      className="text-xs text-red-400 hover:text-red-600 hover:bg-red-50 rounded px-1 py-0.5 transition shrink-0"
+                    >
+                      刪除
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
@@ -458,11 +458,15 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
                         ))}
                       </div>
                     )}
-                    {dayAssign.map((a) => (
-                      <div key={a.id} className={`text-xs rounded px-1.5 py-0.5 mt-0.5 truncate ${SHIFTS[a.shift as ShiftKey].color}`}>
-                        {a.user.name} · {SHIFTS[a.shift as ShiftKey].label}
+                    {dayAssign.length > 0 && (
+                      <div className="grid grid-cols-2 gap-0.5 mt-0.5">
+                        {dayAssign.map((a) => (
+                          <div key={a.id} className={`text-xs rounded px-1 py-0.5 truncate ${SHIFTS[a.shift as ShiftKey].color}`}>
+                            {a.user.name}
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    )}
                   </button>
                 )
               })}
