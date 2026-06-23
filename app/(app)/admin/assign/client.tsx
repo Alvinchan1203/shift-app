@@ -251,6 +251,7 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
                           const assignedA = shift === 'C' ? isAssigned(dateStr, p.user.id, 'A') : false
                           const assignedB = shift === 'C' ? isAssigned(dateStr, p.user.id, 'B') : false
                           const assigned = isAssigned(dateStr, p.user.id, shift)
+                          const anyAssigned = assignedA || assignedB || assigned
                           return (
                             <div key={p.id} className={shift === 'C' ? 'mb-1' : ''}>
                               <div className="flex items-center justify-between gap-1">
@@ -272,10 +273,10 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
                               {shift === 'C' && (
                                 <div className="flex items-center gap-1">
                                   <button
-                                    onClick={() => !published && toggleAssign(dateStr, p.user.id, p.user.name, 'A')}
-                                    disabled={published}
+                                    onClick={() => !published && !(!assignedA && anyAssigned) && toggleAssign(dateStr, p.user.id, p.user.name, 'A')}
+                                    disabled={published || (!assignedA && anyAssigned)}
                                     style={{ fontSize: '10px' }}
-                                    className={`px-1.5 py-0.5 rounded transition disabled:opacity-40 disabled:cursor-not-allowed ${
+                                    className={`px-1.5 py-0.5 rounded transition disabled:opacity-30 disabled:cursor-not-allowed ${
                                       assignedA
                                         ? 'bg-green-100 text-green-700 hover:bg-red-100 hover:text-red-700'
                                         : 'bg-blue-50 text-blue-600 hover:bg-green-100 hover:text-green-700'
@@ -284,10 +285,10 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
                                     {assignedA ? '✓A' : 'A班'}
                                   </button>
                                   <button
-                                    onClick={() => !published && toggleAssign(dateStr, p.user.id, p.user.name, 'B')}
-                                    disabled={published}
+                                    onClick={() => !published && !(!assignedB && anyAssigned) && toggleAssign(dateStr, p.user.id, p.user.name, 'B')}
+                                    disabled={published || (!assignedB && anyAssigned)}
                                     style={{ fontSize: '10px' }}
-                                    className={`px-1.5 py-0.5 rounded transition disabled:opacity-40 disabled:cursor-not-allowed ${
+                                    className={`px-1.5 py-0.5 rounded transition disabled:opacity-30 disabled:cursor-not-allowed ${
                                       assignedB
                                         ? 'bg-green-100 text-green-700 hover:bg-red-100 hover:text-red-700'
                                         : 'bg-teal-50 text-teal-600 hover:bg-green-100 hover:text-green-700'
@@ -296,10 +297,10 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
                                     {assignedB ? '✓B' : 'B班'}
                                   </button>
                                   <button
-                                    onClick={() => !published && toggleAssign(dateStr, p.user.id, p.user.name, 'C')}
-                                    disabled={published}
+                                    onClick={() => !published && !(!assigned && anyAssigned) && toggleAssign(dateStr, p.user.id, p.user.name, 'C')}
+                                    disabled={published || (!assigned && anyAssigned)}
                                     style={{ fontSize: '10px' }}
-                                    className={`px-1.5 py-0.5 rounded transition disabled:opacity-40 disabled:cursor-not-allowed ${
+                                    className={`px-1.5 py-0.5 rounded transition disabled:opacity-30 disabled:cursor-not-allowed ${
                                       assigned
                                         ? 'bg-green-100 text-green-700 hover:bg-red-100 hover:text-red-700'
                                         : 'bg-gray-100 text-gray-600 hover:bg-green-100 hover:text-green-700'
