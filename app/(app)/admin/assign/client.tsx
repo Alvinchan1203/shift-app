@@ -54,6 +54,7 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
   const [autoAssignResult, setAutoAssignResult] = useState<number | null>(null)
   const [clearConfirm, setClearConfirm] = useState(false)
   const [clearing, setClearing] = useState(false)
+  const [dailyRequired, setDailyRequired] = useState(3)
 
   const days = getMonthDays(year, month)
   const [refreshing, setRefreshing] = useState(false)
@@ -351,6 +352,15 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
       {/* 月份導航 + 發布狀態列 */}
       <div className="flex items-center justify-between mb-3">
         <MonthPicker year={year} month={month + 1} onChange={(y, m) => { setYear(y); setMonth(m - 1) }} />
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <span className="shrink-0">每天需要</span>
+          <input
+            type="number" min={1} max={20} value={dailyRequired}
+            onChange={e => setDailyRequired(Math.max(1, Number(e.target.value)))}
+            className="w-12 border rounded-lg px-2 py-1 text-sm text-center"
+          />
+          <span className="shrink-0 text-gray-400">人</span>
+        </div>
         <div className="flex items-center gap-2">
           {!published && (
             <>
@@ -436,7 +446,7 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
             <button
               key={dateStr}
               onClick={() => setSheetDate(dateStr)}
-              className="w-full flex items-center justify-between px-4 py-3 bg-white rounded-xl border border-gray-200 hover:bg-blue-50 transition text-left"
+              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border hover:bg-blue-50 transition text-left ${dayAssign.length < dailyRequired ? 'bg-yellow-50 border-yellow-200' : 'bg-white border-gray-200'}`}
             >
               <span className="text-sm font-medium text-gray-700">
                 {new Date(dateStr + 'T00:00:00').toLocaleDateString('zh-HK', { month: 'short', day: 'numeric', weekday: 'short' })}
@@ -497,7 +507,7 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
                   <button
                     key={dateStr}
                     onClick={() => setSelectedDate(isSelected ? null : dateStr)}
-                    className={`border-b border-r p-2 min-h-[80px] text-left w-full hover:bg-blue-50 transition ${isSelected ? 'bg-blue-50 ring-2 ring-inset ring-blue-400' : ''}`}
+                    className={`border-b border-r p-2 min-h-[80px] text-left w-full hover:bg-blue-50 transition ${isSelected ? 'bg-blue-50 ring-2 ring-inset ring-blue-400' : dayAssign.length < dailyRequired ? 'bg-yellow-50' : ''}`}
                   >
                     <div className="text-sm text-gray-500 mb-1">{day.getDate()}</div>
                     {dayPrefs.length > 0 && (
