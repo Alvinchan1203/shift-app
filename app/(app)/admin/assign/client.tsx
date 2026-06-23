@@ -244,52 +244,64 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
                       <div className="mb-1"><ShiftBadge shift={shift} /></div>
                       <div className="space-y-1 pl-2">
                         {shiftPrefs.map((p) => {
-                          const assignedC = isAssigned(dateStr, p.user.id, 'C')
                           const assignedA = shift === 'C' ? isAssigned(dateStr, p.user.id, 'A') : false
                           const assignedB = shift === 'C' ? isAssigned(dateStr, p.user.id, 'B') : false
                           const assigned = isAssigned(dateStr, p.user.id, shift)
                           return (
-                            <div key={p.id} className="flex items-center justify-between gap-1">
-                              <span className="text-sm text-gray-700 truncate">{p.user.name}</span>
-                              <div className="flex items-center gap-1 shrink-0">
-                                {shift === 'C' && (
-                                  <>
-                                    <button
-                                      onClick={() => !published && toggleAssign(dateStr, p.user.id, p.user.name, 'A')}
-                                      disabled={published}
-                                      className={`text-xs px-1.5 py-1 rounded transition disabled:opacity-40 disabled:cursor-not-allowed ${
-                                        assignedA
-                                          ? 'bg-green-100 text-green-700 hover:bg-red-100 hover:text-red-700'
-                                          : 'bg-blue-50 text-blue-600 hover:bg-green-100 hover:text-green-700'
-                                      }`}
-                                    >
-                                      {assignedA ? '✓A' : 'A班'}
-                                    </button>
-                                    <button
-                                      onClick={() => !published && toggleAssign(dateStr, p.user.id, p.user.name, 'B')}
-                                      disabled={published}
-                                      className={`text-xs px-1.5 py-1 rounded transition disabled:opacity-40 disabled:cursor-not-allowed ${
-                                        assignedB
-                                          ? 'bg-green-100 text-green-700 hover:bg-red-100 hover:text-red-700'
-                                          : 'bg-teal-50 text-teal-600 hover:bg-green-100 hover:text-green-700'
-                                      }`}
-                                    >
-                                      {assignedB ? '✓B' : 'B班'}
-                                    </button>
-                                  </>
+                            <div key={p.id} className={`${shift === 'C' ? 'mb-1.5' : ''}`}>
+                              <div className="flex items-center justify-between gap-1">
+                                <span className="text-sm text-gray-700 truncate">{p.user.name}</span>
+                                {shift !== 'C' && (
+                                  <button
+                                    onClick={() => !published && toggleAssign(dateStr, p.user.id, p.user.name, shift)}
+                                    disabled={published}
+                                    className={`text-xs px-2 py-1 rounded-lg transition shrink-0 disabled:opacity-40 disabled:cursor-not-allowed ${
+                                      assigned
+                                        ? 'bg-green-100 text-green-700 hover:bg-red-100 hover:text-red-700'
+                                        : 'bg-gray-100 text-gray-600 hover:bg-green-100 hover:text-green-700'
+                                    }`}
+                                  >
+                                    {assigned ? '✓' : '排班'}
+                                  </button>
                                 )}
-                                <button
-                                  onClick={() => !published && toggleAssign(dateStr, p.user.id, p.user.name, shift)}
-                                  disabled={published}
-                                  className={`text-xs px-2 py-1 rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed ${
-                                    assigned
-                                      ? 'bg-green-100 text-green-700 hover:bg-red-100 hover:text-red-700'
-                                      : 'bg-gray-100 text-gray-600 hover:bg-green-100 hover:text-green-700'
-                                  }`}
-                                >
-                                  {assigned ? '✓' : '排班'}
-                                </button>
                               </div>
+                              {shift === 'C' && (
+                                <div className="flex items-center gap-1 mt-0.5">
+                                  <button
+                                    onClick={() => !published && toggleAssign(dateStr, p.user.id, p.user.name, 'A')}
+                                    disabled={published}
+                                    className={`text-xs px-2 py-1 rounded transition disabled:opacity-40 disabled:cursor-not-allowed ${
+                                      assignedA
+                                        ? 'bg-green-100 text-green-700 hover:bg-red-100 hover:text-red-700'
+                                        : 'bg-blue-50 text-blue-600 hover:bg-green-100 hover:text-green-700'
+                                    }`}
+                                  >
+                                    {assignedA ? '✓A班' : 'A班'}
+                                  </button>
+                                  <button
+                                    onClick={() => !published && toggleAssign(dateStr, p.user.id, p.user.name, 'B')}
+                                    disabled={published}
+                                    className={`text-xs px-2 py-1 rounded transition disabled:opacity-40 disabled:cursor-not-allowed ${
+                                      assignedB
+                                        ? 'bg-green-100 text-green-700 hover:bg-red-100 hover:text-red-700'
+                                        : 'bg-teal-50 text-teal-600 hover:bg-green-100 hover:text-green-700'
+                                    }`}
+                                  >
+                                    {assignedB ? '✓B班' : 'B班'}
+                                  </button>
+                                  <button
+                                    onClick={() => !published && toggleAssign(dateStr, p.user.id, p.user.name, 'C')}
+                                    disabled={published}
+                                    className={`text-xs px-2 py-1 rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed ${
+                                      assigned
+                                        ? 'bg-green-100 text-green-700 hover:bg-red-100 hover:text-red-700'
+                                        : 'bg-gray-100 text-gray-600 hover:bg-green-100 hover:text-green-700'
+                                    }`}
+                                  >
+                                    {assigned ? '✓C班' : 'C班'}
+                                  </button>
+                                </div>
+                              )}
                             </div>
                           )
                         })}
