@@ -212,11 +212,15 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
     assignedDaysMap.set(a.userId, (assignedDaysMap.get(a.userId) ?? 0) + (PREF_DAY_VALUE[a.shift as ShiftKey] ?? 0))
   }
   const prefSummaryRows = [...prefDaysMap.entries()]
-    .map(([userId, s]) => ({
-      name: s.name,
-      days: s.days,
-      remaining: Math.max(0, s.days - (assignedDaysMap.get(userId) ?? 0)),
-    }))
+    .map(([userId, s]) => {
+      const assigned = assignedDaysMap.get(userId) ?? 0
+      return {
+        name: s.name,
+        days: s.days,
+        assigned,
+        remaining: Math.max(0, s.days - assigned),
+      }
+    })
     .sort((a, b) => b.days - a.days)
 
   // 排班面板內容（桌面側邊欄 / 手機底部面板共用）
@@ -530,27 +534,39 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
               選擇日期以查看意願並分配排班
             </div>
           )}
-          {prefSummaryRows.length > 0 && (
-            <div className="bg-white rounded-2xl shadow-sm border p-4">
-              <h3 className="font-semibold text-gray-700 text-sm mb-2">本月報更意願摘要</h3>
-              <div className="divide-y">
-                {prefSummaryRows.map(row => {
-                  const fmt = (n: number) => Number.isInteger(n) ? String(n) : n.toFixed(1)
-                  return (
-                    <div key={row.name} className="flex justify-between items-center py-2">
-                      <span className="text-sm text-gray-700">{row.name}</span>
-                      <div className="flex items-center gap-1.5 text-right">
-                        <span className="text-xs text-gray-400">剩 {fmt(row.remaining)}</span>
-                        <span className="text-sm font-medium text-blue-600">/ {fmt(row.days)} 天</span>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          )}
         </div>
       </div>
+
+      {/* ── 本月報更意願摘要 ── */}
+      {prefSummaryRows.length > 0 && (
+        <div className="mt-6">
+          <h3 className="font-semibold text-gray-800 text-sm mb-3">本月報更意願摘要</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {prefSummaryRows.map(row => {
+              const fmt = (n: number) => Number.isInteger(n) ? String(n) : n.toFixed(1)
+              return (
+                <div key={row.name} className="bg-white rounded-xl border p-3">
+                  <div className="font-medium text-gray-800 text-sm truncate mb-2">{row.name}</div>
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-400">意願</span>
+                      <span className="font-medium text-blue-600">{fmt(row.days)} 天</span>
+                    </div>
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-400">已排班</span>
+                      <span className="font-medium text-gray-700">{fmt(row.assigned)} 天</span>
+                    </div>
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-400">剩餘</span>
+                      <span className={`font-medium ${row.remaining > 0 ? 'text-orange-500' : 'text-gray-400'}`}>{fmt(row.remaining)} 天</span>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       {/* ── 員工排班統計 ── */}
       <div className="mt-8">
