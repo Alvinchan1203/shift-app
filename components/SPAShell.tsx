@@ -21,7 +21,7 @@ interface Props {
 }
 
 export default function SPAShell({ userName, role, userId }: Props) {
-  const defaultView = role === 'ADMIN' ? 'admin/preferences' : 'employee/preferences'
+  const defaultView = role === 'ADMIN' ? 'attendance' : 'employee/preferences'
   const [view, setView] = useState(defaultView)
 
   const show = (key: string) => view === key ? '' : 'hidden'
