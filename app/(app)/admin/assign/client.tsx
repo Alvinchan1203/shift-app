@@ -58,8 +58,15 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
   const [autoAssignResult, setAutoAssignResult] = useState<number | null>(null)
   const [clearConfirm, setClearConfirm] = useState(false)
   const [clearing, setClearing] = useState(false)
-  const [dailyRequiredInput, setDailyRequiredInput] = useState('')
-  const [dailyRequired, setDailyRequired] = useState(0)
+  const [dailyRequiredInput, setDailyRequiredInput] = useState(() => {
+    if (typeof window === 'undefined') return ''
+    return localStorage.getItem('dailyRequired') ?? ''
+  })
+  const [dailyRequired, setDailyRequired] = useState(() => {
+    if (typeof window === 'undefined') return 0
+    const saved = localStorage.getItem('dailyRequired')
+    return saved ? parseInt(saved) : 0
+  })
 
   const days = getMonthDays(year, month)
   const [refreshing, setRefreshing] = useState(false)
@@ -366,14 +373,18 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
           <input
             type="text" inputMode="numeric" value={dailyRequiredInput}
             onChange={e => { if (/^\d{0,2}$/.test(e.target.value)) setDailyRequiredInput(e.target.value) }}
-            onKeyDown={e => { if (e.key === 'Enter') setDailyRequired(dailyRequiredInput === '' ? 0 : parseInt(dailyRequiredInput)) }}
+            onKeyDown={e => { if (e.key === 'Enter') { const val = dailyRequiredInput === '' ? 0 : parseInt(dailyRequiredInput); setDailyRequired(val); localStorage.setItem('dailyRequired', String(val)) } }}
             onFocus={e => e.target.select()}
             placeholder="0"
             className="w-12 border rounded-lg px-2 py-1 text-sm text-center"
           />
           <span className="shrink-0 text-gray-400">人</span>
           <button
-            onClick={() => setDailyRequired(dailyRequiredInput === '' ? 0 : parseInt(dailyRequiredInput))}
+            onClick={() => {
+              const val = dailyRequiredInput === '' ? 0 : parseInt(dailyRequiredInput)
+              setDailyRequired(val)
+              localStorage.setItem('dailyRequired', String(val))
+            }}
             className="text-xs px-2.5 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition shrink-0"
           >
             確認
