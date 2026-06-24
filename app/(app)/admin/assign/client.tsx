@@ -365,6 +365,7 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
           <input
             type="number" min={1} max={20} value={dailyRequired}
             onChange={e => setDailyRequired(Math.max(1, Number(e.target.value)))}
+            onFocus={e => e.target.select()}
             className="w-12 border rounded-lg px-2 py-1 text-sm text-center"
           />
           <span className="shrink-0 text-gray-400">人</span>
