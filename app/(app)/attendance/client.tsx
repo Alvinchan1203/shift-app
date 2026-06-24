@@ -394,14 +394,14 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
 
       {/* ── Roster 表格（橫向捲動）── */}
       <div className={`overflow-x-auto rounded-2xl border shadow-sm bg-white transition-opacity ${loadingMonth ? 'opacity-50 pointer-events-none' : ''}`}>
-        <table className="border-collapse min-w-max w-full text-sm">
+        <table className="border-collapse w-full text-sm table-fixed" style={{ minWidth: '700px' }}>
           <thead>
             <tr className="bg-gray-50 border-b">
-              <th className="sticky left-0 z-10 bg-gray-50 text-left px-4 py-2.5 font-medium text-gray-600 min-w-[110px] border-r">員工</th>
+              <th className="sticky left-0 z-10 bg-gray-50 text-left px-4 py-2.5 font-medium text-gray-600 w-[110px] border-r">員工</th>
               {monthDays.map(day => {
                 const { rest } = isRestDay(day)
                 return (
-                  <th key={toDateStr(day)} className={`text-center px-0 py-2 font-medium w-9 text-xs ${rest ? 'text-pink-300' : 'text-gray-500'}`}>
+                  <th key={toDateStr(day)} className={`text-center px-0 py-2 font-medium text-xs ${rest ? 'text-pink-300' : 'text-gray-500'}`}>
                     <div>{day.getDate()}</div>
                     <div className="text-gray-300 font-normal">{'日一二三四五六'[day.getDay()]}</div>
                   </th>
@@ -414,7 +414,7 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
               const totalMins = calcMonthlyMinutes(user.id)
               return (
                 <tr key={user.id} className="hover:bg-gray-50">
-                  <td className={`sticky left-0 z-10 px-3 py-1 border-r min-w-[110px] ${user.cannotWitness ? 'bg-pink-100 hover:bg-pink-200' : 'bg-white hover:bg-gray-50'}`}>
+                  <td className={`sticky left-0 z-10 px-3 py-1 border-r w-[110px] ${user.cannotWitness ? 'bg-pink-100 hover:bg-pink-200' : 'bg-white hover:bg-gray-50'}`}>
                     <div className="font-medium text-gray-800 text-sm leading-tight">{user.name}</div>
                     <div className="flex items-center gap-1.5 mt-0.5">
                       <span className="text-xs text-gray-400">{formatDuration(totalMins)}</span>
