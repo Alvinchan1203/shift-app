@@ -16,6 +16,7 @@ type InitialData = {
   assignments: Assignment[]
   holidays: Holiday[]
   submittedUserIds: string[]
+  submissions?: { userId: string; confirmedAt: string }[]
   published: boolean
   publishedAt: string | null
   initialYear: number
@@ -43,6 +44,9 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
   const [sheetDate, setSheetDate] = useState<string | null>(null)
   const [prefs, setPrefs] = useState<Pref[]>(initialData.prefs)
   const [submittedUserIds, setSubmittedUserIds] = useState<Set<string>>(new Set(initialData.submittedUserIds))
+  const [submittedAtMap, setSubmittedAtMap] = useState<Map<string, string>>(
+    new Map((initialData.submissions ?? []).map(s => [s.userId, s.confirmedAt]))
+  )
   const [assignments, setAssignments] = useState<Assignment[]>(initialData.assignments)
   const [holidays, setHolidays] = useState<Holiday[]>(initialData.holidays)
   const [published, setPublished] = useState(initialData.published)
@@ -71,7 +75,9 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
     setPrefs(p.map((x: Pref) => ({ ...x, date: x.date.slice(0, 10) })))
     setAssignments(a.map((x: Assignment) => ({ ...x, date: x.date.slice(0, 10) })))
     setHolidays(h.map((x: Holiday) => ({ ...x, date: x.date.slice(0, 10) })))
-    setSubmittedUserIds(new Set((Array.isArray(subs) ? subs : []).map((s: { userId: string }) => s.userId)))
+    const subsArr = Array.isArray(subs) ? subs : []
+    setSubmittedUserIds(new Set(subsArr.map((s: { userId: string }) => s.userId)))
+    setSubmittedAtMap(new Map(subsArr.map((s: { userId: string; confirmedAt: string }) => [s.userId, s.confirmedAt ?? ''])))
     if (showSpinner) setRefreshing(false)
   }
 
@@ -91,7 +97,9 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
     fetch(`/api/preferences/submit?year=${year}&month=${month + 1}`)
       .then((r) => r.json())
       .then((subs) => {
-        setSubmittedUserIds(new Set((Array.isArray(subs) ? subs : []).map((s: { userId: string }) => s.userId)))
+        const subsArr = Array.isArray(subs) ? subs : []
+        setSubmittedUserIds(new Set(subsArr.map((s: { userId: string }) => s.userId)))
+        setSubmittedAtMap(new Map(subsArr.map((s: { userId: string; confirmedAt: string }) => [s.userId, s.confirmedAt ?? ''])))
       })
   }, [year, month])
 
@@ -514,7 +522,9 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
                       const assignMap = new Map(dayAssign.map(a => [a.userId, a]))
                       const prefUserIds = new Set(dayPrefs.map(p => p.user.id))
                       const chips = [
-                        ...[...new Map(dayPrefs.map(p => [p.user.id, p.user.name])).entries()].map(([uid, name]) => {
+                        ...[...new Map(dayPrefs.map(p => [p.user.id, p.user.name])).entries()]
+                          .sort(([uidA], [uidB]) => (submittedAtMap.get(uidA) ?? '').localeCompare(submittedAtMap.get(uidB) ?? ''))
+                          .map(([uid, name]) => {
                           const a = assignMap.get(uid)
                           return { key: uid, name, colorClass: a ? SHIFTS[a.shift as ShiftKey].color : 'text-gray-700 bg-white border border-gray-200' }
                         }),

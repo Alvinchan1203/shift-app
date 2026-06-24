@@ -48,6 +48,7 @@ export default function AdminAssignView() {
         assignments: assignments.map((a: Assignment) => ({ ...a, date: a.date.slice(0, 10) })),
         holidays: holidays.map((h: Holiday) => ({ ...h, date: h.date.slice(0, 10) })),
         submittedUserIds: (Array.isArray(subs) ? subs : []).map((s: { userId: string }) => s.userId),
+        submissions: (Array.isArray(subs) ? subs : []).map((s: { userId: string; confirmedAt: string }) => ({ userId: s.userId, confirmedAt: s.confirmedAt ?? '' })),
         published: publishData.published ?? false,
         publishedAt: publishData.publishedAt ?? null,
         initialYear: year,
