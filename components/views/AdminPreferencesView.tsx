@@ -45,6 +45,7 @@ export default function AdminPreferencesView() {
   const [prefs, setPrefs] = useState<Pref[]>([])
   const [submissions, setSubmissions] = useState<Submission[]>([])
   const [refreshKey, setRefreshKey] = useState(0)
+  const [hideTesting, setHideTesting] = useState(true)
 
   useEffect(() => {
     setEmployees(null)
@@ -94,34 +95,43 @@ export default function AdminPreferencesView() {
     return a.name.localeCompare(b.name)
   })
 
-  const submittedCount = employees.filter(e => submissionByUser[e.id]?.confirmedAt != null).length
+  const displayEmployees = hideTesting
+    ? sortedEmployees.filter(e => !e.name.toLowerCase().startsWith('testing'))
+    : sortedEmployees
+  const submittedCount = displayEmployees.filter(e => submissionByUser[e.id]?.confirmedAt != null).length
 
   return (
     <main className="max-w-4xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <h2 className="text-xl font-bold text-gray-800">Bee上班意願</h2>
-          {employees.length > 0 && (
+          {displayEmployees.length > 0 && (
             <span className={`text-xs px-2.5 py-1 rounded-full border font-medium ${
-              submittedCount === employees.length
+              submittedCount === displayEmployees.length
                 ? 'bg-green-50 text-green-700 border-green-200'
                 : 'bg-gray-100 text-gray-500 border-gray-200'
             }`}>
-              已提交 {submittedCount} / {employees.length} 人
+              已提交 {submittedCount} / {displayEmployees.length} 人
             </span>
           )}
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setHideTesting(h => !h)}
+            className={`text-xs px-3 py-1.5 rounded-lg border transition ${hideTesting ? 'bg-gray-100 text-gray-500 border-gray-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200 hover:bg-yellow-100'}`}
+          >
+            {hideTesting ? '顯示測試帳戶' : '隱藏測試帳戶'}
+          </button>
           <MonthPicker year={year} month={month} onChange={(y, m) => { setYear(y); setMonth(m) }} />
           <button onClick={() => setRefreshKey(k => k + 1)} className="px-2.5 py-1.5 rounded-lg border hover:bg-gray-100 text-gray-500 transition" title="重新整理">↺</button>
         </div>
       </div>
 
-      {employees.length === 0 ? (
+      {displayEmployees.length === 0 ? (
         <div className="bg-white rounded-2xl shadow-sm border p-8 text-center text-gray-400">暫無員工帳號</div>
       ) : (
         <div className="space-y-4">
-          {sortedEmployees.map(emp => {
+          {displayEmployees.map(emp => {
             const subRecord = submissionByUser[emp.id]
             const empPrefs = prefsByUser[emp.id] ?? []
             return (
