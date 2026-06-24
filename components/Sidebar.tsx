@@ -18,10 +18,10 @@ export default function Sidebar({ userName, role, onNavigate, activeView }: Side
 
   const links = role === 'ADMIN'
     ? [
-        { href: '/admin/preferences', view: 'admin/preferences', label: '報更紀錄' },
+        { href: '/attendance', view: 'attendance', label: '實際出勤' },
         { href: '/admin/assign', view: 'admin/assign', label: '分配排班' },
         { href: '/admin/holidays', view: 'admin/holidays', label: '假期管理' },
-        { href: '/attendance', view: 'attendance', label: '實際出勤' },
+        { href: '/admin/preferences', view: 'admin/preferences', label: '報更紀錄' },
         { href: '/admin/worklogs', view: 'admin/worklogs', label: '員工工作記錄' },
         { href: '/admin/scores', view: 'admin/scores', label: '員工評分' },
         { href: '/admin/users', view: 'admin/users', label: '賬戶管理' },
