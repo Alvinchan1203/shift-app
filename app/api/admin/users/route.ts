@@ -32,7 +32,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: '缺少資料' }, { status: 400 })
     }
     const admin = await prisma.user.findUnique({ where: { id: session.user.id }, select: { name: true } })
-    if (admin?.name !== 'alvinchan') {
+    if (admin?.name.toLowerCase() !== 'alvinchan') {
       return NextResponse.json({ error: '無權限修改此設定' }, { status: 403 })
     }
     const user = await prisma.user.update({
@@ -48,7 +48,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: '缺少資料' }, { status: 400 })
     }
     const admin = await prisma.user.findUnique({ where: { id: session.user.id }, select: { name: true } })
-    if (admin?.name !== 'alvinchan') {
+    if (admin?.name.toLowerCase() !== 'alvinchan') {
       return NextResponse.json({ error: '無權限修改此設定' }, { status: 403 })
     }
     const user = await prisma.user.update({
@@ -134,7 +134,7 @@ export async function PATCH(req: NextRequest) {
       if (!newName || typeof newName !== 'string' || !newName.trim()) {
         return NextResponse.json({ error: '新名字不可為空' }, { status: 400 })
       }
-      if (!admin.canRenameUser && admin.name !== 'alvinchan') {
+      if (!admin.canRenameUser && admin.name.toLowerCase() !== 'alvinchan') {
         return NextResponse.json({ error: '您沒有改名的權限' }, { status: 403 })
       }
       const updated = await prisma.user.update({

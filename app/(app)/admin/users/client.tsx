@@ -225,7 +225,7 @@ export default function UsersClient({ currentUserName, currentUserCanDeleteAdmin
                         額外報更
                       </button>
                     )}
-                    {emp.role === 'ADMIN' && currentUserName === 'alvinchan' && (
+                    {emp.role === 'ADMIN' && currentUserName.toLowerCase() === 'alvinchan' && (
                       <>
                         <button
                           onClick={() => toggleCanDeleteAdmin(emp)}
@@ -253,7 +253,7 @@ export default function UsersClient({ currentUserName, currentUserCanDeleteAdmin
                         </button>
                       </>
                     )}
-                    {(currentUserCanRenameUser || currentUserName === 'alvinchan') && (
+                    {(currentUserCanRenameUser || currentUserName.toLowerCase() === 'alvinchan') && (
                       <button
                         onClick={() => { setRenameModal(emp); setRenameNewName(emp.name); setRenamePassword(''); setRenameError(''); setRenameSuccess(false) }}
                         className="text-xs text-blue-600 hover:text-blue-800 border border-blue-200 rounded-lg px-2.5 py-1 hover:bg-blue-50 transition"
