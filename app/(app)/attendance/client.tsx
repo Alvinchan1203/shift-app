@@ -394,7 +394,7 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
 
       {/* ── Roster 表格（橫向捲動）── */}
       <div className={`overflow-x-auto rounded-2xl border shadow-sm bg-white transition-opacity ${loadingMonth ? 'opacity-50 pointer-events-none' : ''}`}>
-        <table className="border-collapse min-w-max text-sm">
+        <table className="border-collapse min-w-max w-full text-sm">
           <thead>
             <tr className="bg-gray-50 border-b">
               <th className="sticky left-0 z-10 bg-gray-50 text-left px-4 py-2.5 font-medium text-gray-600 min-w-[110px] border-r">員工</th>
