@@ -650,7 +650,7 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
 
             {/* 桌面：月曆格式 */}
             <div className="hidden md:block bg-white rounded-2xl shadow-sm border overflow-x-auto">
-              <table className="text-xs border-collapse" style={{ minWidth: 'max-content' }}>
+              <table className="text-xs border-collapse w-full">
                 <thead>
                   <tr className="bg-gray-50">
                     <th className="sticky left-0 z-10 bg-gray-50 text-left px-3 py-2 font-medium text-gray-600 border-r border-b min-w-[110px]">員工</th>
@@ -659,7 +659,7 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
                       const isWeekend = day.getDay() === 0 || day.getDay() === 6
                       const holiday = getHoliday(dateStr)
                       return (
-                        <th key={dateStr} className={`text-center px-1 py-2 font-medium border-b min-w-[36px] ${isWeekend || holiday ? 'bg-pink-50 text-pink-400' : 'text-gray-500'}`}>
+                        <th key={dateStr} className={`text-center px-1 py-2 font-medium border-b border-r border-gray-200 min-w-[36px] ${isWeekend || holiday ? 'bg-pink-50 text-pink-400' : 'text-gray-500'}`}>
                           <div>{day.getDate()}</div>
                           <div className={`${isWeekend || holiday ? 'text-pink-300' : 'text-gray-400'}`}>{weekdays[day.getDay()]}</div>
                         </th>
@@ -682,7 +682,7 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
                           const holiday = getHoliday(dateStr)
                           const shift = dateShiftMap.get(dateStr)
                           return (
-                            <td key={dateStr} className={`text-center px-0.5 py-1.5 ${isWeekend || holiday ? 'bg-pink-50' : ''}`}>
+                            <td key={dateStr} className={`text-center px-0.5 py-1.5 border-r border-gray-200 ${isWeekend || holiday ? 'bg-pink-50' : ''}`}>
                               {shift && (
                                 <span className={`inline-block rounded px-1 py-0.5 leading-tight ${SHIFTS[shift as ShiftKey].color}`}>
                                   {SHIFTS[shift as ShiftKey].label}
