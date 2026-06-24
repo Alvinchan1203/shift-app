@@ -218,15 +218,26 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
   const statsRows = baseList.map((u) => {
     const s = statsMap.get(u.id)
     const records = s ? [...s.records].sort((a, b) => a.date.localeCompare(b.date)) : []
+    const totalDays = records.reduce((sum, r) => sum + (r.shift === 'C' ? 1 : 0.5), 0)
     return {
+      id: u.id,
       name: u.name,
       records,
+      totalDays,
       totalHours: records.reduce((sum, r) => sum + SHIFT_HOURS[r.shift as ShiftKey], 0),
     }
   })
 
+  const fmt = (n: number) => Number.isInteger(n) ? String(n) : n.toFixed(1)
+
   const PREF_DAY_VALUE: Record<ShiftKey, number> = { A: 0.5, B: 0.5, C: 1 }
   const monthPrefEntries = prefs.filter(p => p.date.startsWith(monthPrefix) && submittedUserIds.has(p.user.id))
+
+  const statsPrefMap = new Map<string, Map<string, ShiftKey>>()
+  for (const p of monthPrefEntries) {
+    if (!statsPrefMap.has(p.user.id)) statsPrefMap.set(p.user.id, new Map())
+    statsPrefMap.get(p.user.id)!.set(p.date, p.shift as ShiftKey)
+  }
   const prefDaysMap = new Map<string, { name: string; days: number }>()
   for (const p of monthPrefEntries) {
     if (!prefDaysMap.has(p.user.id)) prefDaysMap.set(p.user.id, { name: p.user.name, days: 0 })
@@ -601,7 +612,6 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
           <h3 className="font-semibold text-gray-800 text-sm mb-3">本月報更意願摘要</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {prefSummaryRows.map(row => {
-              const fmt = (n: number) => Number.isInteger(n) ? String(n) : n.toFixed(1)
               return (
                 <div key={row.name} className="bg-white rounded-xl border p-3">
                   <div className="font-medium text-gray-800 text-sm truncate mb-2">{row.name}</div>
@@ -640,7 +650,7 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-medium text-gray-800">{row.name}</span>
                     <div className="flex gap-3 text-sm text-gray-500">
-                      <span>{row.records.length} 天</span>
+                      <span>{fmt(row.totalDays)} 天</span>
                       <span>{row.totalHours} 小時</span>
                     </div>
                   </div>
@@ -678,24 +688,30 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
                 <tbody className="divide-y">
                   {statsRows.map((row) => {
                     const dateShiftMap = new Map(row.records.map(r => [r.date, r.shift]))
+                    const userPrefMap = statsPrefMap.get(row.id) ?? new Map<string, ShiftKey>()
                     return (
                       <tr key={row.name} className="hover:bg-gray-50/50">
                         <td className="sticky left-0 z-10 bg-white px-3 py-1 border-r min-w-[110px]">
                           <div className="font-medium text-gray-800">{row.name}</div>
-                          <div className="text-gray-400 mt-0.5">{row.records.length}天 · {row.totalHours}h</div>
+                          <div className="text-gray-400 mt-0.5">{fmt(row.totalDays)}天 · {row.totalHours}h</div>
                         </td>
                         {days.map(day => {
                           const dateStr = toDateStr(day)
                           const isWeekend = day.getDay() === 0 || day.getDay() === 6
                           const holiday = getHoliday(dateStr)
                           const shift = dateShiftMap.get(dateStr)
+                          const prefShift = userPrefMap.get(dateStr)
                           return (
                             <td key={dateStr} className={`text-center px-0.5 py-1.5 border-r border-gray-200 ${isWeekend || holiday ? 'bg-pink-50' : ''}`}>
-                              {shift && (
+                              {shift ? (
                                 <span className={`inline-block rounded px-1 py-0.5 leading-tight ${SHIFTS[shift as ShiftKey].color}`}>
                                   {SHIFTS[shift as ShiftKey].label}
                                 </span>
-                              )}
+                              ) : prefShift && !isWeekend && !holiday ? (
+                                <span className="inline-block rounded px-1 py-0.5 leading-tight bg-gray-100 text-gray-400">
+                                  {SHIFTS[prefShift].label}
+                                </span>
+                              ) : null}
                             </td>
                           )
                         })}
