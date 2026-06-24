@@ -366,6 +366,7 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
           <input
             type="text" inputMode="numeric" value={dailyRequiredInput}
             onChange={e => { if (/^\d{0,2}$/.test(e.target.value)) setDailyRequiredInput(e.target.value) }}
+            onKeyDown={e => { if (e.key === 'Enter') setDailyRequired(dailyRequiredInput === '' ? 0 : parseInt(dailyRequiredInput)) }}
             onFocus={e => e.target.select()}
             placeholder="0"
             className="w-12 border rounded-lg px-2 py-1 text-sm text-center"
