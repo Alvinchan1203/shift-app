@@ -510,24 +510,29 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
                     className={`border-b border-r p-2 min-h-[80px] text-left w-full hover:bg-blue-50 transition ${isSelected ? 'bg-blue-50 ring-2 ring-inset ring-blue-400' : dayAssign.length < dailyRequired ? 'bg-yellow-50' : ''}`}
                   >
                     <div className="text-sm text-gray-500 mb-1">{day.getDate()}</div>
-                    {dayPrefs.length > 0 && (
-                      <div className="grid grid-cols-2 gap-0.5 mt-0.5">
-                        {[...new Map(dayPrefs.map(p => [p.user.id, p.user.name])).entries()].map(([uid, name]) => (
-                          <div key={uid} className="text-xs text-blue-700 bg-blue-50 rounded px-1 py-0.5 truncate">
-                            {name}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    {dayAssign.length > 0 && (
-                      <div className="grid grid-cols-2 gap-0.5 mt-0.5">
-                        {dayAssign.map((a) => (
-                          <div key={a.id} className={`text-xs rounded px-1 py-0.5 truncate ${SHIFTS[a.shift as ShiftKey].color}`}>
-                            {a.user.name}
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    {(() => {
+                      const assignMap = new Map(dayAssign.map(a => [a.userId, a]))
+                      const prefUserIds = new Set(dayPrefs.map(p => p.user.id))
+                      const chips = [
+                        ...[...new Map(dayPrefs.map(p => [p.user.id, p.user.name])).entries()].map(([uid, name]) => {
+                          const a = assignMap.get(uid)
+                          return { key: uid, name, colorClass: a ? SHIFTS[a.shift as ShiftKey].color : 'text-blue-700 bg-blue-50' }
+                        }),
+                        ...dayAssign.filter(a => !prefUserIds.has(a.userId)).map(a => ({
+                          key: a.id, name: a.user.name, colorClass: SHIFTS[a.shift as ShiftKey].color
+                        })),
+                      ]
+                      if (chips.length === 0) return null
+                      return (
+                        <div className="grid grid-cols-2 gap-0.5 mt-0.5">
+                          {chips.map(({ key, name, colorClass }) => (
+                            <div key={key} className={`text-xs rounded px-1 py-0.5 truncate ${colorClass}`}>
+                              {name}
+                            </div>
+                          ))}
+                        </div>
+                      )
+                    })()}
                   </button>
                 )
               })}
