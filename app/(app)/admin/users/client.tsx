@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 
-type Employee = { id: string; name: string; email: string; role: string; extraSubmitEnabled: boolean; canDeleteAdmin: boolean; createdAt: string }
+type Employee = { id: string; name: string; email: string; role: string; extraSubmitEnabled: boolean; canDeleteAdmin: boolean; canRenameUser: boolean; createdAt: string }
 
 const inputCls = 'w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300'
 
-export default function UsersClient({ currentUserName, currentUserCanDeleteAdmin, initialData }: { currentUserName: string; currentUserCanDeleteAdmin: boolean; initialData: Employee[] }) {
+export default function UsersClient({ currentUserName, currentUserCanDeleteAdmin, currentUserCanRenameUser, initialData }: { currentUserName: string; currentUserCanDeleteAdmin: boolean; currentUserCanRenameUser: boolean; initialData: Employee[] }) {
   const [employees, setEmployees] = useState<Employee[]>(initialData)
 
   const [addModal, setAddModal] = useState(false)
@@ -25,6 +25,13 @@ export default function UsersClient({ currentUserName, currentUserCanDeleteAdmin
   const [resetError, setResetError] = useState('')
   const [resetSuccess, setResetSuccess] = useState(false)
   const [resetSaving, setResetSaving] = useState(false)
+
+  const [renameModal, setRenameModal] = useState<Employee | null>(null)
+  const [renameNewName, setRenameNewName] = useState('')
+  const [renamePassword, setRenamePassword] = useState('')
+  const [renameError, setRenameError] = useState('')
+  const [renameSuccess, setRenameSuccess] = useState(false)
+  const [renameSaving, setRenameSaving] = useState(false)
 
   function openAdd() {
     setAddForm({ name: '', password: '', confirmPassword: '', adminPassword: '', role: 'EMPLOYEE' })
@@ -110,6 +117,36 @@ export default function UsersClient({ currentUserName, currentUserCanDeleteAdmin
     setEmployees(prev => prev.map(e => e.id === emp.id ? { ...e, canDeleteAdmin: updated.canDeleteAdmin } : e))
   }
 
+  async function toggleCanRenameUser(emp: Employee) {
+    const updated = await fetch('/api/admin/users', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: emp.id, canRenameUser: !emp.canRenameUser }),
+    }).then(r => r.json())
+    setEmployees(prev => prev.map(e => e.id === emp.id ? { ...e, canRenameUser: updated.canRenameUser } : e))
+  }
+
+  async function renameUser() {
+    setRenameError('')
+    setRenameSuccess(false)
+    if (!renameNewName.trim()) { setRenameError('請輸入新名字'); return }
+    if (!renamePassword) { setRenameError('請輸入管理員密碼'); return }
+    setRenameSaving(true)
+    try {
+      const r = await fetch('/api/admin/users', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: renameModal!.id, adminPassword: renamePassword, newName: renameNewName.trim() }),
+      })
+      const data = await r.json()
+      if (!r.ok) { setRenameError(data.error ?? '改名失敗'); return }
+      setEmployees(prev => prev.map(e => e.id === renameModal!.id ? { ...e, name: data.name } : e))
+      setRenameSuccess(true)
+    } finally {
+      setRenameSaving(false)
+    }
+  }
+
   async function resetEmployeePassword() {
     setResetError('')
     setResetSuccess(false)
@@ -189,17 +226,39 @@ export default function UsersClient({ currentUserName, currentUserCanDeleteAdmin
                       </button>
                     )}
                     {emp.role === 'ADMIN' && currentUserName === 'alvinchan' && (
+                      <>
+                        <button
+                          onClick={() => toggleCanDeleteAdmin(emp)}
+                          title={emp.canDeleteAdmin ? '點擊撤銷刪除管理員權限' : '點擊授予刪除管理員權限'}
+                          className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg border transition ${
+                            emp.canDeleteAdmin
+                              ? 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100'
+                              : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100'
+                          }`}
+                        >
+                          <span className={`w-2 h-2 rounded-full ${emp.canDeleteAdmin ? 'bg-purple-500' : 'bg-gray-300'}`} />
+                          刪管理員
+                        </button>
+                        <button
+                          onClick={() => toggleCanRenameUser(emp)}
+                          title={emp.canRenameUser ? '點擊撤銷改名權限' : '點擊授予改名權限'}
+                          className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg border transition ${
+                            emp.canRenameUser
+                              ? 'bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100'
+                              : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100'
+                          }`}
+                        >
+                          <span className={`w-2 h-2 rounded-full ${emp.canRenameUser ? 'bg-orange-500' : 'bg-gray-300'}`} />
+                          改名
+                        </button>
+                      </>
+                    )}
+                    {(currentUserCanRenameUser || currentUserName === 'alvinchan') && (
                       <button
-                        onClick={() => toggleCanDeleteAdmin(emp)}
-                        title={emp.canDeleteAdmin ? '點擊撤銷刪除管理員權限' : '點擊授予刪除管理員權限'}
-                        className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg border transition ${
-                          emp.canDeleteAdmin
-                            ? 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100'
-                            : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100'
-                        }`}
+                        onClick={() => { setRenameModal(emp); setRenameNewName(emp.name); setRenamePassword(''); setRenameError(''); setRenameSuccess(false) }}
+                        className="text-xs text-blue-600 hover:text-blue-800 border border-blue-200 rounded-lg px-2.5 py-1 hover:bg-blue-50 transition"
                       >
-                        <span className={`w-2 h-2 rounded-full ${emp.canDeleteAdmin ? 'bg-purple-500' : 'bg-gray-300'}`} />
-                        刪管理員
+                        改名
                       </button>
                     )}
                     <button
@@ -311,6 +370,42 @@ export default function UsersClient({ currentUserName, currentUserCanDeleteAdmin
             <button onClick={resetEmployeePassword} disabled={resetSaving || resetSuccess}
               className="w-full py-2.5 rounded-xl border border-amber-200 bg-amber-50 text-amber-700 text-sm font-medium hover:bg-amber-100 transition disabled:opacity-50">
               {resetSaving ? '處理中...' : '確認重置'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Rename Modal */}
+      {renameModal && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setRenameModal(null)} />
+          <div className="relative bg-white rounded-t-2xl sm:rounded-2xl p-5 w-full sm:max-w-sm shadow-xl">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-gray-800">更改名字</h3>
+              <button onClick={() => setRenameModal(null)} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">
+              更改 <span className="font-semibold text-gray-800">{renameModal.name}</span> 的顯示名字
+            </p>
+            <div className="space-y-3 mb-4">
+              <div>
+                <p className="text-xs text-gray-500 mb-1.5">新名字</p>
+                <input type="text" placeholder="輸入新名字" value={renameNewName}
+                  onChange={e => setRenameNewName(e.target.value)}
+                  className="w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 mb-1.5">請輸入您的管理員密碼以確認操作</p>
+                <input type="password" placeholder="管理員密碼" value={renamePassword}
+                  onChange={e => setRenamePassword(e.target.value)}
+                  className="w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300" />
+              </div>
+            </div>
+            {renameError && <p className="text-xs text-red-500 mb-3">{renameError}</p>}
+            {renameSuccess && <p className="text-xs text-green-600 mb-3">名字已成功更改為「{renameNewName}」</p>}
+            <button onClick={renameUser} disabled={renameSaving || renameSuccess}
+              className="w-full py-2.5 rounded-xl border border-blue-200 bg-blue-50 text-blue-700 text-sm font-medium hover:bg-blue-100 transition disabled:opacity-50">
+              {renameSaving ? '處理中...' : '確認改名'}
             </button>
           </div>
         </div>
