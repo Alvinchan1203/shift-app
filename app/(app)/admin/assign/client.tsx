@@ -21,6 +21,7 @@ type InitialData = {
   publishedAt: string | null
   initialYear: number
   initialMonth: number
+  allEmployees?: { id: string; name: string }[]
 }
 
 function toDateStr(d: Date) {
@@ -211,11 +212,18 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
     if (!statsMap.has(a.userId)) statsMap.set(a.userId, { name: a.user.name, records: [] })
     statsMap.get(a.userId)!.records.push({ date: a.date, shift: a.shift as ShiftKey })
   }
-  const statsRows = [...statsMap.values()].map((s) => ({
-    ...s,
-    records: [...s.records].sort((a, b) => a.date.localeCompare(b.date)),
-    totalHours: s.records.reduce((sum, r) => sum + SHIFT_HOURS[r.shift as ShiftKey], 0),
-  })).sort((a, b) => a.name.localeCompare(b.name))
+  const baseList = initialData.allEmployees && initialData.allEmployees.length > 0
+    ? initialData.allEmployees
+    : [...statsMap.entries()].map(([id, s]) => ({ id, name: s.name })).sort((a, b) => a.name.localeCompare(b.name))
+  const statsRows = baseList.map((u) => {
+    const s = statsMap.get(u.id)
+    const records = s ? [...s.records].sort((a, b) => a.date.localeCompare(b.date)) : []
+    return {
+      name: u.name,
+      records,
+      totalHours: records.reduce((sum, r) => sum + SHIFT_HOURS[r.shift as ShiftKey], 0),
+    }
+  })
 
   const PREF_DAY_VALUE: Record<ShiftKey, number> = { A: 0.5, B: 0.5, C: 1 }
   const monthPrefEntries = prefs.filter(p => p.date.startsWith(monthPrefix) && submittedUserIds.has(p.user.id))

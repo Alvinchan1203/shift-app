@@ -42,7 +42,11 @@ export default function AdminAssignView() {
       fetch(`/api/preferences/submit?year=${year}&month=${month1}`).then(r => r.json()),
       fetch(`/api/schedule-publish?year=${year}&month=${month1}`).then(r => r.json()),
       fetch('/api/admin/settings').then(r => r.json()),
-    ]).then(([prefs, assignments, holidays, subs, publishData, settings]) => {
+      fetch('/api/admin/users').then(r => r.json()),
+    ]).then(([prefs, assignments, holidays, subs, publishData, settings, usersData]) => {
+      const allEmployees = (Array.isArray(usersData) ? usersData : [])
+        .filter((u: { role: string }) => u.role === 'EMPLOYEE' && !u.name.toLowerCase().startsWith('testing'))
+        .map((u: { id: string; name: string }) => ({ id: u.id, name: u.name }))
       setInitialData({
         prefs: prefs.map((p: Pref) => ({ ...p, date: p.date.slice(0, 10) })),
         assignments: assignments.map((a: Assignment) => ({ ...a, date: a.date.slice(0, 10) })),
@@ -53,6 +57,7 @@ export default function AdminAssignView() {
         publishedAt: publishData.publishedAt ?? null,
         initialYear: year,
         initialMonth: month,
+        allEmployees,
       })
       setNotifyEnabled(settings?.feishu_notifications_enabled === 'true')
     })
