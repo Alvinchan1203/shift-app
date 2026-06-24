@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-type Employee = { id: string; name: string; email: string; role: string; extraSubmitEnabled: boolean; canDeleteAdmin: boolean; canRenameUser: boolean; createdAt: string }
+type Employee = { id: string; name: string; email: string; role: string; extraSubmitEnabled: boolean; canDeleteAdmin: boolean; canRenameUser: boolean; cannotWitness: boolean; createdAt: string }
 
 const inputCls = 'w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300'
 
@@ -106,6 +106,15 @@ export default function UsersClient({ currentUserName, currentUserCanDeleteAdmin
       body: JSON.stringify({ userId: emp.id, extraSubmitEnabled: !emp.extraSubmitEnabled }),
     }).then(r => r.json())
     setEmployees(prev => prev.map(e => e.id === emp.id ? { ...e, extraSubmitEnabled: updated.extraSubmitEnabled } : e))
+  }
+
+  async function toggleCannotWitness(emp: Employee) {
+    const updated = await fetch('/api/admin/users', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: emp.id, cannotWitness: !emp.cannotWitness }),
+    }).then(r => r.json())
+    setEmployees(prev => prev.map(e => e.id === emp.id ? { ...e, cannotWitness: updated.cannotWitness } : e))
   }
 
   async function toggleCanDeleteAdmin(emp: Employee) {
@@ -212,18 +221,32 @@ export default function UsersClient({ currentUserName, currentUserCanDeleteAdmin
                   </div>
                   <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
                     {emp.role === 'EMPLOYEE' && (
-                      <button
-                        onClick={() => toggleExtraSubmit(emp)}
-                        title={emp.extraSubmitEnabled ? '點擊關閉額外報更權限' : '點擊開啟額外報更權限（可在15日前或26日後提交）'}
-                        className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg border transition ${
-                          emp.extraSubmitEnabled
-                            ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100'
-                            : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100'
-                        }`}
-                      >
-                        <span className={`w-2 h-2 rounded-full ${emp.extraSubmitEnabled ? 'bg-green-500' : 'bg-gray-300'}`} />
-                        額外報更
-                      </button>
+                      <>
+                        <button
+                          onClick={() => toggleExtraSubmit(emp)}
+                          title={emp.extraSubmitEnabled ? '點擊關閉額外報更權限' : '點擊開啟額外報更權限（可在15日前或26日後提交）'}
+                          className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg border transition ${
+                            emp.extraSubmitEnabled
+                              ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100'
+                              : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100'
+                          }`}
+                        >
+                          <span className={`w-2 h-2 rounded-full ${emp.extraSubmitEnabled ? 'bg-green-500' : 'bg-gray-300'}`} />
+                          額外報更
+                        </button>
+                        <button
+                          onClick={() => toggleCannotWitness(emp)}
+                          title={emp.cannotWitness ? '點擊取消「未能見證」標記' : '點擊標記為未能見證（出勤頁面名字變粉紅）'}
+                          className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg border transition ${
+                            emp.cannotWitness
+                              ? 'bg-pink-50 text-pink-700 border-pink-200 hover:bg-pink-100'
+                              : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100'
+                          }`}
+                        >
+                          <span className={`w-2 h-2 rounded-full ${emp.cannotWitness ? 'bg-pink-500' : 'bg-gray-300'}`} />
+                          未能見證
+                        </button>
+                      </>
                     )}
                     {emp.role === 'ADMIN' && currentUserName.toLowerCase() === 'alvinchan' && (
                       <>

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { ATTENDANCE_TYPES, AttendanceTypeKey, SHIFT_DURATIONS, formatDuration } from '@/lib/constants'
 import MonthPicker from '@/components/MonthPicker'
 
-type User = { id: string; name: string }
+type User = { id: string; name: string; cannotWitness?: boolean }
 type AttendanceRecord = {
   id: string; userId: string; date: string; type: AttendanceTypeKey; note?: string | null; durationMinutes?: number | null
   user?: { id: string; name: string }
@@ -414,7 +414,7 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
               const totalMins = calcMonthlyMinutes(user.id)
               return (
                 <tr key={user.id} className="hover:bg-gray-50">
-                  <td className="sticky left-0 z-10 bg-white hover:bg-gray-50 px-3 py-1 border-r min-w-[110px]">
+                  <td className={`sticky left-0 z-10 px-3 py-1 border-r min-w-[110px] ${user.cannotWitness ? 'bg-pink-100 hover:bg-pink-200' : 'bg-white hover:bg-gray-50'}`}>
                     <div className="font-medium text-gray-800 text-sm leading-tight">{user.name}</div>
                     <div className="flex items-center gap-1.5 mt-0.5">
                       <span className="text-xs text-gray-400">{formatDuration(totalMins)}</span>

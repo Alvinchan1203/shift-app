@@ -22,6 +22,7 @@ model User {
   extraSubmitEnabled Boolean           @default(false)
   canDeleteAdmin     Boolean           @default(false)
   canRenameUser      Boolean           @default(false)
+  cannotWitness      Boolean           @default(false)
   createdAt          DateTime          @default(now())
   preferences   ShiftPreference[]
   assignments   ShiftAssignment[]

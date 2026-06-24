@@ -10,7 +10,7 @@ export async function GET() {
   }
 
   const users = await prisma.user.findMany({
-    select: { id: true, name: true, email: true, role: true, extraSubmitEnabled: true, canDeleteAdmin: true, canRenameUser: true, createdAt: true },
+    select: { id: true, name: true, email: true, role: true, extraSubmitEnabled: true, canDeleteAdmin: true, canRenameUser: true, cannotWitness: true, createdAt: true },
     orderBy: { name: 'asc' },
   })
   return NextResponse.json(users)
@@ -55,6 +55,18 @@ export async function PUT(req: NextRequest) {
       where: { id: userId },
       data: { canRenameUser: body.canRenameUser },
       select: { id: true, canRenameUser: true },
+    })
+    return NextResponse.json(user)
+  }
+
+  if ('cannotWitness' in body) {
+    if (typeof body.cannotWitness !== 'boolean') {
+      return NextResponse.json({ error: '缺少資料' }, { status: 400 })
+    }
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: { cannotWitness: body.cannotWitness },
+      select: { id: true, cannotWitness: true },
     })
     return NextResponse.json(user)
   }

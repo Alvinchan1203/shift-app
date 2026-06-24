@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import AttendanceClient from '@/app/(app)/attendance/client'
 
-type User = { id: string; name: string }
+type User = { id: string; name: string; cannotWitness?: boolean }
 
 function Skeleton() {
   return (
@@ -58,7 +58,7 @@ export default function AttendanceView({ isAdmin, userId, userName }: Props) {
 
     Promise.all([...basePromises, ...adminPromises]).then(
       ([records, assignments, holidays, confirmedMins, publishData, usersData, logsData]) => {
-        setUsers(isAdmin ? usersData.filter((u: { role: string }) => u.role === 'EMPLOYEE') : [{ id: userId, name: userName }])
+        setUsers(isAdmin ? usersData.filter((u: { role: string }) => u.role === 'EMPLOYEE').map((u: User & { role: string }) => ({ id: u.id, name: u.name, cannotWitness: u.cannotWitness })) : [{ id: userId, name: userName }])
         setInitialData({
           initialYear: year,
           initialMonth: month,
