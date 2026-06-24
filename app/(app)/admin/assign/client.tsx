@@ -516,7 +516,7 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
                       const chips = [
                         ...[...new Map(dayPrefs.map(p => [p.user.id, p.user.name])).entries()].map(([uid, name]) => {
                           const a = assignMap.get(uid)
-                          return { key: uid, name, colorClass: a ? SHIFTS[a.shift as ShiftKey].color : 'text-blue-700 bg-blue-50' }
+                          return { key: uid, name, colorClass: a ? SHIFTS[a.shift as ShiftKey].color : 'text-gray-700 bg-white border border-gray-200' }
                         }),
                         ...dayAssign.filter(a => !prefUserIds.has(a.userId)).map(a => ({
                           key: a.id, name: a.user.name, colorClass: SHIFTS[a.shift as ShiftKey].color
