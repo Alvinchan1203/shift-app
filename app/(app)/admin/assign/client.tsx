@@ -648,35 +648,52 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
               ))}
             </div>
 
-            {/* 桌面：表格式 */}
-            <div className="hidden md:block bg-white rounded-2xl shadow-sm border overflow-hidden">
-              <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b">
-                  <tr>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600 w-28">員工</th>
-                    <th className="text-center px-4 py-3 font-medium text-gray-600 w-20">排班日數</th>
-                    <th className="text-center px-4 py-3 font-medium text-gray-600 w-24">總工時</th>
-                    <th className="text-left px-4 py-3 font-medium text-gray-600">排班明細</th>
+            {/* 桌面：月曆格式 */}
+            <div className="hidden md:block bg-white rounded-2xl shadow-sm border overflow-x-auto">
+              <table className="text-xs border-collapse" style={{ minWidth: 'max-content' }}>
+                <thead>
+                  <tr className="bg-gray-50">
+                    <th className="sticky left-0 z-10 bg-gray-50 text-left px-3 py-2 font-medium text-gray-600 border-r border-b min-w-[110px]">員工</th>
+                    {days.map(day => {
+                      const dateStr = toDateStr(day)
+                      const isWeekend = day.getDay() === 0 || day.getDay() === 6
+                      const holiday = getHoliday(dateStr)
+                      return (
+                        <th key={dateStr} className={`text-center px-1 py-2 font-medium border-b min-w-[36px] ${isWeekend || holiday ? 'bg-pink-50 text-pink-400' : 'text-gray-500'}`}>
+                          <div>{day.getDate()}</div>
+                          <div className={`${isWeekend || holiday ? 'text-pink-300' : 'text-gray-400'}`}>{weekdays[day.getDay()]}</div>
+                        </th>
+                      )
+                    })}
                   </tr>
                 </thead>
                 <tbody className="divide-y">
-                  {statsRows.map((row) => (
-                    <tr key={row.name} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 font-medium text-gray-800">{row.name}</td>
-                      <td className="px-4 py-3 text-center text-gray-700">{row.records.length} 天</td>
-                      <td className="px-4 py-3 text-center text-gray-700">{row.totalHours} 小時</td>
-                      <td className="px-4 py-3">
-                        <div className="flex flex-wrap gap-1.5">
-                          {row.records.map((r) => (
-                            <span key={r.date} className="inline-flex items-center gap-1 text-xs bg-gray-100 rounded-full px-2 py-0.5 text-gray-600">
-                              {new Date(r.date + 'T00:00:00').toLocaleDateString('zh-HK', { month: 'short', day: 'numeric' })}
-                              <span className={`px-1 rounded ${SHIFTS[r.shift].color}`}>{SHIFTS[r.shift].label}</span>
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  {statsRows.map((row) => {
+                    const dateShiftMap = new Map(row.records.map(r => [r.date, r.shift]))
+                    return (
+                      <tr key={row.name} className="hover:bg-gray-50/50">
+                        <td className="sticky left-0 z-10 bg-white px-3 py-1 border-r min-w-[110px]">
+                          <div className="font-medium text-gray-800">{row.name}</div>
+                          <div className="text-gray-400 mt-0.5">{row.records.length}天 · {row.totalHours}h</div>
+                        </td>
+                        {days.map(day => {
+                          const dateStr = toDateStr(day)
+                          const isWeekend = day.getDay() === 0 || day.getDay() === 6
+                          const holiday = getHoliday(dateStr)
+                          const shift = dateShiftMap.get(dateStr)
+                          return (
+                            <td key={dateStr} className={`text-center px-0.5 py-1.5 ${isWeekend || holiday ? 'bg-pink-50' : ''}`}>
+                              {shift && (
+                                <span className={`inline-block rounded px-1 py-0.5 leading-tight ${SHIFTS[shift as ShiftKey].color}`}>
+                                  {SHIFTS[shift as ShiftKey].label}
+                                </span>
+                              )}
+                            </td>
+                          )
+                        })}
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
