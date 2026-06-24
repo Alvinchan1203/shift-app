@@ -58,7 +58,7 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
   const [autoAssignResult, setAutoAssignResult] = useState<number | null>(null)
   const [clearConfirm, setClearConfirm] = useState(false)
   const [clearing, setClearing] = useState(false)
-  const [dailyRequiredInput, setDailyRequiredInput] = useState(0)
+  const [dailyRequiredInput, setDailyRequiredInput] = useState('')
   const [dailyRequired, setDailyRequired] = useState(0)
 
   const days = getMonthDays(year, month)
@@ -364,14 +364,15 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <span className="shrink-0">每天需要</span>
           <input
-            type="number" min={0} max={20} value={dailyRequiredInput}
-            onChange={e => setDailyRequiredInput(Math.max(0, Number(e.target.value)))}
+            type="text" inputMode="numeric" value={dailyRequiredInput}
+            onChange={e => { if (/^\d{0,2}$/.test(e.target.value)) setDailyRequiredInput(e.target.value) }}
             onFocus={e => e.target.select()}
+            placeholder="0"
             className="w-12 border rounded-lg px-2 py-1 text-sm text-center"
           />
           <span className="shrink-0 text-gray-400">人</span>
           <button
-            onClick={() => setDailyRequired(dailyRequiredInput)}
+            onClick={() => setDailyRequired(dailyRequiredInput === '' ? 0 : parseInt(dailyRequiredInput))}
             className="text-xs px-2.5 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition shrink-0"
           >
             確認
