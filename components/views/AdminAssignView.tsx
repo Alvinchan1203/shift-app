@@ -45,7 +45,7 @@ export default function AdminAssignView() {
       fetch('/api/admin/users').then(r => r.json()),
     ]).then(([prefs, assignments, holidays, subs, publishData, settings, usersData]) => {
       const allEmployees = (Array.isArray(usersData) ? usersData : [])
-        .filter((u: { role: string }) => u.role === 'EMPLOYEE' && !u.name.toLowerCase().startsWith('testing'))
+        .filter((u: { role: string; name: string }) => u.role === 'EMPLOYEE' && !u.name.toLowerCase().startsWith('testing'))
         .map((u: { id: string; name: string }) => ({ id: u.id, name: u.name }))
       setInitialData({
         prefs: prefs.map((p: Pref) => ({ ...p, date: p.date.slice(0, 10) })),
