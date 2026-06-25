@@ -19,6 +19,14 @@ type AttendanceLog = {
 type DurationType = 'OT' | 'SPECIAL'
 const DURATION_TYPES: DurationType[] = ['OT', 'SPECIAL']
 
+type ConfirmedChange = {
+  userId: string
+  userName: string
+  date: string
+  added: AttendanceTypeKey[]
+  removed: AttendanceTypeKey[]
+}
+
 type InitialData = {
   initialYear: number
   initialMonth: number
@@ -56,6 +64,11 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
   const [month, setMonth] = useState(initialData.initialMonth)
   const [isPublished, setIsPublished] = useState(initialData.isPublished)
   const [records, setRecords] = useState<AttendanceRecord[]>(initialData.records as AttendanceRecord[])
+  const [savedRecords, setSavedRecords] = useState<AttendanceRecord[]>(initialData.records as AttendanceRecord[])
+  const [pendingCells, setPendingCells] = useState<Set<string>>(new Set())
+  const [confirmedChanges, setConfirmedChanges] = useState<ConfirmedChange[]>([])
+  const [confirmingAll, setConfirmingAll] = useState(false)
+  const [notifying, setNotifying] = useState(false)
   const [assignments, setAssignments] = useState<Assignment[]>(initialData.assignments)
   const [holidays] = useState<Holiday[]>(initialData.holidays)
   const [loadingMonth, setLoadingMonth] = useState(false)
@@ -64,8 +77,7 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
   const [modal, setModal] = useState<{ userId: string; userName: string; dateStr: string; currentTypes: AttendanceTypeKey[] } | null>(null)
   const [selectedTypes, setSelectedTypes] = useState<AttendanceTypeKey[]>([])
   const [durations, setDurations] = useState<Partial<Record<DurationType, { h: string; m: string }>>>({})
-  const [saving, setSaving] = useState(false)
-  const [saveError, setSaveError] = useState<string | null>(null)
+  const [saveError] = useState<string | null>(null)
   const [logs, setLogs] = useState<AttendanceLog[]>(initialData.logs as AttendanceLog[])
   const [showLog, setShowLog] = useState(false)
   const [confirmedMins, setConfirmedMins] = useState<Record<string, number | null>>(initialData.confirmedMinutesMap ?? {})
@@ -85,7 +97,11 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
     ]
     if (isAdmin) promises.push(fetch(`/api/attendance/log?year=${year}&month=${m1}`).then(r => r.json()))
     Promise.all(promises).then(([att, asgn, confirmMap, publishData, logsData]) => {
-      setRecords(att.map((r: AttendanceRecord) => ({ ...r, date: r.date.slice(0, 10) })))
+      const mapped = att.map((r: AttendanceRecord) => ({ ...r, date: r.date.slice(0, 10) }))
+      setRecords(mapped)
+      setSavedRecords(mapped)
+      setPendingCells(new Set())
+      setConfirmedChanges([])
       setAssignments(asgn.map((a: Assignment) => ({ ...a, date: a.date.slice(0, 10) })))
       setConfirmedMins(confirmMap)
       setIsPublished(!!publishData?.published)
@@ -172,8 +188,6 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
       }
     }
 
-    setSaving(false)
-    setSaveError(null)
     setDurations(initDurations)
     setModal({ userId, userName, dateStr, currentTypes: existing })
     setSelectedTypes(initial)
@@ -190,61 +204,97 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
     return total > 0 ? total : undefined
   }
 
-  async function saveRecords() {
+  function saveToPending() {
     if (!modal) return
-    setSaving(true)
-    try {
-      const toAdd = selectedTypes.filter(t => !modal.currentTypes.includes(t))
-      const toRemove = modal.currentTypes.filter(t => !selectedTypes.includes(t))
-      const toUpdateDuration = DURATION_TYPES.filter(t => selectedTypes.includes(t) && modal.currentTypes.includes(t))
+    const toAdd = selectedTypes.filter(t => !modal.currentTypes.includes(t))
+    const toRemove = modal.currentTypes.filter(t => !selectedTypes.includes(t))
+    const toUpdateDuration = DURATION_TYPES.filter(t => selectedTypes.includes(t) && modal.currentTypes.includes(t))
 
-      const typesToPost = [
-        ...toAdd.map(t => t),
-        ...toUpdateDuration.map(t => t as AttendanceTypeKey),
-      ]
+    const typesToUpdate = [...new Set([...toAdd, ...toUpdateDuration])] as AttendanceTypeKey[]
 
-      const postResults = await Promise.all(
-        typesToPost.map(async type => {
-          const dm = (type === 'OT' || type === 'SPECIAL') ? getDurationMinutes(type) : undefined
-          const r = await fetch('/api/attendance', {
-            method: 'POST',
+    setRecords(prev => {
+      let updated = prev.filter(r => !(
+        r.userId === modal.userId && r.date === modal.dateStr &&
+        (toRemove.includes(r.type) || (toUpdateDuration as string[]).includes(r.type))
+      ))
+      for (const type of typesToUpdate) {
+        const dm = (type === 'OT' || type === 'SPECIAL') ? getDurationMinutes(type as DurationType) : undefined
+        updated = [...updated, {
+          id: `pending-${modal.userId}-${modal.dateStr}-${type}`,
+          userId: modal.userId,
+          date: modal.dateStr,
+          type,
+          durationMinutes: dm ?? null,
+        }]
+      }
+      return updated
+    })
+
+    const cellKey = `${modal.userId}|${modal.dateStr}`
+    setPendingCells(prev => new Set([...prev, cellKey]))
+    setModal(null)
+  }
+
+  async function confirmAllChanges() {
+    if (pendingCells.size === 0) return
+    setConfirmingAll(true)
+    const newConfirmed: ConfirmedChange[] = []
+
+    for (const cellKey of pendingCells) {
+      const [userId, date] = cellKey.split('|')
+      const userName = users.find(u => u.id === userId)?.name ?? ''
+
+      const currentTypes = records.filter(r => r.userId === userId && r.date === date).map(r => r.type)
+      const dbTypes = savedRecords.filter(r => r.userId === userId && r.date === date).map(r => r.type)
+
+      const toAdd = currentTypes.filter(t => !dbTypes.includes(t))
+      const toRemove = dbTypes.filter(t => !currentTypes.includes(t))
+      const toUpdateDuration = DURATION_TYPES.filter(t => currentTypes.includes(t) && dbTypes.includes(t)) as AttendanceTypeKey[]
+
+      const typesToPost = [...new Set([...toAdd, ...toUpdateDuration])]
+
+      try {
+        await Promise.all([
+          ...typesToPost.map(type => {
+            const rec = records.find(r => r.userId === userId && r.date === date && r.type === type)
+            return fetch('/api/attendance', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userId, date, type, durationMinutes: rec?.durationMinutes ?? null }),
+            })
+          }),
+          ...toRemove.map(type => fetch('/api/attendance', {
+            method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: modal.userId, date: modal.dateStr, type, durationMinutes: dm ?? null }),
-          })
-          const data = await r.json()
-          if (!r.ok) throw new Error(data?.error ?? `HTTP ${r.status}`)
-          return data
-        })
-      )
+            body: JSON.stringify({ userId, date, type }),
+          })),
+        ])
 
-      await Promise.all(
-        toRemove.map(type => fetch('/api/attendance', {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: modal.userId, date: modal.dateStr, type }),
-        }))
-      )
-
-      setRecords(prev => {
-        let updated = prev.filter(r => !(
-          r.userId === modal.userId && r.date === modal.dateStr &&
-          (toRemove.includes(r.type) || (toUpdateDuration as string[]).includes(r.type))
-        ))
-        for (const saved of postResults) {
-          if (saved && saved.id) {
-            updated = [...updated, { ...saved, date: saved.date.slice(0, 10) }]
-          }
+        if (toAdd.length > 0 || toRemove.length > 0) {
+          newConfirmed.push({ userId, userName, date, added: toAdd, removed: toRemove })
         }
-        return updated
-      })
-      setSaveError(null)
-      setModal(null)
-      if (isAdmin) fetch(`/api/attendance/log?year=${year}&month=${month + 1}`).then(r => r.json()).then(data => setLogs(data.map((l: AttendanceLog) => ({ ...l, date: l.date.slice(0, 10) }))))
-    } catch (e: any) {
-      setSaveError(e?.message ?? '儲存失敗')
-    } finally {
-      setSaving(false)
+      } catch {
+        // continue with remaining cells even if one fails
+      }
     }
+
+    setSavedRecords([...records])
+    setPendingCells(new Set())
+    setConfirmedChanges(prev => [...prev, ...newConfirmed])
+    fetch(`/api/attendance/log?year=${year}&month=${month + 1}`).then(r => r.json()).then(data => setLogs(data.map((l: AttendanceLog) => ({ ...l, date: l.date.slice(0, 10) }))))
+    setConfirmingAll(false)
+  }
+
+  async function sendFeishuNotification() {
+    if (confirmedChanges.length === 0) return
+    setNotifying(true)
+    await fetch('/api/attendance/notify-feishu', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ year, month: month + 1, changes: confirmedChanges }),
+    })
+    setConfirmedChanges([])
+    setNotifying(false)
   }
 
   async function deleteLog(id: string) {
@@ -256,21 +306,12 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
     setLogs(prev => prev.filter(l => l.id !== id))
   }
 
-  async function deleteAllRecords() {
+  function clearCellToPending() {
     if (!modal) return
-    setSaving(true)
-    try {
-      await fetch('/api/attendance', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: modal.userId, date: modal.dateStr }),
-      })
-      setRecords(prev => prev.filter(r => !(r.userId === modal.userId && r.date === modal.dateStr)))
-      setModal(null)
-      if (isAdmin) fetch(`/api/attendance/log?year=${year}&month=${month + 1}`).then(r => r.json()).then(data => setLogs(data.map((l: AttendanceLog) => ({ ...l, date: l.date.slice(0, 10) }))))
-    } finally {
-      setSaving(false)
-    }
+    setRecords(prev => prev.filter(r => !(r.userId === modal.userId && r.date === modal.dateStr)))
+    const cellKey = `${modal.userId}|${modal.dateStr}`
+    setPendingCells(prev => new Set([...prev, cellKey]))
+    setModal(null)
   }
 
 
@@ -316,6 +357,7 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
     const dayRecords = getRecords(userId, dateStr)
     const assignment = getAssignment(userId, dateStr)
     const prefill = dayRecords.length === 0 && assignment && isPublished ? assignment.shift as AttendanceTypeKey : null
+    const isPending = pendingCells.has(`${userId}|${dateStr}`)
 
     if (restDay) return <td className="border border-gray-400 bg-pink-50 w-9" />
 
@@ -340,7 +382,7 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
     }
 
     return (
-      <td className="border border-gray-400 w-9 p-0">
+      <td className={`border w-9 p-0 ${isPending ? 'border-orange-400 border-2' : 'border-gray-400'}`}>
         <button
           onClick={() => openModal(userId, userName, dateStr)}
           className={`flex flex-col items-center justify-center text-xs font-medium w-full h-full min-h-[26px] transition
@@ -391,6 +433,35 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
       <div className="flex justify-center items-center gap-2 mb-4">
         <MonthPicker year={year} month={month + 1} onChange={(y, m) => { setYear(y); setMonth(m - 1) }} />
       </div>
+
+      {/* 確認 & 飛書通知按鈕（管理員）*/}
+      {isAdmin && (
+        <div className="flex items-center gap-3 mb-4">
+          <button
+            onClick={confirmAllChanges}
+            disabled={pendingCells.size === 0 || confirmingAll}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium border transition
+              ${pendingCells.size > 0 && !confirmingAll
+                ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700'
+                : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'}`}
+          >
+            {confirmingAll ? '確認中...' : `確認所有修改${pendingCells.size > 0 ? `（${pendingCells.size}格）` : ''}`}
+          </button>
+          <button
+            onClick={sendFeishuNotification}
+            disabled={confirmedChanges.length === 0 || notifying}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium border transition
+              ${confirmedChanges.length > 0 && !notifying
+                ? 'bg-green-600 text-white border-green-600 hover:bg-green-700'
+                : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'}`}
+          >
+            {notifying ? '發送中...' : `📣 發送飛書通知${confirmedChanges.length > 0 ? `（${confirmedChanges.length}項更新）` : ''}`}
+          </button>
+          {pendingCells.size > 0 && (
+            <span className="text-xs text-orange-500">有未確認的修改，格子以橙色邊框標示</span>
+          )}
+        </div>
+      )}
 
       {/* ── Roster 表格（橫向捲動）── */}
       <div className={`overflow-x-auto rounded-2xl border shadow-sm bg-white transition-opacity ${loadingMonth ? 'opacity-50 pointer-events-none' : ''}`}>
@@ -560,7 +631,6 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
               {(Object.entries(ATTENDANCE_TYPES) as [AttendanceTypeKey, typeof ATTENDANCE_TYPES[AttendanceTypeKey]][]).map(([key, t]) => (
                 <button
                   key={key}
-                  disabled={saving}
                   onClick={() => toggleType(key)}
                   className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border transition text-sm font-medium
                     ${selectedTypes.includes(key) ? 'ring-2 ring-blue-400' : 'hover:opacity-80'}
@@ -604,17 +674,15 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
 
             <div className="flex gap-2">
               <button
-                onClick={saveRecords}
-                disabled={saving}
-                className="flex-1 py-2.5 rounded-xl border border-blue-200 bg-blue-50 text-blue-600 text-sm font-medium hover:bg-blue-100 transition disabled:opacity-50"
+                onClick={saveToPending}
+                className="flex-1 py-2.5 rounded-xl border border-blue-200 bg-blue-50 text-blue-600 text-sm font-medium hover:bg-blue-100 transition"
               >
-                {saving ? '處理中...' : '儲存'}
+                儲存
               </button>
               {(modal.currentTypes.length > 0 || selectedTypes.length > 0) && (
                 <button
-                  onClick={deleteAllRecords}
-                  disabled={saving}
-                  className="px-4 py-2.5 rounded-xl border border-red-200 bg-red-50 text-red-600 text-sm hover:bg-red-100 transition disabled:opacity-50"
+                  onClick={clearCellToPending}
+                  className="px-4 py-2.5 rounded-xl border border-red-200 bg-red-50 text-red-600 text-sm hover:bg-red-100 transition"
                 >
                   清除
                 </button>
