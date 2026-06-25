@@ -57,7 +57,7 @@ export default function EmployeePreferencesView({ userName }: { userName: string
   if (!loaded) return <Skeleton />
 
   return (
-    <main className="max-w-3xl mx-auto px-4 py-8">
+    <main className="max-w-5xl mx-auto px-4 py-8">
       <div className="flex justify-end mb-2">
         <button onClick={() => setRefreshKey(k => k + 1)} className="px-2.5 py-1.5 rounded-lg border hover:bg-gray-100 text-gray-500 transition" title="重新整理">↺</button>
       </div>

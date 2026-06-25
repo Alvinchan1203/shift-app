@@ -28,8 +28,8 @@ export default function Sidebar({ userName, role, onNavigate, activeView }: Side
         { href: '/employee/password', view: 'password', label: '修改密碼' },
       ]
     : [
-        { href: '/employee/preferences', view: 'employee/preferences', label: '提交意願' },
         { href: '/employee/schedule', view: 'employee/schedule', label: '我的排班' },
+        { href: '/employee/preferences', view: 'employee/preferences', label: '提交意願' },
         { href: '/attendance', view: 'attendance', label: '我的出勤' },
         { href: '/employee/full-attendance', view: 'employee/full-attendance', label: '全員出勤' },
         { href: '/employee/worklog', view: 'employee/worklog', label: '工作記錄' },

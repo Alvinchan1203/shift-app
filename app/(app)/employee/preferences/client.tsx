@@ -276,7 +276,7 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
           </div>
           <div className="grid grid-cols-7">
             {Array.from({ length: firstDow }).map((_, i) => (
-              <div key={`empty-${i}`} className="border-b border-r p-2 min-h-[80px]" />
+              <div key={`empty-${i}`} className="border-b border-r p-2 min-h-[110px]" />
             ))}
             {days.map((day, dayIndex) => {
               const dateStr = toDateStr(day)
@@ -290,7 +290,7 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
 
               if (isWeekend || holiday) {
                 return (
-                  <div key={dateStr} className="relative border-b border-r p-2 min-h-[80px] bg-pink-50">
+                  <div key={dateStr} className="relative border-b border-r p-2 min-h-[110px] bg-pink-50">
                     <div className="text-xs text-pink-400 mb-1">{day.getDate()}</div>
                     <div className="text-xs text-pink-500 font-medium text-center mt-2">
                       {holiday ? holiday.name : '休息'}
@@ -300,7 +300,7 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
               }
 
               return (
-                <div key={dateStr} className={`relative border-b border-r p-2 min-h-[80px] ${!canSubmit ? 'bg-gray-50' : ''}`}>
+                <div key={dateStr} className={`relative border-b border-r p-2 min-h-[110px] ${!canSubmit ? 'bg-gray-50' : ''}`}>
                   <div className="text-xs text-gray-500 mb-1">{day.getDate()}</div>
                   <button
                     disabled={!canSubmit}
