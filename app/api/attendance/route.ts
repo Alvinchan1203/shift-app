@@ -14,7 +14,9 @@ export async function GET(req: NextRequest) {
     lt: new Date(Date.UTC(year, month, 1)),
   } : null
 
-  if (session.user.role === 'ADMIN') {
+  const all = searchParams.get('all') === 'true'
+
+  if (session.user.role === 'ADMIN' || all) {
     const records = await prisma.attendanceRecord.findMany({
       where: dateFilter ? { date: dateFilter } : undefined,
       include: { user: { select: { id: true, name: true } } },

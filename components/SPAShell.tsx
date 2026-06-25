@@ -13,6 +13,7 @@ import EmployeePreferencesView from '@/components/views/EmployeePreferencesView'
 import EmployeeScheduleView from '@/components/views/EmployeeScheduleView'
 import EmployeeWorkLogView from '@/components/views/EmployeeWorkLogView'
 import PasswordView from '@/components/views/PasswordView'
+import EmployeeFullAttendanceView from '@/components/views/EmployeeFullAttendanceView'
 
 interface Props {
   userName: string
@@ -52,6 +53,7 @@ export default function SPAShell({ userName, role, userId }: Props) {
             <div className={show('employee/preferences')}><EmployeePreferencesView userName={userName} /></div>
             <div className={show('employee/schedule')}><EmployeeScheduleView /></div>
             <div className={show('attendance')}><AttendanceView isAdmin={false} userId={userId} userName={userName} /></div>
+            <div className={show('employee/full-attendance')}><EmployeeFullAttendanceView userId={userId} userName={userName} /></div>
             <div className={show('employee/worklog')}><EmployeeWorkLogView /></div>
             <div className={show('password')}><PasswordView /></div>
           </>

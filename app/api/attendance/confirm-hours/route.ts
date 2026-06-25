@@ -11,11 +11,12 @@ export async function GET(req: NextRequest) {
   const month = parseInt(searchParams.get('month') ?? '')
   if (isNaN(year) || isNaN(month)) return NextResponse.json({})
 
+  const all = searchParams.get('all') === 'true'
   const scores = await prisma.monthlyScore.findMany({
     where: {
       year,
       month,
-      ...(session.user.role !== 'ADMIN' ? { userId: session.user.id } : {}),
+      ...(session.user.role !== 'ADMIN' && !all ? { userId: session.user.id } : {}),
     },
     select: { userId: true, confirmedMinutes: true },
   })
