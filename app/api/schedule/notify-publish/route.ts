@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
         const count = assignCountMap.get(dateStr) ?? 0
         if (count < dailyRequired) {
           const label = new Date(dateStr + 'T00:00:00').toLocaleDateString('zh-HK', { month: 'short', day: 'numeric', weekday: 'short' })
-          understaffedDays.push(`• ${label}（已有 ${count} 人）`)
+          understaffedDays.push(`• ${label}`)
         }
       }
       cur.setUTCDate(cur.getUTCDate() + 1)
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     if (understaffedDays.length > 0) {
       understaffedSection = [
         '',
-        `以下日子人手不足（目標 ${dailyRequired} 人），歡迎有興趣的同事聯繫 nicochen 提交額外上班意願：`,
+        '以下日子人手不足，歡迎有興趣的同事聯繫 nicochen 提交額外上班意願：',
         '',
         understaffedDays.join('\n'),
       ].join('\n')

@@ -62,6 +62,9 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
   const [clearing, setClearing] = useState(false)
   const [notifyingPublish, setNotifyingPublish] = useState(false)
   const [editingPublished, setEditingPublished] = useState(false)
+  const [assignSnapshot, setAssignSnapshot] = useState<Assignment[]>([])
+  const [adjustChanges, setAdjustChanges] = useState<{ date: string; userName: string; action: 'add' | 'remove'; shift: ShiftKey }[]>([])
+  const [notifyingAdjust, setNotifyingAdjust] = useState(false)
   const [dailyRequiredInput, setDailyRequiredInput] = useState(() => {
     const db = initialData.initialDailyRequired ?? 0
     return db > 0 ? String(db) : ''
@@ -167,9 +170,43 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
     setNotifyingPublish(false)
   }
 
+  function enterEditMode() {
+    setAssignSnapshot([...assignments])
+    setAdjustChanges([])
+    setEditingPublished(true)
+  }
+
+  function confirmEditPublished() {
+    const monthPrefix = `${year}-${String(month + 1).padStart(2, '0')}`
+    const snapMap = new Map(assignSnapshot.filter(a => a.date.startsWith(monthPrefix)).map(a => [`${a.date}|${a.userId}|${a.shift}`, a]))
+    const currMap = new Map(assignments.filter(a => a.date.startsWith(monthPrefix)).map(a => [`${a.date}|${a.userId}|${a.shift}`, a]))
+    const changes: typeof adjustChanges = []
+    for (const [key, a] of currMap) {
+      if (!snapMap.has(key)) changes.push({ date: a.date, userName: a.user.name, action: 'add', shift: a.shift as ShiftKey })
+    }
+    for (const [key, a] of snapMap) {
+      if (!currMap.has(key)) changes.push({ date: a.date, userName: a.user.name, action: 'remove', shift: a.shift as ShiftKey })
+    }
+    setAdjustChanges(changes.sort((a, b) => a.date.localeCompare(b.date) || a.userName.localeCompare(b.userName)))
+    setEditingPublished(false)
+  }
+
   async function cancelEditPublished() {
     await fetchData(false)
+    setAdjustChanges([])
     setEditingPublished(false)
+  }
+
+  async function sendAdjustNotification() {
+    if (adjustChanges.length === 0) return
+    setNotifyingAdjust(true)
+    await fetch('/api/schedule/notify-adjust', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ year, month: month + 1, changes: adjustChanges }),
+    })
+    setAdjustChanges([])
+    setNotifyingAdjust(false)
   }
 
   async function handleUnpublish() {
@@ -485,7 +522,7 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
         <div className="flex items-center justify-between mb-3 bg-orange-50 border border-orange-200 rounded-xl px-4 py-2.5 gap-3">
           <span className="text-sm text-orange-700 font-medium">✏️ 修改模式・排班已解鎖，可進行微調</span>
           <div className="flex items-center gap-2 shrink-0">
-            <button onClick={() => setEditingPublished(false)}
+            <button onClick={confirmEditPublished}
               className="text-xs px-3 py-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition">
               確認修改
             </button>
@@ -494,6 +531,15 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
               放棄修改
             </button>
           </div>
+        </div>
+      )}
+      {!editingPublished && adjustChanges.length > 0 && (
+        <div className="flex items-center justify-between mb-3 bg-blue-50 border border-blue-200 rounded-xl px-4 py-2.5 gap-3">
+          <span className="text-sm text-blue-700">排班已調整（{adjustChanges.length} 項），可發送飛書通知</span>
+          <button onClick={sendAdjustNotification} disabled={notifyingAdjust}
+            className="text-xs px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition disabled:opacity-50 shrink-0">
+            {notifyingAdjust ? '發送中...' : '調整排班飛書通知'}
+          </button>
         </div>
       )}
       <div className="flex items-center justify-between mb-4 bg-gray-50 rounded-xl px-4 py-3 border gap-3">
@@ -508,7 +554,7 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
         {published ? (
           <div className="flex items-center gap-2 shrink-0">
             {!editingPublished && (
-              <button onClick={() => setEditingPublished(true)}
+              <button onClick={enterEditMode}
                 className="text-xs px-3 py-2 rounded-lg bg-orange-100 text-orange-600 hover:bg-orange-200 transition">
                 解鎖微調
               </button>
