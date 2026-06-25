@@ -271,7 +271,12 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
         ])
 
         if (toAdd.length > 0 || toRemove.length > 0) {
-          newConfirmed.push({ userId, userName, date, added: toAdd, removed: toRemove })
+          // 若 DB 無紀錄但有排班，以排班作為「原先狀態」顯示在通知中
+          const assignment = assignments.find(a => a.userId === userId && a.date === date)
+          const notifyRemoved = toRemove.length === 0 && toAdd.length > 0 && assignment
+            ? [assignment.shift as AttendanceTypeKey]
+            : toRemove
+          newConfirmed.push({ userId, userName, date, added: toAdd, removed: notifyRemoved })
         }
       } catch {
         // continue with remaining cells even if one fails
