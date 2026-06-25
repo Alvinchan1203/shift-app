@@ -28,6 +28,7 @@ export default function EmployeePreferencesView({ userName }: { userName: string
   const [holidays, setHolidays] = useState<Holiday[]>([])
   const [submission, setSubmission] = useState<{ submittedAt: string } | null>(null)
   const [extraSubmitEnabled, setExtraSubmitEnabled] = useState(false)
+  const [isSchedulePublished, setIsSchedulePublished] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
@@ -42,11 +43,13 @@ export default function EmployeePreferencesView({ userName }: { userName: string
       fetch('/api/holidays').then(r => r.json()),
       fetch(`/api/preferences/submit?year=${nextYear}&month=${m}`).then(r => r.json()),
       fetch('/api/me').then(r => r.json()),
-    ]).then(([prefsData, holidaysData, submissionData, me]) => {
+      fetch(`/api/schedule-publish?year=${nextYear}&month=${m}`).then(r => r.json()),
+    ]).then(([prefsData, holidaysData, submissionData, me, publishData]) => {
       setPrefs(prefsData.map((p: Pref) => ({ ...p, date: p.date.slice(0, 10) })))
       setHolidays(holidaysData.map((h: Holiday) => ({ ...h, date: h.date.slice(0, 10) })))
       setSubmission(submissionData ? { submittedAt: submissionData.submittedAt } : null)
       setExtraSubmitEnabled(me.extraSubmitEnabled ?? false)
+      setIsSchedulePublished(!!publishData?.published)
       setLoaded(true)
     })
   }, [refreshKey])
@@ -61,7 +64,7 @@ export default function EmployeePreferencesView({ userName }: { userName: string
       <EmployeePreferencesClient
         userName={userName}
         extraSubmitEnabled={extraSubmitEnabled}
-        initialData={{ prefs, holidays, submission }}
+        initialData={{ prefs, holidays, submission, isSchedulePublished }}
       />
     </main>
   )

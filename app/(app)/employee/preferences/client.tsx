@@ -36,6 +36,7 @@ type InitialData = {
   prefs: { id: string; date: string; shift: string }[]
   holidays: Holiday[]
   submission: { submittedAt: string } | null
+  isSchedulePublished?: boolean
 }
 
 export default function EmployeePreferencesClient({ userName, extraSubmitEnabled, initialData }: { userName: string; extraSubmitEnabled: boolean; initialData: InitialData }) {
@@ -66,9 +67,10 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
   }, [holidays])
 
   const actualOpenDay = actualOpenDate.getDate()
+  const isSchedulePublished = initialData.isSchedulePublished ?? false
   const isWindowOpen = todayDate >= actualOpenDay && todayDate <= 26
   const isViewingTargetMonth = year === targetYear && month === targetMonth
-  const canSubmit = extraSubmitEnabled || (isWindowOpen && isViewingTargetMonth)
+  const canSubmit = extraSubmitEnabled || (!isSchedulePublished && isWindowOpen && isViewingTargetMonth)
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -158,7 +160,21 @@ export default function EmployeePreferencesClient({ userName, extraSubmitEnabled
   const firstDow = days[0].getDay()
 
   // Status banner
-  const banner = isWindowOpen ? (
+  const banner = isSchedulePublished && !extraSubmitEnabled ? (
+    <div className="flex items-center gap-2 bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 mb-4">
+      <span className="w-2 h-2 rounded-full bg-gray-400 shrink-0" />
+      <span className="text-sm text-gray-600">
+        <span className="font-medium">{targetMonthLabel}</span>排班已發布，意願提交已關閉
+      </span>
+    </div>
+  ) : isSchedulePublished && extraSubmitEnabled ? (
+    <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-4">
+      <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
+      <span className="text-sm text-green-700">
+        <span className="font-medium">{targetMonthLabel}</span>排班已發布・您已開啟額外報更，仍可提交意願
+      </span>
+    </div>
+  ) : isWindowOpen ? (
     <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-4">
       <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
       <span className="text-sm text-green-700">
