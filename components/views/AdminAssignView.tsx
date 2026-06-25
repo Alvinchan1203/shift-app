@@ -47,6 +47,7 @@ export default function AdminAssignView() {
       const allEmployees = (Array.isArray(usersData) ? usersData : [])
         .filter((u: { role: string; name: string }) => u.role === 'EMPLOYEE' && !u.name.toLowerCase().startsWith('testing'))
         .map((u: { id: string; name: string }) => ({ id: u.id, name: u.name }))
+      const monthKey = `${year}-${String(month1).padStart(2, '0')}`
       setInitialData({
         prefs: prefs.map((p: Pref) => ({ ...p, date: p.date.slice(0, 10) })),
         assignments: assignments.map((a: Assignment) => ({ ...a, date: a.date.slice(0, 10) })),
@@ -58,6 +59,7 @@ export default function AdminAssignView() {
         initialYear: year,
         initialMonth: month,
         allEmployees,
+        initialDailyRequired: settings?.[`daily_required_${monthKey}`] ? parseInt(settings[`daily_required_${monthKey}`]) : 0,
       })
       setNotifyEnabled(settings?.feishu_notifications_enabled === 'true')
     })

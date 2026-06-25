@@ -22,6 +22,7 @@ type InitialData = {
   initialYear: number
   initialMonth: number
   allEmployees?: { id: string; name: string }[]
+  initialDailyRequired?: number
 }
 
 function toDateStr(d: Date) {
@@ -60,14 +61,10 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
   const [clearConfirm, setClearConfirm] = useState(false)
   const [clearing, setClearing] = useState(false)
   const [dailyRequiredInput, setDailyRequiredInput] = useState(() => {
-    if (typeof window === 'undefined') return ''
-    return localStorage.getItem('dailyRequired') ?? ''
+    const db = initialData.initialDailyRequired ?? 0
+    return db > 0 ? String(db) : ''
   })
-  const [dailyRequired, setDailyRequired] = useState(() => {
-    if (typeof window === 'undefined') return 0
-    const saved = localStorage.getItem('dailyRequired')
-    return saved ? parseInt(saved) : 0
-  })
+  const [dailyRequired, setDailyRequired] = useState(initialData.initialDailyRequired ?? 0)
 
   const days = getMonthDays(year, month)
   const [refreshing, setRefreshing] = useState(false)
@@ -109,6 +106,14 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
         const subsArr = Array.isArray(subs) ? subs : []
         setSubmittedUserIds(new Set(subsArr.map((s: { userId: string }) => s.userId)))
         setSubmittedAtMap(new Map(subsArr.map((s: { userId: string; confirmedAt: string }) => [s.userId, s.confirmedAt ?? ''])))
+      })
+    const mk = `${year}-${String(month + 1).padStart(2, '0')}`
+    fetch('/api/admin/settings')
+      .then(r => r.json())
+      .then(settings => {
+        const val = settings?.[`daily_required_${mk}`] ? parseInt(settings[`daily_required_${mk}`]) : 0
+        setDailyRequired(val)
+        setDailyRequiredInput(val > 0 ? String(val) : '')
       })
   }, [year, month])
 
@@ -392,7 +397,14 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
           <input
             type="text" inputMode="numeric" value={dailyRequiredInput}
             onChange={e => { if (/^\d{0,2}$/.test(e.target.value)) setDailyRequiredInput(e.target.value) }}
-            onKeyDown={e => { if (e.key === 'Enter') { const val = dailyRequiredInput === '' ? 0 : parseInt(dailyRequiredInput); setDailyRequired(val); localStorage.setItem('dailyRequired', String(val)) } }}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                const val = dailyRequiredInput === '' ? 0 : parseInt(dailyRequiredInput)
+                setDailyRequired(val)
+                const mk = `${year}-${String(month + 1).padStart(2, '0')}`
+                fetch('/api/admin/settings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: `daily_required_${mk}`, value: String(val) }) })
+              }
+            }}
             onFocus={e => e.target.select()}
             placeholder="0"
             className="w-12 border rounded-lg px-2 py-1 text-sm text-center"
@@ -402,7 +414,8 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
             onClick={() => {
               const val = dailyRequiredInput === '' ? 0 : parseInt(dailyRequiredInput)
               setDailyRequired(val)
-              localStorage.setItem('dailyRequired', String(val))
+              const mk = `${year}-${String(month + 1).padStart(2, '0')}`
+              fetch('/api/admin/settings', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: `daily_required_${mk}`, value: String(val) }) })
             }}
             className="text-xs px-2.5 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition shrink-0"
           >
