@@ -4,9 +4,7 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(req: NextRequest) {
   const session = await auth()
-  if (!session || session.user.role !== 'ADMIN') {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { searchParams } = new URL(req.url)
   const year = searchParams.get('year') ? parseInt(searchParams.get('year')!) : null
@@ -18,7 +16,10 @@ export async function GET(req: NextRequest) {
   } : null
 
   const logs = await prisma.attendanceLog.findMany({
-    where: dateFilter ? { date: dateFilter } : {},
+    where: {
+      ...(dateFilter ? { date: dateFilter } : {}),
+      ...(session.user.role !== 'ADMIN' ? { userId: session.user.id } : {}),
+    },
     orderBy: { createdAt: 'desc' },
     take: 200,
   })

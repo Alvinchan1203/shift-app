@@ -2,11 +2,15 @@
 
 import { useEffect, useState } from 'react'
 import ShiftBadge from '@/components/ShiftBadge'
-import { ShiftKey, SHIFT_HOURS, SHIFTS } from '@/lib/constants'
+import { ShiftKey, SHIFT_HOURS, SHIFTS, ATTENDANCE_TYPES, AttendanceTypeKey } from '@/lib/constants'
 
 type Assignment = { id: string; date: string; shift: string; userId: string }
 type PublishedMonth = { id: string; year: number; month: number; publishedAt: string }
 type Holiday = { id: string; date: string; name: string }
+type AttendanceRecord = { id: string; date: string; type: AttendanceTypeKey; durationMinutes?: number | null }
+type AttendanceLog = { id: string; date: string; type: AttendanceTypeKey; action: 'ADD' | 'REMOVE'; adminName: string; createdAt: string }
+
+type LogGroup = { date: string; removed: AttendanceTypeKey[]; added: AttendanceTypeKey[]; adminName: string; createdAt: string }
 
 function getMonthDays(year: number, month: number) {
   const days: Date[] = []
@@ -38,6 +42,27 @@ function Skeleton() {
   )
 }
 
+function groupLogs(logs: AttendanceLog[]): LogGroup[] {
+  const map = new Map<string, LogGroup>()
+  const sorted = [...logs].sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+  for (const log of sorted) {
+    const key = log.date
+    if (!map.has(key)) {
+      map.set(key, { date: log.date, removed: [], added: [], adminName: log.adminName, createdAt: log.createdAt })
+    }
+    const g = map.get(key)!
+    if (log.action === 'REMOVE') g.removed.push(log.type)
+    else g.added.push(log.type)
+    if (log.createdAt > g.createdAt) { g.createdAt = log.createdAt; g.adminName = log.adminName }
+  }
+  return [...map.values()].sort((a, b) => b.date.localeCompare(a.date))
+}
+
+function typeLabel(type: AttendanceTypeKey) {
+  const t = ATTENDANCE_TYPES[type]
+  return `${t.label}${t.desc ? `（${t.desc}）` : ''}`
+}
+
 export default function EmployeeScheduleView() {
   const today = new Date()
   const [year, setYear] = useState(today.getFullYear())
@@ -46,7 +71,10 @@ export default function EmployeeScheduleView() {
   const [publishedSet, setPublishedSet] = useState<Set<string>>(new Set())
   const [assignments, setAssignments] = useState<Assignment[]>([])
   const [holidays, setHolidays] = useState<Holiday[]>([])
+  const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>([])
+  const [attendanceLogs, setAttendanceLogs] = useState<AttendanceLog[]>([])
   const [refreshKey, setRefreshKey] = useState(0)
+
   const SHIFT_TIMES: Record<string, { start: string; end: string; label: string }> = {
     A: { start: '010000', end: '060000', label: 'A班' },
     B: { start: '050000', end: '100000', label: 'B班' },
@@ -100,19 +128,24 @@ export default function EmployeeScheduleView() {
 
   useEffect(() => {
     setLoaded(false)
+    const m1 = month + 1
     Promise.all([
       fetch('/api/schedule-publish').then(r => r.json()),
       fetch('/api/assignments').then(r => r.json()),
       fetch('/api/holidays').then(r => r.json()),
-    ]).then(([months, asgn, hols]) => {
+      fetch(`/api/attendance?year=${year}&month=${m1}`).then(r => r.json()),
+      fetch(`/api/attendance/log?year=${year}&month=${m1}`).then(r => r.json()),
+    ]).then(([months, asgn, hols, att, logs]) => {
       setPublishedSet(new Set(
         (months as PublishedMonth[]).map(pm => `${pm.year}-${String(pm.month).padStart(2, '0')}`)
       ))
       setAssignments((asgn as Assignment[]).map(a => ({ ...a, date: a.date.slice(0, 10) })))
       setHolidays((hols as Holiday[]).map(h => ({ ...h, date: h.date.slice(0, 10) })))
+      setAttendanceRecords((att as AttendanceRecord[]).map(r => ({ ...r, date: r.date.slice(0, 10) })))
+      setAttendanceLogs(Array.isArray(logs) ? (logs as AttendanceLog[]).map(l => ({ ...l, date: l.date.slice(0, 10) })) : [])
       setLoaded(true)
     })
-  }, [refreshKey])
+  }, [refreshKey, year, month])
 
   if (!loaded) return <Skeleton />
 
@@ -124,15 +157,30 @@ export default function EmployeeScheduleView() {
   const firstDow = days[0].getDay()
 
   const monthAssignments = assignments.filter(a => a.date.startsWith(monthKey))
-  const monthHours = monthAssignments.reduce((sum, a) => sum + (SHIFT_HOURS[a.shift as ShiftKey] ?? 0), 0)
+  const monthAttendance = attendanceRecords.filter(r => r.date.startsWith(monthKey))
+  const monthLogs = attendanceLogs.filter(l => l.date.startsWith(monthKey))
 
   const assignByDate = new Map<string, Assignment>()
   for (const a of monthAssignments) assignByDate.set(a.date, a)
+
+  const attendByDate = new Map<string, AttendanceRecord[]>()
+  for (const r of monthAttendance) {
+    if (!attendByDate.has(r.date)) attendByDate.set(r.date, [])
+    attendByDate.get(r.date)!.push(r)
+  }
 
   const holidayByDate = new Map<string, string>()
   for (const h of holidays) {
     if (h.date.startsWith(monthKey)) holidayByDate.set(h.date, h.name)
   }
+
+  const WORK_HOURS: Partial<Record<AttendanceTypeKey, number>> = { A: 5, B: 5, C: 8 }
+
+  const scheduleHours = monthAssignments.reduce((sum, a) => sum + (SHIFT_HOURS[a.shift as ShiftKey] ?? 0), 0)
+  const actualHours = monthAttendance.reduce((sum, r) => sum + (WORK_HOURS[r.type] ?? 0), 0)
+  const hasActual = monthAttendance.length > 0
+
+  const logGroups = groupLogs(monthLogs)
 
   function prevMonth() {
     if (month === 0) { setMonth(11); setYear(y => y - 1) }
@@ -142,6 +190,12 @@ export default function EmployeeScheduleView() {
     if (month === 11) { setMonth(0); setYear(y => y + 1) }
     else setMonth(m => m + 1)
   }
+
+  const allDates = new Set([
+    ...monthAssignments.map(a => a.date),
+    ...monthAttendance.map(r => r.date),
+  ])
+  const sortedDates = [...allDates].sort()
 
   return (
     <main className="max-w-5xl mx-auto px-4 py-6 sm:py-8">
@@ -158,8 +212,14 @@ export default function EmployeeScheduleView() {
         <button onClick={prevMonth} className="px-3 py-2 rounded-lg border hover:bg-gray-100 text-gray-600">‹</button>
         <div className="text-center">
           <span className="font-semibold text-gray-800">{monthLabel}</span>
-          {isPublished && monthHours > 0 && (
-            <span className="ml-2 text-sm text-blue-600 font-medium">{monthHours} 小時</span>
+          {isPublished && (
+            <span className="ml-2 text-sm font-medium">
+              {hasActual ? (
+                <span className="text-green-600">{actualHours}h</span>
+              ) : scheduleHours > 0 ? (
+                <span className="text-blue-600">{scheduleHours}h</span>
+              ) : null}
+            </span>
           )}
           {!isPublished && (
             <span className="ml-2 text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">未發布</span>
@@ -178,6 +238,7 @@ export default function EmployeeScheduleView() {
         <button onClick={nextMonth} className="px-3 py-2 rounded-lg border hover:bg-gray-100 text-gray-600">›</button>
       </div>
 
+      {/* ── 月曆 ── */}
       <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
         <div className="grid grid-cols-7 border-b bg-gray-50">
           {weekdays.map((d, i) => (
@@ -193,7 +254,9 @@ export default function EmployeeScheduleView() {
             const isWeekend = day.getDay() === 0 || day.getDay() === 6
             const holidayName = holidayByDate.get(dateStr)
             const assignment = assignByDate.get(dateStr)
+            const dayAttendance = attendByDate.get(dateStr) ?? []
             const isRest = isWeekend || !!holidayName
+            const hasAttend = dayAttendance.length > 0
             return (
               <div
                 key={dateStr}
@@ -208,9 +271,20 @@ export default function EmployeeScheduleView() {
                 {isRest && !holidayName && (
                   <div className="text-xs text-pink-300">休息</div>
                 )}
-                {isPublished && assignment && (
-                  <div className="mt-0.5">
-                    <ShiftBadge shift={assignment.shift as ShiftKey} />
+                {isPublished && !isRest && (
+                  <div className="mt-0.5 space-y-0.5">
+                    {hasAttend ? (
+                      dayAttendance.map(r => {
+                        const t = ATTENDANCE_TYPES[r.type]
+                        return (
+                          <div key={r.id} className={`text-xs rounded-md px-1 py-0.5 font-medium leading-tight ${t.bg} ${t.text}`}>
+                            {t.label}
+                          </div>
+                        )
+                      })
+                    ) : assignment ? (
+                      <ShiftBadge shift={assignment.shift as ShiftKey} />
+                    ) : null}
                   </div>
                 )}
               </div>
@@ -219,7 +293,8 @@ export default function EmployeeScheduleView() {
         </div>
       </div>
 
-      {isPublished && monthAssignments.length > 0 && (
+      {/* ── 本月排班紀錄 ── */}
+      {isPublished && sortedDates.length > 0 && (
         <div className="mt-6">
           <h3 className="text-sm font-semibold text-gray-600 mb-2">本月排班紀錄</h3>
           <div className="bg-white rounded-xl border overflow-hidden shadow-sm">
@@ -227,42 +302,99 @@ export default function EmployeeScheduleView() {
               <thead>
                 <tr className="bg-gray-50 border-b text-xs text-gray-500">
                   <th className="text-left px-4 py-2 font-medium">日期</th>
-                  <th className="text-left px-4 py-2 font-medium">星期</th>
-                  <th className="text-left px-4 py-2 font-medium">班次</th>
-                  <th className="text-left px-4 py-2 font-medium">時間</th>
+                  <th className="text-left px-4 py-2 font-medium">排班</th>
+                  <th className="text-left px-4 py-2 font-medium">實際出勤</th>
                   <th className="text-right px-4 py-2 font-medium">工時</th>
                 </tr>
               </thead>
               <tbody>
-                {[...monthAssignments]
-                  .sort((a, b) => a.date.localeCompare(b.date))
-                  .map((a, idx) => {
-                    const d = new Date(a.date)
-                    const shift = SHIFTS[a.shift as ShiftKey]
-                    const hours = SHIFT_HOURS[a.shift as ShiftKey] ?? 0
-                    const isWeekend = d.getDay() === 0 || d.getDay() === 6
-                    return (
-                      <tr key={a.id} className={`border-b last:border-0 ${idx % 2 === 0 ? '' : 'bg-gray-50/50'}`}>
-                        <td className="px-4 py-2 text-gray-700 tabular-nums">{a.date}</td>
-                        <td className={`px-4 py-2 ${isWeekend ? 'text-pink-500' : 'text-gray-500'}`}>
-                          {['日', '一', '二', '三', '四', '五', '六'][d.getDay()]}
-                        </td>
-                        <td className="px-4 py-2">
-                          <ShiftBadge shift={a.shift as ShiftKey} />
-                        </td>
-                        <td className="px-4 py-2 text-gray-500 tabular-nums">{shift?.time ?? '—'}</td>
-                        <td className="px-4 py-2 text-right text-gray-600 tabular-nums">{hours}h</td>
-                      </tr>
-                    )
-                  })}
+                {sortedDates.map((dateStr, idx) => {
+                  const d = new Date(dateStr + 'T00:00:00')
+                  const assign = assignByDate.get(dateStr)
+                  const dayAttend = attendByDate.get(dateStr) ?? []
+                  const isWeekend = d.getDay() === 0 || d.getDay() === 6
+                  const hours = dayAttend.length > 0
+                    ? dayAttend.reduce((sum, r) => sum + (WORK_HOURS[r.type] ?? 0), 0)
+                    : assign ? (SHIFT_HOURS[assign.shift as ShiftKey] ?? 0) : 0
+                  const dateLabel = d.toLocaleDateString('zh-HK', { month: 'short', day: 'numeric', weekday: 'short' })
+                  return (
+                    <tr key={dateStr} className={`border-b last:border-0 ${idx % 2 === 0 ? '' : 'bg-gray-50/50'}`}>
+                      <td className={`px-4 py-2 tabular-nums text-xs ${isWeekend ? 'text-pink-500' : 'text-gray-700'}`}>{dateLabel}</td>
+                      <td className="px-4 py-2">
+                        {assign ? <ShiftBadge shift={assign.shift as ShiftKey} /> : <span className="text-gray-300">—</span>}
+                      </td>
+                      <td className="px-4 py-2">
+                        {dayAttend.length > 0 ? (
+                          <div className="flex flex-wrap gap-1">
+                            {dayAttend.map(r => {
+                              const t = ATTENDANCE_TYPES[r.type]
+                              return (
+                                <span key={r.id} className={`text-xs rounded px-1.5 py-0.5 font-medium ${t.bg} ${t.text}`}>
+                                  {t.label}
+                                </span>
+                              )
+                            })}
+                          </div>
+                        ) : (
+                          <span className="text-gray-300 text-xs">—</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-2 text-right tabular-nums text-gray-600 text-xs">{hours}h</td>
+                    </tr>
+                  )
+                })}
               </tbody>
               <tfoot>
                 <tr className="bg-gray-50 border-t">
-                  <td colSpan={4} className="px-4 py-2 text-xs text-gray-500 font-medium">合計 {monthAssignments.length} 天</td>
-                  <td className="px-4 py-2 text-right text-sm font-semibold text-blue-600 tabular-nums">{monthHours}h</td>
+                  <td colSpan={3} className="px-4 py-2 text-xs text-gray-500 font-medium">
+                    合計 {sortedDates.length} 天
+                    {hasActual && <span className="ml-2 text-green-600">（已有出勤記錄）</span>}
+                  </td>
+                  <td className="px-4 py-2 text-right text-sm font-semibold tabular-nums">
+                    {hasActual ? (
+                      <span className="text-green-600">{actualHours}h</span>
+                    ) : (
+                      <span className="text-blue-600">{scheduleHours}h</span>
+                    )}
+                  </td>
                 </tr>
               </tfoot>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* ── 出勤修改紀錄 ── */}
+      {logGroups.length > 0 && (
+        <div className="mt-6">
+          <h3 className="text-sm font-semibold text-gray-600 mb-2">出勤修改紀錄</h3>
+          <div className="bg-white rounded-xl border overflow-hidden shadow-sm divide-y">
+            {logGroups.map(g => {
+              const d = new Date(g.date + 'T00:00:00')
+              const dateLabel = d.toLocaleDateString('zh-HK', { month: 'short', day: 'numeric', weekday: 'short' })
+              let changeText = ''
+              if (g.removed.length > 0 && g.added.length > 0) {
+                changeText = `${g.removed.map(typeLabel).join('、')} → ${g.added.map(typeLabel).join('、')}`
+              } else if (g.added.length > 0) {
+                changeText = `新增 ${g.added.map(typeLabel).join('、')}`
+              } else {
+                changeText = `移除 ${g.removed.map(typeLabel).join('、')}`
+              }
+              return (
+                <div key={g.date} className="flex items-center justify-between px-4 py-3 gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="text-sm text-gray-700 shrink-0">{dateLabel}</span>
+                    <span className="text-sm text-gray-600 truncate">{changeText}</span>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className="text-xs text-gray-400">{g.adminName}</div>
+                    <div className="text-xs text-gray-300">
+                      {new Date(g.createdAt).toLocaleString('zh-HK', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
       )}
