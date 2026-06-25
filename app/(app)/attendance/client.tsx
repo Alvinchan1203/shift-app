@@ -89,10 +89,11 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
     if (isInitialMount.current) { isInitialMount.current = false; return }
     setLoadingMonth(true)
     const m1 = month + 1
+    const isAllView = !isAdmin && users.length > 1
     const promises: Promise<any>[] = [
-      fetch(`/api/attendance?year=${year}&month=${m1}`).then(r => r.json()),
-      fetch(`/api/assignments?year=${year}&month=${m1}`).then(r => r.json()),
-      fetch(`/api/attendance/confirm-hours?year=${year}&month=${m1}`).then(r => r.json()),
+      fetch(`/api/attendance?year=${year}&month=${m1}${isAllView ? '&all=true' : ''}`).then(r => r.json()),
+      fetch(`/api/assignments?year=${year}&month=${m1}${isAllView ? '&all=true' : ''}`).then(r => r.json()),
+      fetch(`/api/attendance/confirm-hours?year=${year}&month=${m1}${isAllView ? '&all=true' : ''}`).then(r => r.json()),
       fetch(`/api/schedule-publish?year=${year}&month=${m1}`).then(r => r.json()),
     ]
     if (isAdmin) promises.push(fetch(`/api/attendance/log?year=${year}&month=${m1}`).then(r => r.json()))

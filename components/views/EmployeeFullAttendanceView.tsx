@@ -39,7 +39,7 @@ export default function EmployeeFullAttendanceView({ userId, userName }: Props) 
 
     Promise.all([
       fetch(`/api/attendance?year=${year}&month=${m1}&all=true`).then(r => r.json()),
-      fetch(`/api/assignments?year=${year}&month=${m1}`).then(r => r.json()),
+      fetch(`/api/assignments?year=${year}&month=${m1}&all=true`).then(r => r.json()),
       fetch('/api/holidays').then(r => r.json()),
       fetch(`/api/attendance/confirm-hours?year=${year}&month=${m1}&all=true`).then(r => r.json()),
       fetch(`/api/schedule-publish?year=${year}&month=${m1}`).then(r => r.json()),

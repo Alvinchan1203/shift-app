@@ -10,6 +10,7 @@ export async function GET(req: NextRequest) {
   const date = searchParams.get('date')
   const year = searchParams.get('year') ? parseInt(searchParams.get('year')!) : null
   const month = searchParams.get('month') ? parseInt(searchParams.get('month')!) : null
+  const all = searchParams.get('all') === 'true'
 
   const dateFilter = year && month
     ? { gte: new Date(Date.UTC(year, month - 1, 1)), lt: new Date(Date.UTC(year, month, 1)) }
@@ -22,6 +23,18 @@ export async function GET(req: NextRequest) {
       orderBy: [{ date: 'asc' }, { shift: 'asc' }],
     })
     return NextResponse.json(assignments)
+  }
+
+  if (all && year && month) {
+    const publish = await prisma.schedulePublish.findUnique({ where: { year_month: { year, month } } })
+    if (publish) {
+      const assignments = await prisma.shiftAssignment.findMany({
+        where: { date: dateFilter! },
+        include: { user: { select: { id: true, name: true } } },
+        orderBy: [{ date: 'asc' }, { shift: 'asc' }],
+      })
+      return NextResponse.json(assignments)
+    }
   }
 
   const assignments = await prisma.shiftAssignment.findMany({
