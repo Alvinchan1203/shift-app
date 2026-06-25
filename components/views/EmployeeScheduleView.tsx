@@ -176,8 +176,6 @@ export default function EmployeeScheduleView() {
 
   const WORK_HOURS: Partial<Record<AttendanceTypeKey, number>> = { A: 5, B: 5, C: 8 }
 
-  const scheduleHours = monthAssignments.reduce((sum, a) => sum + (SHIFT_HOURS[a.shift as ShiftKey] ?? 0), 0)
-  const actualHours = monthAttendance.reduce((sum, r) => sum + (WORK_HOURS[r.type] ?? 0), 0)
   const hasActual = monthAttendance.length > 0
 
   const logGroups = groupLogs(monthLogs)
@@ -197,6 +195,16 @@ export default function EmployeeScheduleView() {
   ])
   const sortedDates = [...allDates].sort()
 
+  // 每天：有出勤紀錄用出勤工時，否則用排班工時
+  const totalHours = sortedDates.reduce((sum, dateStr) => {
+    const assign = assignByDate.get(dateStr)
+    const dayAttend = attendByDate.get(dateStr) ?? []
+    const h = dayAttend.length > 0
+      ? dayAttend.reduce((s, r) => s + (WORK_HOURS[r.type] ?? 0), 0)
+      : assign ? (SHIFT_HOURS[assign.shift as ShiftKey] ?? 0) : 0
+    return sum + h
+  }, 0)
+
   return (
     <main className="max-w-5xl mx-auto px-4 py-6 sm:py-8">
       <div className="flex items-center justify-between mb-4">
@@ -212,13 +220,9 @@ export default function EmployeeScheduleView() {
         <button onClick={prevMonth} className="px-3 py-2 rounded-lg border hover:bg-gray-100 text-gray-600">‹</button>
         <div className="text-center">
           <span className="font-semibold text-gray-800">{monthLabel}</span>
-          {isPublished && (
-            <span className="ml-2 text-sm font-medium">
-              {hasActual ? (
-                <span className="text-green-600">{actualHours}h</span>
-              ) : scheduleHours > 0 ? (
-                <span className="text-blue-600">{scheduleHours}h</span>
-              ) : null}
+          {isPublished && totalHours > 0 && (
+            <span className={`ml-2 text-sm font-medium ${hasActual ? 'text-green-600' : 'text-blue-600'}`}>
+              {totalHours}h
             </span>
           )}
           {!isPublished && (
@@ -275,6 +279,9 @@ export default function EmployeeScheduleView() {
                   <div className="mt-0.5 space-y-0.5">
                     {hasAttend ? (
                       dayAttendance.map(r => {
+                        if (r.type === 'A' || r.type === 'B' || r.type === 'C') {
+                          return <ShiftBadge key={r.id} shift={r.type} />
+                        }
                         const t = ATTENDANCE_TYPES[r.type]
                         return (
                           <div key={r.id} className={`text-xs rounded-md px-1 py-0.5 font-medium leading-tight ${t.bg} ${t.text}`}>
@@ -351,11 +358,7 @@ export default function EmployeeScheduleView() {
                     {hasActual && <span className="ml-2 text-green-600">（已有出勤記錄）</span>}
                   </td>
                   <td className="px-4 py-2 text-right text-sm font-semibold tabular-nums">
-                    {hasActual ? (
-                      <span className="text-green-600">{actualHours}h</span>
-                    ) : (
-                      <span className="text-blue-600">{scheduleHours}h</span>
-                    )}
+                    <span className={hasActual ? 'text-green-600' : 'text-blue-600'}>{totalHours}h</span>
                   </td>
                 </tr>
               </tfoot>
