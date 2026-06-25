@@ -285,7 +285,7 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
 
     setSavedRecords([...records])
     setPendingCells(new Set())
-    setConfirmedChanges(prev => [...prev, ...newConfirmed])
+    setConfirmedChanges(newConfirmed)
     fetch(`/api/attendance/log?year=${year}&month=${month + 1}`).then(r => r.json()).then(data => setLogs(data.map((l: AttendanceLog) => ({ ...l, date: l.date.slice(0, 10) }))))
     setConfirmingAll(false)
   }
