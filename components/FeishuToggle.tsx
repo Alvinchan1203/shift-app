@@ -30,7 +30,7 @@ export default function FeishuToggle({ initialEnabled }: { initialEnabled: boole
       }`}
     >
       <span className={`w-2 h-2 rounded-full ${enabled ? 'bg-blue-500' : 'bg-gray-300'}`} />
-      飛書通知
+      自動通知bee報更開關
     </button>
   )
 }

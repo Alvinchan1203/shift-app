@@ -1426,6 +1426,8 @@ export const UserScalarFieldEnum = {
   preferenceEnabled: 'preferenceEnabled',
   extraSubmitEnabled: 'extraSubmitEnabled',
   canDeleteAdmin: 'canDeleteAdmin',
+  canRenameUser: 'canRenameUser',
+  cannotWitness: 'cannotWitness',
   createdAt: 'createdAt'
 } as const
 

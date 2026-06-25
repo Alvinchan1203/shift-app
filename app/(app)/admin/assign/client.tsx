@@ -60,6 +60,7 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
   const [autoAssignResult, setAutoAssignResult] = useState<number | null>(null)
   const [clearConfirm, setClearConfirm] = useState(false)
   const [clearing, setClearing] = useState(false)
+  const [notifyingPublish, setNotifyingPublish] = useState(false)
   const [dailyRequiredInput, setDailyRequiredInput] = useState(() => {
     const db = initialData.initialDailyRequired ?? 0
     return db > 0 ? String(db) : ''
@@ -153,6 +154,16 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
     setAutoAssignResult(data.added ?? 0)
     setAutoAssigning(false)
     await fetchData(true)
+  }
+
+  async function sendPublishNotification() {
+    setNotifyingPublish(true)
+    await fetch('/api/schedule/notify-publish', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ year, month: month + 1, dailyRequired }),
+    })
+    setNotifyingPublish(false)
   }
 
   async function handleUnpublish() {
@@ -474,10 +485,16 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
           </span>
         </div>
         {published ? (
-          <button onClick={handleUnpublish} disabled={publishing}
-            className="text-xs px-3 py-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition disabled:opacity-50 shrink-0">
-            {publishing ? '處理中...' : '取消發布'}
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <button onClick={sendPublishNotification} disabled={notifyingPublish}
+              className="text-xs px-3 py-2 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 transition disabled:opacity-50">
+              {notifyingPublish ? '發送中...' : '📣 通知報更谷'}
+            </button>
+            <button onClick={handleUnpublish} disabled={publishing}
+              className="text-xs px-3 py-2 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition disabled:opacity-50">
+              {publishing ? '處理中...' : '取消發布'}
+            </button>
+          </div>
         ) : (
           <button onClick={handlePublish} disabled={publishing}
             className="text-xs px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition disabled:opacity-50 shrink-0">
