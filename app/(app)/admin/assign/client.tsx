@@ -61,6 +61,7 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
   const [clearConfirm, setClearConfirm] = useState(false)
   const [clearing, setClearing] = useState(false)
   const [notifyingPublish, setNotifyingPublish] = useState(false)
+  const [editingPublished, setEditingPublished] = useState(false)
   const [dailyRequiredInput, setDailyRequiredInput] = useState(() => {
     const db = initialData.initialDailyRequired ?? 0
     return db > 0 ? String(db) : ''
@@ -164,6 +165,11 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
       body: JSON.stringify({ year, month: month + 1, dailyRequired }),
     })
     setNotifyingPublish(false)
+  }
+
+  async function cancelEditPublished() {
+    await fetchData(false)
+    setEditingPublished(false)
   }
 
   async function handleUnpublish() {
@@ -310,8 +316,8 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
                                 <span className={`truncate ${shift === 'C' ? 'text-xs text-gray-700' : 'text-sm text-gray-700'}`}>{p.user.name}</span>
                                 {shift !== 'C' && (
                                   <button
-                                    onClick={() => !published && toggleAssign(dateStr, p.user.id, p.user.name, shift)}
-                                    disabled={published}
+                                    onClick={() => (!published || editingPublished) && toggleAssign(dateStr, p.user.id, p.user.name, shift)}
+                                    disabled={published && !editingPublished}
                                     className={`text-xs px-2 py-1 rounded-lg transition shrink-0 disabled:opacity-40 disabled:cursor-not-allowed ${
                                       assigned
                                         ? 'bg-green-100 text-green-700 hover:bg-red-100 hover:text-red-700'
@@ -325,8 +331,8 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
                               {shift === 'C' && (
                                 <div className="flex items-center gap-1">
                                   <button
-                                    onClick={() => !published && !(!assignedA && anyAssigned) && toggleAssign(dateStr, p.user.id, p.user.name, 'A')}
-                                    disabled={published || (!assignedA && anyAssigned)}
+                                    onClick={() => (!published || editingPublished) && !(!assignedA && anyAssigned) && toggleAssign(dateStr, p.user.id, p.user.name, 'A')}
+                                    disabled={(published && !editingPublished) || (!assignedA && anyAssigned)}
                                     style={{ fontSize: '10px' }}
                                     className={`px-1.5 py-0.5 rounded transition disabled:opacity-30 disabled:cursor-not-allowed ${
                                       assignedA
@@ -337,8 +343,8 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
                                     {assignedA ? '✓A' : 'A班'}
                                   </button>
                                   <button
-                                    onClick={() => !published && !(!assignedB && anyAssigned) && toggleAssign(dateStr, p.user.id, p.user.name, 'B')}
-                                    disabled={published || (!assignedB && anyAssigned)}
+                                    onClick={() => (!published || editingPublished) && !(!assignedB && anyAssigned) && toggleAssign(dateStr, p.user.id, p.user.name, 'B')}
+                                    disabled={(published && !editingPublished) || (!assignedB && anyAssigned)}
                                     style={{ fontSize: '10px' }}
                                     className={`px-1.5 py-0.5 rounded transition disabled:opacity-30 disabled:cursor-not-allowed ${
                                       assignedB
@@ -349,8 +355,8 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
                                     {assignedB ? '✓B' : 'B班'}
                                   </button>
                                   <button
-                                    onClick={() => !published && !(!assigned && anyAssigned) && toggleAssign(dateStr, p.user.id, p.user.name, 'C')}
-                                    disabled={published || (!assigned && anyAssigned)}
+                                    onClick={() => (!published || editingPublished) && !(!assigned && anyAssigned) && toggleAssign(dateStr, p.user.id, p.user.name, 'C')}
+                                    disabled={(published && !editingPublished) || (!assigned && anyAssigned)}
                                     style={{ fontSize: '10px' }}
                                     className={`px-1.5 py-0.5 rounded transition disabled:opacity-30 disabled:cursor-not-allowed ${
                                       assigned
@@ -381,7 +387,7 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
                     {a.user.name}
                     <span className="ml-1 text-xs text-gray-400">{SHIFTS[a.shift as ShiftKey].label}</span>
                   </span>
-                  {!published && (
+                  {(!published || editingPublished) && (
                     <button
                       onClick={() => toggleAssign(dateStr, a.userId, a.user.name, a.shift as ShiftKey)}
                       className="text-xs text-red-400 hover:text-red-600 hover:bg-red-50 rounded px-1 py-0.5 transition shrink-0"
@@ -475,6 +481,21 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
           </button>
         </div>
       </div>
+      {editingPublished && (
+        <div className="flex items-center justify-between mb-3 bg-orange-50 border border-orange-200 rounded-xl px-4 py-2.5 gap-3">
+          <span className="text-sm text-orange-700 font-medium">✏️ 修改模式・排班已解鎖，可進行微調</span>
+          <div className="flex items-center gap-2 shrink-0">
+            <button onClick={() => setEditingPublished(false)}
+              className="text-xs px-3 py-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition">
+              確認修改
+            </button>
+            <button onClick={cancelEditPublished}
+              className="text-xs px-3 py-2 rounded-lg border border-orange-200 text-orange-600 hover:bg-orange-100 transition">
+              放棄修改
+            </button>
+          </div>
+        </div>
+      )}
       <div className="flex items-center justify-between mb-4 bg-gray-50 rounded-xl px-4 py-3 border gap-3">
         <div className="flex items-center gap-2 min-w-0">
           <span className={`w-2 h-2 rounded-full shrink-0 ${published ? 'bg-green-500' : 'bg-yellow-400'}`} />
@@ -486,6 +507,12 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
         </div>
         {published ? (
           <div className="flex items-center gap-2 shrink-0">
+            {!editingPublished && (
+              <button onClick={() => setEditingPublished(true)}
+                className="text-xs px-3 py-2 rounded-lg bg-orange-100 text-orange-600 hover:bg-orange-200 transition">
+                解鎖微調
+              </button>
+            )}
             <button onClick={sendPublishNotification} disabled={notifyingPublish}
               className="text-xs px-3 py-2 rounded-lg bg-green-100 text-green-700 hover:bg-green-200 transition disabled:opacity-50">
               {notifyingPublish ? '發送中...' : '📣 通知報更谷'}
