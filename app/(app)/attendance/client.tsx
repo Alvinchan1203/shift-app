@@ -238,9 +238,8 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
   async function confirmAllChanges() {
     if (pendingCells.size === 0) return
     setConfirmingAll(true)
-    const newConfirmed: ConfirmedChange[] = []
 
-    for (const cellKey of pendingCells) {
+    const cellJobs = [...pendingCells].map(cellKey => {
       const [userId, date] = cellKey.split('|')
       const userName = users.find(u => u.id === userId)?.name ?? ''
 
@@ -250,38 +249,36 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
       const toAdd = currentTypes.filter(t => !dbTypes.includes(t))
       const toRemove = dbTypes.filter(t => !currentTypes.includes(t))
       const toUpdateDuration = DURATION_TYPES.filter(t => currentTypes.includes(t) && dbTypes.includes(t)) as AttendanceTypeKey[]
-
       const typesToPost = [...new Set([...toAdd, ...toUpdateDuration])]
 
-      try {
-        await Promise.all([
-          ...typesToPost.map(type => {
-            const rec = records.find(r => r.userId === userId && r.date === date && r.type === type)
-            return fetch('/api/attendance', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ userId, date, type, durationMinutes: rec?.durationMinutes ?? null }),
-            })
-          }),
-          ...toRemove.map(type => fetch('/api/attendance', {
-            method: 'DELETE',
+      const requests = [
+        ...typesToPost.map(type => {
+          const rec = records.find(r => r.userId === userId && r.date === date && r.type === type)
+          return fetch('/api/attendance', {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId, date, type }),
-          })),
-        ])
+            body: JSON.stringify({ userId, date, type, durationMinutes: rec?.durationMinutes ?? null }),
+          })
+        }),
+        ...toRemove.map(type => fetch('/api/attendance', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId, date, type }),
+        })),
+      ]
 
-        if (toAdd.length > 0 || toRemove.length > 0) {
-          // 若 DB 無紀錄但有排班，以排班作為「原先狀態」顯示在通知中
-          const assignment = assignments.find(a => a.userId === userId && a.date === date)
-          const notifyRemoved = toRemove.length === 0 && toAdd.length > 0 && assignment
-            ? [assignment.shift as AttendanceTypeKey]
-            : toRemove
-          newConfirmed.push({ userId, userName, date, added: toAdd, removed: notifyRemoved })
-        }
-      } catch {
-        // continue with remaining cells even if one fails
-      }
-    }
+      return Promise.all(requests).then(() => {
+        if (toAdd.length === 0 && toRemove.length === 0) return null
+        const assignment = assignments.find(a => a.userId === userId && a.date === date)
+        const notifyRemoved = toRemove.length === 0 && toAdd.length > 0 && assignment
+          ? [assignment.shift as AttendanceTypeKey]
+          : toRemove
+        return { userId, userName, date, added: toAdd, removed: notifyRemoved } as ConfirmedChange
+      }).catch(() => null)
+    })
+
+    const results = await Promise.all(cellJobs)
+    const newConfirmed = results.filter((r): r is ConfirmedChange => r !== null)
 
     setSavedRecords([...records])
     setPendingCells(new Set())
