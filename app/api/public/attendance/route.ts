@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
 
   const [users, publish, holidays] = await Promise.all([
     prisma.user.findMany({
-      where: { role: 'EMPLOYEE' },
+      where: { role: 'EMPLOYEE', name: { not: { startsWith: 'Testing-' } } },
       select: { id: true, name: true },
       orderBy: { name: 'asc' },
     }),

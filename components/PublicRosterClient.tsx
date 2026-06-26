@@ -204,6 +204,16 @@ export default function PublicRosterClient({ isLoggedIn }: Props) {
           <button onClick={nextMonth} className="w-8 h-8 flex items-center justify-center rounded-xl border border-gray-200 hover:bg-gray-100 transition text-gray-500">›</button>
         </div>
 
+        {/* 圖例 */}
+        <div className="flex flex-wrap gap-2 mb-4">
+          {Object.entries(SHIFTS).map(([key, s]) => (
+            <div key={key} className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg ${s.color}`}>
+              <span className="font-medium">{s.label}</span>
+              <span className="opacity-70">{s.time}</span>
+            </div>
+          ))}
+        </div>
+
         {/* 未發布提示 */}
         {!isPublished && !loading && (
           <div className="bg-gray-100 border border-gray-200 rounded-xl px-4 py-3 mb-4">
@@ -224,11 +234,11 @@ export default function PublicRosterClient({ isLoggedIn }: Props) {
                   return (
                     <th
                       key={ds}
-                      className={`text-center px-0 py-2 font-medium text-xs
-                        ${isToday ? 'bg-indigo-600 text-white' : rest ? 'text-pink-300' : 'text-gray-500'}`}
+                      className={`text-center px-0 py-2 text-xs
+                        ${isToday ? 'bg-indigo-50' : rest ? 'text-pink-300' : 'text-gray-500'}`}
                     >
-                      <div>{day.getDate()}</div>
-                      <div className={`font-normal ${isToday ? 'text-indigo-200' : 'text-gray-300'}`}>
+                      <div className={isToday ? 'font-bold text-gray-900' : 'font-medium'}>{day.getDate()}</div>
+                      <div className={`font-normal ${isToday ? 'text-gray-500' : 'text-gray-300'}`}>
                         {'日一二三四五六'[day.getDay()]}
                       </div>
                     </th>
@@ -284,15 +294,6 @@ export default function PublicRosterClient({ isLoggedIn }: Props) {
           </table>
         </div>
 
-        {/* 圖例 */}
-        <div className="flex flex-wrap gap-2 mt-4">
-          {Object.entries(SHIFTS).map(([key, s]) => (
-            <div key={key} className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg ${s.color}`}>
-              <span className="font-medium">{s.label}</span>
-              <span className="opacity-70">{s.time}</span>
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   )
