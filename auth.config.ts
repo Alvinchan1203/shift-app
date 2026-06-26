@@ -21,7 +21,7 @@ export const authConfig: NextAuthConfig = {
       const publicPaths = ['/login', '/register']
 
       if (publicPaths.includes(pathname)) {
-        return isLoggedIn ? Response.redirect(new URL('/dashboard', request.url)) : true
+        return true
       }
 
       if (!isLoggedIn) return false
