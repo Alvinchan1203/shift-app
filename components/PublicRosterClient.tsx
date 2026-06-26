@@ -116,9 +116,9 @@ export default function PublicRosterClient({ isLoggedIn }: Props) {
             <span className="text-sm font-semibold text-gray-800 leading-tight">金鐘辦公室Bee報更系統</span>
           </div>
           {isLoggedIn ? (
-            <a href="/app" className="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl text-sm font-semibold transition-colors">
+            <button onClick={() => { sessionStorage.setItem('tab_auth', '1'); window.location.href = '/app' }} className="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl text-sm font-semibold transition-colors">
               進入系統 →
-            </a>
+            </button>
           ) : (
             <form onSubmit={handleLogin} className="space-y-3">
               <input
@@ -158,9 +158,9 @@ export default function PublicRosterClient({ isLoggedIn }: Props) {
           <span className="text-xs text-gray-500 shrink-0">今天：{todayDisplay}</span>
         </div>
         {isLoggedIn ? (
-          <a href="/app" className="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl text-sm font-semibold transition-colors">
+          <button onClick={() => { sessionStorage.setItem('tab_auth', '1'); window.location.href = '/app' }} className="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl text-sm font-semibold transition-colors">
             進入系統 →
-          </a>
+          </button>
         ) : (
           <>
             <form onSubmit={handleLogin} className="flex items-center gap-2">
