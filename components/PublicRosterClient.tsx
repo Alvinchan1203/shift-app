@@ -208,7 +208,7 @@ export default function PublicRosterClient({ isLoggedIn }: Props) {
         <div className="flex flex-wrap gap-2 mb-4">
           {Object.entries(SHIFTS).map(([key, s]) => (
             <div key={key} className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg ${s.color}`}>
-              <span className="font-medium">{s.label}</span>
+              <span className="font-medium">{key}</span>
               <span className="opacity-70">{s.time}</span>
             </div>
           ))}
@@ -269,7 +269,7 @@ export default function PublicRosterClient({ isLoggedIn }: Props) {
                               const shift = SHIFTS[a.shift as ShiftKey]
                               return shift ? (
                                 <div key={i} className={`flex items-center justify-center text-xs font-medium py-1 ${shift.color}`}>
-                                  {shift.label}
+                                  {a.shift}
                                 </div>
                               ) : null
                             })}
