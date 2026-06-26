@@ -1,8 +1,7 @@
-import { redirect } from 'next/navigation'
-import { requireAuth } from '@/lib/require-auth'
+import { auth } from '@/auth'
+import PublicRosterClient from '@/components/PublicRosterClient'
 
 export default async function Home() {
-  const session = await requireAuth()
-  if (session.user.role === 'ADMIN') redirect('/admin/preferences')
-  redirect('/employee/preferences')
+  const session = await auth()
+  return <PublicRosterClient isLoggedIn={!!session?.user} />
 }
