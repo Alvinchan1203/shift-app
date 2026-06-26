@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Sidebar from '@/components/Sidebar'
 import AdminPreferencesView from '@/components/views/AdminPreferencesView'
 import AdminAssignView from '@/components/views/AdminAssignView'
@@ -22,8 +22,19 @@ interface Props {
 }
 
 export default function SPAShell({ userName, role, userId }: Props) {
-  const defaultView = role === 'ADMIN' ? 'attendance' : 'employee/preferences'
+  const defaultView = role === 'ADMIN' ? 'attendance' : 'employee/schedule'
   const [view, setView] = useState(defaultView)
+  const [tabReady, setTabReady] = useState(false)
+
+  useEffect(() => {
+    if (!sessionStorage.getItem('tab_auth')) {
+      window.location.replace('/login')
+    } else {
+      setTabReady(true)
+    }
+  }, [])
+
+  if (!tabReady) return null
 
   const show = (key: string) => view === key ? '' : 'hidden'
 

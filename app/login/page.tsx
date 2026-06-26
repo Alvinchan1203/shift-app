@@ -22,6 +22,7 @@ export default function LoginPage() {
       setError('用戶名或密碼錯誤')
       setLoading(false)
     } else {
+      sessionStorage.setItem('tab_auth', '1')
       router.push('/dashboard')
     }
   }
