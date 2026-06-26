@@ -33,5 +33,5 @@ export const authConfig: NextAuthConfig = {
       return true
     },
   },
-  pages: { signIn: '/login' },
+  pages: { signIn: '/' },
 }

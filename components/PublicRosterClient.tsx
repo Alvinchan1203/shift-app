@@ -26,9 +26,11 @@ function toDateStr(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-function todayStr() {
-  return toDateStr(new Date())
-}
+const ClockIcon = () => (
+  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+)
 
 export default function PublicRosterClient({ isLoggedIn }: Props) {
   const now = new Date()
@@ -74,7 +76,7 @@ export default function PublicRosterClient({ isLoggedIn }: Props) {
   }
 
   const days = getMonthDays(year, month)
-  const today = todayStr()
+  const today = toDateStr(new Date())
 
   function isRestDay(day: Date) {
     const dow = day.getDay()
@@ -83,11 +85,12 @@ export default function PublicRosterClient({ isLoggedIn }: Props) {
     return dow === 0 || dow === 6 || !!holiday
   }
 
-  function getAssignments(userId: string, dateStr: string) {
+  function getShiftAssignments(userId: string, dateStr: string) {
     return assignments.filter(a => a.userId === userId && a.date === dateStr)
   }
 
   const monthLabel = new Date(year, month - 1).toLocaleDateString('zh-HK', { year: 'numeric', month: 'long' })
+  const todayDisplay = new Date().toLocaleDateString('zh-HK', { month: 'long', day: 'numeric', weekday: 'short' })
 
   function prevMonth() {
     if (month === 1) { setYear(y => y - 1); setMonth(12) }
@@ -98,38 +101,8 @@ export default function PublicRosterClient({ isLoggedIn }: Props) {
     else setMonth(m => m + 1)
   }
 
-  const todayDisplay = new Date().toLocaleDateString('zh-HK', { month: 'long', day: 'numeric', weekday: 'short' })
-
-  const LoginForm = ({ compact }: { compact: boolean }) => (
-    <form onSubmit={handleLogin} className={compact ? 'flex items-center gap-2' : 'space-y-3'}>
-      <input
-        type="text"
-        value={username}
-        onChange={e => setUsername(e.target.value)}
-        placeholder="用戶名"
-        required
-        className={`border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-400 transition ${compact ? 'w-28' : 'w-full'}`}
-      />
-      <input
-        type="password"
-        value={password}
-        onChange={e => setPassword(e.target.value)}
-        placeholder="密碼"
-        required
-        className={`border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-400 transition ${compact ? 'w-24' : 'w-full'}`}
-      />
-      <button
-        type="submit"
-        disabled={loggingIn}
-        className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-semibold disabled:opacity-50 transition-colors whitespace-nowrap"
-      >
-        {loggingIn ? '登入中...' : '登入'}
-      </button>
-      {!compact && loginError && (
-        <p className="text-xs text-red-500">{loginError}</p>
-      )}
-    </form>
-  )
+  const inputClass = (w: string) =>
+    `border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-400 transition ${w}`
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -138,21 +111,37 @@ export default function PublicRosterClient({ isLoggedIn }: Props) {
         <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-4 w-64">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0">
-              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <ClockIcon />
             </div>
             <span className="text-sm font-semibold text-gray-800 leading-tight">金鐘辦公室Bee報更系統</span>
           </div>
           {isLoggedIn ? (
-            <a
-              href="/app"
-              className="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl text-sm font-semibold transition-colors"
-            >
+            <a href="/app" className="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl text-sm font-semibold transition-colors">
               進入系統 →
             </a>
           ) : (
-            <LoginForm compact={false} />
+            <form onSubmit={handleLogin} className="space-y-3">
+              <input
+                type="text"
+                value={username}
+                onChange={e => setUsername(e.target.value)}
+                placeholder="用戶名"
+                required
+                className={inputClass('w-full')}
+              />
+              <input
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="密碼"
+                required
+                className={inputClass('w-full')}
+              />
+              {loginError && <p className="text-xs text-red-500">{loginError}</p>}
+              <button type="submit" disabled={loggingIn} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl text-sm font-semibold disabled:opacity-50 transition-colors">
+                {loggingIn ? '登入中...' : '登入'}
+              </button>
+            </form>
           )}
         </div>
       </div>
@@ -162,27 +151,40 @@ export default function PublicRosterClient({ isLoggedIn }: Props) {
         <div className="flex items-center justify-between gap-3 mb-2">
           <div className="flex items-center gap-2 min-w-0">
             <div className="w-6 h-6 rounded-md bg-indigo-600 flex items-center justify-center shrink-0">
-              <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+              <ClockIcon />
             </div>
             <span className="text-xs font-semibold text-gray-800 truncate">金鐘辦公室Bee報更系統</span>
           </div>
           <span className="text-xs text-gray-500 shrink-0">今天：{todayDisplay}</span>
         </div>
         {isLoggedIn ? (
-          <a
-            href="/app"
-            className="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl text-sm font-semibold transition-colors"
-          >
+          <a href="/app" className="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl text-sm font-semibold transition-colors">
             進入系統 →
           </a>
         ) : (
           <>
-            <LoginForm compact={true} />
-            {loginError && (
-              <p className="text-xs text-red-500 mt-1">{loginError}</p>
-            )}
+            <form onSubmit={handleLogin} className="flex items-center gap-2">
+              <input
+                type="text"
+                value={username}
+                onChange={e => setUsername(e.target.value)}
+                placeholder="用戶名"
+                required
+                className={inputClass('w-28')}
+              />
+              <input
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="密碼"
+                required
+                className={inputClass('w-24')}
+              />
+              <button type="submit" disabled={loggingIn} className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-semibold disabled:opacity-50 transition-colors whitespace-nowrap">
+                {loggingIn ? '登入中...' : '登入'}
+              </button>
+            </form>
+            {loginError && <p className="text-xs text-red-500 mt-1">{loginError}</p>}
           </>
         )}
       </div>
@@ -190,11 +192,9 @@ export default function PublicRosterClient({ isLoggedIn }: Props) {
       {/* ── 主體內容 ── */}
       <div className="max-w-full px-4 py-6 md:pr-72">
         {/* 標題列 */}
-        <div className="flex items-center gap-4 mb-5">
-          <div>
-            <h1 className="text-lg font-bold text-gray-900">本月排班表</h1>
-            <p className="text-sm text-gray-400">今天：{todayDisplay}</p>
-          </div>
+        <div className="mb-5">
+          <h1 className="text-lg font-bold text-gray-900">本月排班表</h1>
+          <p className="text-base font-bold text-gray-900">今天：{todayDisplay}</p>
         </div>
 
         {/* 月份選擇 */}
@@ -234,8 +234,7 @@ export default function PublicRosterClient({ isLoggedIn }: Props) {
                   return (
                     <th
                       key={ds}
-                      className={`text-center px-0 py-2 text-xs
-                        ${isToday ? 'bg-indigo-50' : rest ? 'text-pink-300' : 'text-gray-500'}`}
+                      className={`text-center px-0 py-2 text-xs ${isToday ? 'bg-indigo-50' : rest ? 'text-pink-300' : 'text-gray-500'}`}
                     >
                       <div className={isToday ? 'font-bold text-gray-900' : 'font-medium'}>{day.getDate()}</div>
                       <div className={`font-normal ${isToday ? 'text-gray-500' : 'text-gray-300'}`}>
@@ -256,12 +255,10 @@ export default function PublicRosterClient({ isLoggedIn }: Props) {
                     const ds = toDateStr(day)
                     const isToday = ds === today
                     const rest = isRestDay(day)
-                    const userAssignments = getAssignments(user.id, ds)
+                    const userAssignments = getShiftAssignments(user.id, ds)
 
                     if (rest) {
-                      return (
-                        <td key={ds} className={`border border-gray-200 w-9 ${isToday ? 'bg-indigo-100' : 'bg-pink-50'}`} />
-                      )
+                      return <td key={ds} className={`border border-gray-200 w-9 ${isToday ? 'bg-indigo-100' : 'bg-pink-50'}`} />
                     }
 
                     return (
@@ -293,7 +290,6 @@ export default function PublicRosterClient({ isLoggedIn }: Props) {
             </tbody>
           </table>
         </div>
-
       </div>
     </div>
   )

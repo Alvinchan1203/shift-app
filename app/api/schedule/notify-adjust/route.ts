@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     lines.join('\n'),
     '',
     '請各同事到「我的排班」查看最新安排。',
-    '🔗 https://shift-app-omega-tan.vercel.app/app',
+    '🔗 https://shift-app-omega-tan.vercel.app',
   ].join('\n')
 
   const res = await fetch(webhookUrl, {

@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
     `📢 ${monthLabel}排班已發布`,
     '',
     '請各同事到「我的排班」查看上班時間安排。',
-    '🔗 https://shift-app-omega-tan.vercel.app/app',
+    '🔗 https://shift-app-omega-tan.vercel.app',
     understaffedSection,
   ].join('\n').trimEnd()
 
