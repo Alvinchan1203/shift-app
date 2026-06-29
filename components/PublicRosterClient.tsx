@@ -275,8 +275,8 @@ export default function PublicRosterClient({ isLoggedIn }: Props) {
               <tbody className="divide-y">
                 {users.map(user => (
                   <tr key={user.id} className="hover:bg-gray-50">
-                    <td className="sticky left-0 z-10 bg-white hover:bg-gray-50 px-3 py-2 border-r w-[88px]">
-                      <span className="font-medium text-gray-800 text-xs break-words leading-tight">{user.name}</span>
+                    <td className="sticky left-0 z-10 bg-white hover:bg-gray-50 px-3 py-2 border-r w-[88px] overflow-hidden">
+                      <span className="font-medium text-gray-800 text-xs block truncate">{user.name}</span>
                     </td>
                     {weekDays.map(day => {
                       const ds = toDateStr(day)
