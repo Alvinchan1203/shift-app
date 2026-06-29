@@ -376,7 +376,7 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
               ))}
             </div>
           ) : prefill ? (
-            <div className={`flex items-center justify-center text-xs font-medium py-1.5 opacity-50 ${ATTENDANCE_TYPES[prefill].bg} ${ATTENDANCE_TYPES[prefill].text}`}>
+            <div className={`flex items-center justify-center text-xs font-medium py-1.5 opacity-70 ${ATTENDANCE_TYPES[prefill].bg} ${ATTENDANCE_TYPES[prefill].text}`}>
               {ATTENDANCE_TYPES[prefill].label}
             </div>
           ) : <div className="py-1.5" />}
@@ -389,7 +389,7 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
         <button
           onClick={() => openModal(userId, userName, dateStr)}
           className={`flex flex-col items-center justify-center text-xs font-medium w-full h-full min-h-[26px] transition
-            ${dayRecords.length === 0 && !prefill ? 'hover:bg-blue-50 text-gray-500 hover:text-blue-500' : ''}`}
+            ${dayRecords.length === 0 && !prefill ? 'hover:bg-blue-50 text-gray-600 hover:text-blue-600' : ''}`}
         >
           {dayRecords.length > 0 ? (
             dayRecords.map(r => (
@@ -398,7 +398,7 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
               </span>
             ))
           ) : prefill ? (
-            <span className={`w-full text-center py-1.5 opacity-50 border border-dashed ${ATTENDANCE_TYPES[prefill].bg} ${ATTENDANCE_TYPES[prefill].text}`}>
+            <span className={`w-full text-center py-1.5 opacity-70 border border-dashed ${ATTENDANCE_TYPES[prefill].bg} ${ATTENDANCE_TYPES[prefill].text}`}>
               {ATTENDANCE_TYPES[prefill].label}
             </span>
           ) : '+'}
@@ -467,7 +467,7 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
       )}
 
       {/* ── Roster 表格（橫向捲動）── */}
-      <div className={`overflow-x-auto rounded-2xl border shadow-sm bg-white transition-opacity ${loadingMonth ? 'opacity-50 pointer-events-none' : ''}`}>
+      <div className={`overflow-x-auto rounded-2xl border shadow-sm bg-white transition-opacity ${loadingMonth ? 'opacity-70 pointer-events-none' : ''}`}>
         <table className="border-collapse w-full text-sm table-fixed" style={{ minWidth: '700px' }}>
           <thead>
             <tr className="bg-gray-50 border-b">
