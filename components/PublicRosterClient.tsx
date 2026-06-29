@@ -247,49 +247,73 @@ export default function PublicRosterClient({ isLoggedIn }: Props) {
           </div>
         )}
 
-        {/* 手機：每週檢視 */}
+        {/* 手機：每週表格 */}
         <div className="md:hidden mb-4">
           <div className="flex items-center gap-3 mb-3">
             <button onClick={prevWeek} className="w-8 h-8 flex items-center justify-center rounded-xl border border-gray-200 hover:bg-gray-100 transition text-gray-500">‹</button>
             <span className="text-sm font-semibold text-gray-700 flex-1 text-center">{weekRangeLabel}</span>
             <button onClick={nextWeek} className="w-8 h-8 flex items-center justify-center rounded-xl border border-gray-200 hover:bg-gray-100 transition text-gray-500">›</button>
           </div>
-          <div className={`rounded-2xl border bg-white overflow-hidden divide-y transition-opacity ${loading ? 'opacity-50' : ''}`}>
-            {weekDays.map(day => {
-              const ds = toDateStr(day)
-              const rest = isRestDay(day)
-              const isToday = ds === today
-              const dayAssigns = assignments
-                .filter(a => a.date === ds)
-                .map(a => ({ ...a, userName: users.find(u => u.id === a.userId)?.name ?? '' }))
-              return (
-                <div key={ds} className={`px-4 py-3 ${isToday ? 'bg-indigo-50' : rest ? 'bg-pink-50' : ''}`}>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className={`text-sm ${isToday ? 'font-bold text-gray-900' : rest ? 'font-medium text-pink-400' : 'font-medium text-gray-700'}`}>
-                      {day.getDate()}日（{'日一二三四五六'[day.getDay()]}）
-                    </span>
-                    {rest && <span className="text-xs text-pink-400">休息</span>}
-                    {isToday && !rest && <span className="text-xs text-indigo-500 font-medium">今天</span>}
-                  </div>
-                  {!rest && (
-                    dayAssigns.length > 0 ? (
-                      <div className="flex flex-wrap gap-1.5">
-                        {dayAssigns.map((a, i) => {
-                          const shift = SHIFTS[a.shift as ShiftKey]
-                          return shift ? (
-                            <span key={i} className={`text-xs px-2 py-0.5 rounded-lg font-medium ${shift.color}`}>
-                              {a.userName} {a.shift}
-                            </span>
-                          ) : null
-                        })}
-                      </div>
-                    ) : (
-                      <span className="text-xs text-gray-400">{isPublished ? '無排班' : '未發布'}</span>
+          <div className={`overflow-x-auto rounded-2xl border shadow-sm bg-white transition-opacity ${loading ? 'opacity-50' : ''}`}>
+            <table className="border-collapse w-full text-sm table-fixed">
+              <thead>
+                <tr className="bg-gray-50 border-b">
+                  <th className="sticky left-0 z-10 bg-gray-50 text-left px-3 py-2.5 font-medium text-gray-600 w-[88px] border-r text-xs">員工</th>
+                  {weekDays.map(day => {
+                    const ds = toDateStr(day)
+                    const isToday = ds === today
+                    const rest = isRestDay(day)
+                    return (
+                      <th key={ds} className={`text-center px-0 py-2 text-xs ${isToday ? 'bg-indigo-50' : rest ? 'text-pink-300' : 'text-gray-500'}`}>
+                        <div className={isToday ? 'font-bold text-gray-900' : 'font-medium'}>{day.getDate()}</div>
+                        <div className={`font-normal ${isToday ? 'text-gray-500' : 'text-gray-300'}`}>{'日一二三四五六'[day.getDay()]}</div>
+                      </th>
                     )
-                  )}
-                </div>
-              )
-            })}
+                  })}
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {users.map(user => (
+                  <tr key={user.id} className="hover:bg-gray-50">
+                    <td className="sticky left-0 z-10 bg-white hover:bg-gray-50 px-3 py-2 border-r w-[88px]">
+                      <span className="font-medium text-gray-800 text-xs break-words leading-tight">{user.name}</span>
+                    </td>
+                    {weekDays.map(day => {
+                      const ds = toDateStr(day)
+                      const isToday = ds === today
+                      const rest = isRestDay(day)
+                      const userAssignments = getShiftAssignments(user.id, ds)
+                      if (rest) {
+                        return <td key={ds} className={`border border-gray-200 ${isToday ? 'bg-indigo-100' : 'bg-pink-50'}`} />
+                      }
+                      return (
+                        <td key={ds} className={`border border-gray-200 p-0 ${isToday ? 'bg-indigo-50' : ''}`}>
+                          {userAssignments.length > 0 ? (
+                            <div className="flex flex-col">
+                              {userAssignments.map((a, i) => {
+                                const shift = SHIFTS[a.shift as ShiftKey]
+                                return shift ? (
+                                  <div key={i} className={`flex items-center justify-center text-xs font-medium py-1 ${shift.color}`}>
+                                    {a.shift}
+                                  </div>
+                                ) : null
+                              })}
+                            </div>
+                          ) : (
+                            <div className="py-1.5" />
+                          )}
+                        </td>
+                      )
+                    })}
+                  </tr>
+                ))}
+                {users.length === 0 && !loading && (
+                  <tr>
+                    <td colSpan={weekDays.length + 1} className="text-center py-8 text-gray-400 text-sm">暫無資料</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
 
