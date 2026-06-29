@@ -26,6 +26,14 @@ function toDateStr(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
+function getWeekStart(d: Date): Date {
+  const result = new Date(d)
+  const dow = d.getDay()
+  result.setDate(d.getDate() - (dow === 0 ? 6 : dow - 1))
+  result.setHours(0, 0, 0, 0)
+  return result
+}
+
 const ClockIcon = () => (
   <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -47,6 +55,7 @@ export default function PublicRosterClient({ isLoggedIn }: Props) {
   const [password, setPassword] = useState('')
   const [loginError, setLoginError] = useState('')
   const [loggingIn, setLoggingIn] = useState(false)
+  const [weekStart, setWeekStart] = useState(() => getWeekStart(new Date()))
 
   useEffect(() => {
     setLoading(true)
@@ -91,14 +100,31 @@ export default function PublicRosterClient({ isLoggedIn }: Props) {
 
   const monthLabel = new Date(year, month - 1).toLocaleDateString('zh-HK', { year: 'numeric', month: 'long' })
   const todayDisplay = new Date().toLocaleDateString('zh-HK', { month: 'long', day: 'numeric', weekday: 'short' })
+  const weekDays = Array.from({ length: 7 }, (_, i) => { const d = new Date(weekStart); d.setDate(weekStart.getDate() + i); return d })
+  const weekEnd = weekDays[6]
+  const weekRangeLabel = (() => {
+    const sm = weekStart.getMonth() + 1, sd = weekStart.getDate()
+    const em = weekEnd.getMonth() + 1, ed = weekEnd.getDate()
+    return sm === em ? `${sm}月${sd}日 – ${ed}日` : `${sm}月${sd}日 – ${em}月${ed}日`
+  })()
 
   function prevMonth() {
-    if (month === 1) { setYear(y => y - 1); setMonth(12) }
-    else setMonth(m => m - 1)
+    const newYear = month === 1 ? year - 1 : year
+    const newMonth = month === 1 ? 12 : month - 1
+    if (month === 1) { setYear(y => y - 1); setMonth(12) } else setMonth(m => m - 1)
+    setWeekStart(getWeekStart(new Date(newYear, newMonth - 1, 1)))
   }
   function nextMonth() {
-    if (month === 12) { setYear(y => y + 1); setMonth(1) }
-    else setMonth(m => m + 1)
+    const newYear = month === 12 ? year + 1 : year
+    const newMonth = month === 12 ? 1 : month + 1
+    if (month === 12) { setYear(y => y + 1); setMonth(1) } else setMonth(m => m + 1)
+    setWeekStart(getWeekStart(new Date(newYear, newMonth - 1, 1)))
+  }
+  function prevWeek() {
+    setWeekStart(d => { const n = new Date(d); n.setDate(n.getDate() - 7); return n })
+  }
+  function nextWeek() {
+    setWeekStart(d => { const n = new Date(d); n.setDate(n.getDate() + 7); return n })
   }
 
   const inputClass = (w: string) =>
@@ -221,8 +247,54 @@ export default function PublicRosterClient({ isLoggedIn }: Props) {
           </div>
         )}
 
-        {/* 排班表格 */}
-        <div className={`overflow-x-auto rounded-2xl border shadow-sm bg-white transition-opacity ${loading ? 'opacity-50' : ''}`}>
+        {/* 手機：每週檢視 */}
+        <div className="md:hidden mb-4">
+          <div className="flex items-center gap-3 mb-3">
+            <button onClick={prevWeek} className="w-8 h-8 flex items-center justify-center rounded-xl border border-gray-200 hover:bg-gray-100 transition text-gray-500">‹</button>
+            <span className="text-sm font-semibold text-gray-700 flex-1 text-center">{weekRangeLabel}</span>
+            <button onClick={nextWeek} className="w-8 h-8 flex items-center justify-center rounded-xl border border-gray-200 hover:bg-gray-100 transition text-gray-500">›</button>
+          </div>
+          <div className={`rounded-2xl border bg-white overflow-hidden divide-y transition-opacity ${loading ? 'opacity-50' : ''}`}>
+            {weekDays.map(day => {
+              const ds = toDateStr(day)
+              const rest = isRestDay(day)
+              const isToday = ds === today
+              const dayAssigns = assignments
+                .filter(a => a.date === ds)
+                .map(a => ({ ...a, userName: users.find(u => u.id === a.userId)?.name ?? '' }))
+              return (
+                <div key={ds} className={`px-4 py-3 ${isToday ? 'bg-indigo-50' : rest ? 'bg-pink-50' : ''}`}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className={`text-sm ${isToday ? 'font-bold text-gray-900' : rest ? 'font-medium text-pink-400' : 'font-medium text-gray-700'}`}>
+                      {day.getDate()}日（{'日一二三四五六'[day.getDay()]}）
+                    </span>
+                    {rest && <span className="text-xs text-pink-400">休息</span>}
+                    {isToday && !rest && <span className="text-xs text-indigo-500 font-medium">今天</span>}
+                  </div>
+                  {!rest && (
+                    dayAssigns.length > 0 ? (
+                      <div className="flex flex-wrap gap-1.5">
+                        {dayAssigns.map((a, i) => {
+                          const shift = SHIFTS[a.shift as ShiftKey]
+                          return shift ? (
+                            <span key={i} className={`text-xs px-2 py-0.5 rounded-lg font-medium ${shift.color}`}>
+                              {a.userName} {a.shift}
+                            </span>
+                          ) : null
+                        })}
+                      </div>
+                    ) : (
+                      <span className="text-xs text-gray-400">{isPublished ? '無排班' : '未發布'}</span>
+                    )
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* 排班表格（桌面） */}
+        <div className={`hidden md:block overflow-x-auto rounded-2xl border shadow-sm bg-white transition-opacity ${loading ? 'opacity-50' : ''}`}>
           <table className="border-collapse w-full text-sm table-fixed" style={{ minWidth: '700px' }}>
             <thead>
               <tr className="bg-gray-50 border-b">

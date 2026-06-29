@@ -102,7 +102,7 @@ export default function AdminPreferencesView() {
 
   return (
     <main className="max-w-4xl mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-3">
         <div className="flex items-center gap-3">
           <h2 className="text-xl font-bold text-gray-800">Bee上班意願</h2>
           {displayEmployees.length > 0 && (
@@ -115,7 +115,7 @@ export default function AdminPreferencesView() {
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={() => setHideTesting(h => !h)}
             className={`text-xs px-3 py-1.5 rounded-lg border transition ${hideTesting ? 'bg-gray-100 text-gray-500 border-gray-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200 hover:bg-yellow-100'}`}

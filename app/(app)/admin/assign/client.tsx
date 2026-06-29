@@ -443,9 +443,49 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
 
   return (
     <div>
-      {/* 月份導航 + 發布狀態列 */}
-      <div className="flex items-center justify-between mb-3">
-        <MonthPicker year={year} month={month + 1} onChange={(y, m) => { setYear(y); setMonth(m - 1) }} />
+      {/* 月份導航 + 每天需要 */}
+      <div className="mb-3 flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <MonthPicker year={year} month={month + 1} onChange={(y, m) => { setYear(y); setMonth(m - 1) }} />
+          <div className="flex items-center gap-2">
+            {!published && (
+              <>
+                {clearConfirm ? (
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs text-red-600 hidden sm:inline">確定清除本月所有排班？</span>
+                    <button onClick={handleClearAssignments} disabled={clearing}
+                      className="text-xs px-2.5 py-1.5 rounded-lg bg-red-600 text-white hover:bg-red-700 transition disabled:opacity-50">
+                      {clearing ? '清除中...' : '確定'}
+                    </button>
+                    <button onClick={() => setClearConfirm(false)}
+                      className="text-xs px-2.5 py-1.5 rounded-lg border hover:bg-gray-50 transition">
+                      取消
+                    </button>
+                  </div>
+                ) : (
+                  <button onClick={() => setClearConfirm(true)}
+                    className="text-sm px-3 py-2 rounded-lg border bg-red-50 text-red-600 border-red-200 hover:bg-red-100 transition">
+                    清除草稿
+                  </button>
+                )}
+                <button
+                  onClick={() => { setAutoAssignOpen(true); setAutoAssignResult(null) }}
+                  className="text-sm px-3 py-2 rounded-lg border bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 transition"
+                >
+                  自動排班
+                </button>
+              </>
+            )}
+            <button
+              onClick={() => fetchData(true)}
+              disabled={refreshing}
+              title="重新整理意願資料"
+              className="px-3 py-2 rounded-lg border hover:bg-gray-100 text-gray-500 disabled:opacity-50 transition"
+            >
+              {refreshing ? '⟳' : '↺'}
+            </button>
+          </div>
+        </div>
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <span className="shrink-0">每天需要</span>
           <input
@@ -478,44 +518,6 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
           {dailyRequired > 0 && (
             <span className="text-xs text-yellow-600 shrink-0">黃色 = 未達 {dailyRequired} 人</span>
           )}
-        </div>
-        <div className="flex items-center gap-2">
-          {!published && (
-            <>
-              {clearConfirm ? (
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs text-red-600">確定清除本月所有排班？</span>
-                  <button onClick={handleClearAssignments} disabled={clearing}
-                    className="text-xs px-2.5 py-1.5 rounded-lg bg-red-600 text-white hover:bg-red-700 transition disabled:opacity-50">
-                    {clearing ? '清除中...' : '確定'}
-                  </button>
-                  <button onClick={() => setClearConfirm(false)}
-                    className="text-xs px-2.5 py-1.5 rounded-lg border hover:bg-gray-50 transition">
-                    取消
-                  </button>
-                </div>
-              ) : (
-                <button onClick={() => setClearConfirm(true)}
-                  className="text-sm px-3 py-2 rounded-lg border bg-red-50 text-red-600 border-red-200 hover:bg-red-100 transition">
-                  清除草稿
-                </button>
-              )}
-              <button
-                onClick={() => { setAutoAssignOpen(true); setAutoAssignResult(null) }}
-                className="text-sm px-3 py-2 rounded-lg border bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 transition"
-              >
-                自動排班
-              </button>
-            </>
-          )}
-          <button
-            onClick={() => fetchData(true)}
-            disabled={refreshing}
-            title="重新整理意願資料"
-            className="px-3 py-2 rounded-lg border hover:bg-gray-100 text-gray-500 disabled:opacity-50 transition"
-          >
-            {refreshing ? '⟳' : '↺'}
-          </button>
         </div>
       </div>
       {editingPublished && (
