@@ -602,28 +602,30 @@ export default function AdminAssignClient({ initialData }: { initialData: Initia
             <button
               key={dateStr}
               onClick={() => setSheetDate(dateStr)}
-              className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border hover:bg-blue-50 transition text-left ${dailyRequired > 0 && dayAssign.length < dailyRequired ? 'bg-yellow-50 border-yellow-200' : 'bg-white border-gray-200'}`}
+              className={`w-full flex flex-col px-4 py-3 rounded-xl border hover:bg-blue-50 transition text-left ${dailyRequired > 0 && dayAssign.length < dailyRequired ? 'bg-yellow-50 border-yellow-200' : 'bg-white border-gray-200'}`}
             >
-              <span className="text-sm font-medium text-gray-700">
-                {new Date(dateStr + 'T00:00:00').toLocaleDateString('zh-HK', { month: 'short', day: 'numeric', weekday: 'short' })}
-              </span>
-              <div className="flex items-center gap-2">
-                {dayPrefs.length > 0 && (
-                  <span className="text-xs text-blue-500">{dayPrefs.length} 意願</span>
-                )}
-                {dayAssign.length > 0 && (
-                  <div className="flex gap-1">
-                    {dayAssign.map((a) => (
-                      <span key={a.id} className={`text-xs rounded px-1.5 py-0.5 ${SHIFTS[a.shift as ShiftKey].color}`}>
-                        {a.user.name}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                <svg className="w-4 h-4 text-gray-300" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
-                </svg>
+              <div className="flex items-center justify-between w-full">
+                <span className="text-sm font-medium text-gray-700">
+                  {new Date(dateStr + 'T00:00:00').toLocaleDateString('zh-HK', { month: 'short', day: 'numeric', weekday: 'short' })}
+                </span>
+                <div className="flex items-center gap-2">
+                  {dayPrefs.length > 0 && (
+                    <span className="text-xs text-blue-500">{dayPrefs.length} 意願</span>
+                  )}
+                  <svg className="w-4 h-4 text-gray-300" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
+                  </svg>
+                </div>
               </div>
+              {dayAssign.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-1.5">
+                  {dayAssign.map((a) => (
+                    <span key={a.id} className={`text-xs rounded px-1.5 py-0.5 ${SHIFTS[a.shift as ShiftKey].color}`}>
+                      {a.user.name}
+                    </span>
+                  ))}
+                </div>
+              )}
             </button>
           )
         })}
