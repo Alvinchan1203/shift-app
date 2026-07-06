@@ -475,9 +475,9 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
               {monthDays.map(day => {
                 const { rest } = isRestDay(day)
                 return (
-                  <th key={toDateStr(day)} className={`text-center px-0 py-2 font-medium text-xs ${rest ? 'text-pink-300' : 'text-gray-500'}`}>
-                    <div>{day.getDate()}</div>
-                    <div className="text-gray-300 font-normal">{'日一二三四五六'[day.getDay()]}</div>
+                  <th key={toDateStr(day)} className={`text-center px-0 py-2 text-xs`}>
+                    <div className={`font-bold ${rest ? 'text-pink-400' : 'text-gray-900'}`}>{day.getDate()}</div>
+                    <div className={`font-bold ${rest ? 'text-pink-400' : 'text-gray-900'}`}>{'日一二三四五六'[day.getDay()]}</div>
                   </th>
                 )
               })}
