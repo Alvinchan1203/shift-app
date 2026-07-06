@@ -264,9 +264,9 @@ export default function PublicRosterClient({ isLoggedIn }: Props) {
                     const isToday = ds === today
                     const rest = isRestDay(day)
                     return (
-                      <th key={ds} className={`text-center px-0 py-2 text-xs ${isToday ? 'bg-indigo-50' : rest ? 'text-pink-300' : 'text-gray-500'}`}>
-                        <div className={isToday ? 'font-bold text-gray-900' : 'font-medium'}>{day.getDate()}</div>
-                        <div className={`font-normal ${isToday ? 'text-gray-500' : 'text-gray-300'}`}>{'日一二三四五六'[day.getDay()]}</div>
+                      <th key={ds} className={`text-center px-0 py-2 text-xs ${isToday ? 'bg-indigo-50' : ''}`}>
+                        <div className={`font-bold ${rest ? 'text-pink-400' : 'text-gray-900'}`}>{day.getDate()}</div>
+                        <div className={`font-bold ${rest ? 'text-pink-400' : 'text-gray-900'}`}>{'日一二三四五六'[day.getDay()]}</div>
                       </th>
                     )
                   })}
@@ -330,10 +330,10 @@ export default function PublicRosterClient({ isLoggedIn }: Props) {
                   return (
                     <th
                       key={ds}
-                      className={`text-center px-0 py-2 text-xs ${isToday ? 'bg-indigo-50' : rest ? 'text-pink-300' : 'text-gray-500'}`}
+                      className={`text-center px-0 py-2 text-xs ${isToday ? 'bg-indigo-50' : ''}`}
                     >
-                      <div className={isToday ? 'font-bold text-gray-900' : 'font-medium'}>{day.getDate()}</div>
-                      <div className={`font-normal ${isToday ? 'text-gray-500' : 'text-gray-300'}`}>
+                      <div className={`font-bold ${rest ? 'text-pink-400' : 'text-gray-900'}`}>{day.getDate()}</div>
+                      <div className={`font-bold ${rest ? 'text-pink-400' : 'text-gray-900'}`}>
                         {'日一二三四五六'[day.getDay()]}
                       </div>
                     </th>
