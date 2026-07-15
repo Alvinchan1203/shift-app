@@ -1,14 +1,6 @@
 {
   "crons": [
     {
-      "path": "/api/cron/notify-preferences",
-      "schedule": "0 1 * * *"
-    },
-    {
-      "path": "/api/cron/remind-pending",
-      "schedule": "0 1 * * *"
-    },
-    {
       "path": "/api/cron/auto-attendance",
       "schedule": "0 11 * * *"
     }
