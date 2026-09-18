@@ -446,10 +446,6 @@ export type IntFieldUpdateOperationsInput = {
   divide?: number
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type PreferenceSubmissionCreateWithoutUserInput = {
   id?: string
   year: number

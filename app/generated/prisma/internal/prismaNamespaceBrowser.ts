@@ -93,7 +93,10 @@ export const UserScalarFieldEnum = {
   canDeleteAdmin: 'canDeleteAdmin',
   canRenameUser: 'canRenameUser',
   cannotWitness: 'cannotWitness',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  deletedAt: 'deletedAt',
+  deletedById: 'deletedById',
+  deletedByName: 'deletedByName'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]

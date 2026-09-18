@@ -10,6 +10,7 @@ export async function GET() {
   }
 
   const users = await prisma.user.findMany({
+    where: { deletedAt: null },
     select: { id: true, name: true, email: true, role: true, extraSubmitEnabled: true, canDeleteAdmin: true, canRenameUser: true, cannotWitness: true, createdAt: true },
     orderBy: { name: 'asc' },
   })
@@ -195,7 +196,14 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: '您沒有刪除管理員帳號的權限' }, { status: 403 })
     }
 
-    await prisma.user.delete({ where: { id: userId } })
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        deletedAt: new Date(),
+        deletedById: admin.id,
+        deletedByName: admin.name,
+      },
+    })
     return NextResponse.json({ ok: true })
   } catch (e: any) {
     return NextResponse.json({ error: e?.message ?? 'Unknown error' }, { status: 500 })

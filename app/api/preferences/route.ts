@@ -39,6 +39,9 @@ export async function POST(req: NextRequest) {
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const active = await prisma.user.findFirst({ where: { id: session.user.id, deletedAt: null }, select: { id: true } })
+  if (!active) return NextResponse.json({ error: '此帳戶已被停用' }, { status: 403 })
+
   const { date, shift } = await req.json()
   if (!date || !shift) return NextResponse.json({ error: '缺少資料' }, { status: 400 })
 

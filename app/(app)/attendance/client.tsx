@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ATTENDANCE_TYPES, AttendanceTypeKey, SHIFT_DURATIONS, formatDuration } from '@/lib/constants'
 import MonthPicker from '@/components/MonthPicker'
 
@@ -113,6 +113,22 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
 
   const days = getMonthDays(year, month)
   const monthPrefix = `${year}-${String(month + 1).padStart(2, '0')}`
+
+  // 已離職員工：本月出勤紀錄中出現、但不在在職名單中的人，補回一行顯示
+  const displayUsers = useMemo(() => {
+    const known = new Set(users.map(u => u.id))
+    const seen = new Set<string>()
+    const extra: User[] = []
+    for (const r of records) {
+      if (!r.userId || known.has(r.userId) || seen.has(r.userId)) continue
+      const name = r.user?.name
+      if (!name || name.toLowerCase().startsWith('testing')) continue
+      seen.add(r.userId)
+      extra.push({ id: r.userId, name })
+    }
+    if (extra.length === 0) return users
+    return [...users, ...extra].sort((a, b) => a.name.localeCompare(b.name))
+  }, [users, records])
 
   function getRecords(userId: string, dateStr: string) {
     return records.filter(r => r.userId === userId && r.date === dateStr)
@@ -242,7 +258,7 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
 
     const cellJobs = [...pendingCells].map(cellKey => {
       const [userId, date] = cellKey.split('|')
-      const userName = users.find(u => u.id === userId)?.name ?? ''
+      const userName = displayUsers.find(u => u.id === userId)?.name ?? ''
 
       const currentTypes = records.filter(r => r.userId === userId && r.date === date).map(r => r.type)
       const dbTypes = savedRecords.filter(r => r.userId === userId && r.date === date).map(r => r.type)
@@ -484,7 +500,7 @@ export default function AttendanceClient({ isAdmin, users, currentUserId, initia
             </tr>
           </thead>
           <tbody className="divide-y">
-            {users.map(user => {
+            {displayUsers.map(user => {
               const totalMins = calcMonthlyMinutes(user.id)
               return (
                 <tr key={user.id} className="hover:bg-gray-50">

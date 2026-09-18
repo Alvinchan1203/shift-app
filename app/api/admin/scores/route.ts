@@ -30,9 +30,9 @@ export async function GET(req: NextRequest) {
     lt: new Date(Date.UTC(year, month, 1)),
   }
 
-  const [employees, monthlyScores, attendanceRecords, workLogs, deductionRecords] = await Promise.all([
+  const [activeEmployees, monthlyScores, attendanceRecords, workLogs, deductionRecords] = await Promise.all([
     prisma.user.findMany({
-      where: { role: 'EMPLOYEE' },
+      where: { role: 'EMPLOYEE', deletedAt: null },
       select: { id: true, name: true },
       orderBy: { name: 'asc' },
     }),
@@ -53,6 +53,22 @@ export async function GET(req: NextRequest) {
       select: { userId: true, type: true, count: true },
     }),
   ])
+
+  const activeIds = new Set(activeEmployees.map(e => e.id))
+  const recordUserIds = new Set<string>([
+    ...monthlyScores.map(s => s.userId),
+    ...attendanceRecords.map(r => r.userId),
+    ...workLogs.map(w => w.userId),
+    ...deductionRecords.map(d => d.userId),
+  ])
+  const deletedWithData = [...recordUserIds].filter(id => !activeIds.has(id))
+  const deletedEmployees = deletedWithData.length > 0
+    ? await prisma.user.findMany({
+        where: { id: { in: deletedWithData } },
+        select: { id: true, name: true },
+      })
+    : []
+  const employees = [...activeEmployees, ...deletedEmployees].sort((a, b) => a.name.localeCompare(b.name))
 
   const scoreMap = new Map(monthlyScores.map(s => [s.userId, s]))
 

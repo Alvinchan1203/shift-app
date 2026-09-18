@@ -24,6 +24,9 @@ model User {
   canRenameUser      Boolean           @default(false)
   cannotWitness      Boolean           @default(false)
   createdAt          DateTime          @default(now())
+  deletedAt          DateTime?
+  deletedById        String?
+  deletedByName      String?
   preferences   ShiftPreference[]
   assignments   ShiftAssignment[]
   attendances   AttendanceRecord[]

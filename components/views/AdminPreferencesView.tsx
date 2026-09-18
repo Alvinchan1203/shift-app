@@ -6,7 +6,7 @@ import ShiftBadge from '@/components/ShiftBadge'
 import { ShiftKey } from '@/lib/constants'
 
 type Employee = { id: string; name: string }
-type Pref = { id: string; date: string; shift: string; userId?: string; user?: { id: string } }
+type Pref = { id: string; date: string; shift: string; userId?: string; userName?: string; user?: { id: string; name?: string } }
 type Submission = { userId: string; submittedAt: string; confirmedAt: string | null }
 
 function Skeleton() {
@@ -58,10 +58,11 @@ export default function AdminPreferencesView() {
       setEmployees(empData.filter((e: Employee & { role: string }) => e.role === 'EMPLOYEE'))
       setPrefs(
         prefsData
-          .map((p: Pref & { date: string; user?: { id: string } }) => ({
+          .map((p: Pref & { date: string; user?: { id: string; name?: string } }) => ({
             ...p,
             date: p.date.slice(0, 10),
             userId: p.user?.id ?? p.userId,
+            userName: p.user?.name ?? p.userName,
           }))
           .filter((p: Pref) => p.date.startsWith(monthPrefix))
       )
@@ -84,7 +85,19 @@ export default function AdminPreferencesView() {
     prefsByUser[uid].push(p)
   }
 
-  const sortedEmployees = [...employees].sort((a, b) => {
+  // 已離職員工：本月有報更紀錄、但不在在職名單中的人，用紀錄中的名字補回
+  const activeIds = new Set(employees.map(e => e.id))
+  const extraEmployees: Employee[] = []
+  const seenExtra = new Set<string>()
+  for (const p of prefs) {
+    const uid = p.userId ?? ''
+    if (!uid || activeIds.has(uid) || seenExtra.has(uid) || !p.userName) continue
+    seenExtra.add(uid)
+    extraEmployees.push({ id: uid, name: p.userName })
+  }
+  const allEmployees = [...employees, ...extraEmployees]
+
+  const sortedEmployees = [...allEmployees].sort((a, b) => {
     const aTime = submissionByUser[a.id]?.submittedAt
       ? new Date(submissionByUser[a.id].submittedAt).getTime()
       : Infinity

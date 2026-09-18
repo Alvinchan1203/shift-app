@@ -13,9 +13,9 @@ export async function GET(req: NextRequest) {
     lt: new Date(Date.UTC(year, month, 1)),
   }
 
-  const [users, publish, holidays] = await Promise.all([
+  const [activeUsers, publish, holidays] = await Promise.all([
     prisma.user.findMany({
-      where: { role: 'EMPLOYEE', name: { not: { startsWith: 'Testing-' } } },
+      where: { role: 'EMPLOYEE', deletedAt: null, name: { not: { startsWith: 'Testing-' } } },
       select: { id: true, name: true },
       orderBy: { name: 'asc' },
     }),
@@ -29,6 +29,7 @@ export async function GET(req: NextRequest) {
   const isPublished = !!publish
 
   let assignments: { userId: string; date: string; shift: string }[] = []
+  let users = activeUsers
   if (isPublished) {
     const rows = await prisma.shiftAssignment.findMany({
       where: { date: dateFilter },
@@ -36,6 +37,16 @@ export async function GET(req: NextRequest) {
       orderBy: [{ date: 'asc' }, { shift: 'asc' }],
     })
     assignments = rows.map(r => ({ ...r, date: r.date.toISOString().slice(0, 10) }))
+
+    const activeIds = new Set(activeUsers.map(u => u.id))
+    const deletedWithAssign = [...new Set(rows.map(r => r.userId))].filter(id => !activeIds.has(id))
+    if (deletedWithAssign.length > 0) {
+      const deletedUsers = await prisma.user.findMany({
+        where: { id: { in: deletedWithAssign }, name: { not: { startsWith: 'Testing-' } } },
+        select: { id: true, name: true },
+      })
+      users = [...activeUsers, ...deletedUsers].sort((a, b) => a.name.localeCompare(b.name))
+    }
   }
 
   return NextResponse.json({

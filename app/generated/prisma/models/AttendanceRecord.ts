@@ -458,10 +458,6 @@ export type EnumAttendanceTypeFieldUpdateOperationsInput = {
   set?: $Enums.AttendanceType
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
-}
-
 export type NullableIntFieldUpdateOperationsInput = {
   set?: number | null
   increment?: number

@@ -36,6 +36,9 @@ export type UserMinAggregateOutputType = {
   canRenameUser: boolean | null
   cannotWitness: boolean | null
   createdAt: Date | null
+  deletedAt: Date | null
+  deletedById: string | null
+  deletedByName: string | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -50,6 +53,9 @@ export type UserMaxAggregateOutputType = {
   canRenameUser: boolean | null
   cannotWitness: boolean | null
   createdAt: Date | null
+  deletedAt: Date | null
+  deletedById: string | null
+  deletedByName: string | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -64,6 +70,9 @@ export type UserCountAggregateOutputType = {
   canRenameUser: number
   cannotWitness: number
   createdAt: number
+  deletedAt: number
+  deletedById: number
+  deletedByName: number
   _all: number
 }
 
@@ -80,6 +89,9 @@ export type UserMinAggregateInputType = {
   canRenameUser?: true
   cannotWitness?: true
   createdAt?: true
+  deletedAt?: true
+  deletedById?: true
+  deletedByName?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -94,6 +106,9 @@ export type UserMaxAggregateInputType = {
   canRenameUser?: true
   cannotWitness?: true
   createdAt?: true
+  deletedAt?: true
+  deletedById?: true
+  deletedByName?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -108,6 +123,9 @@ export type UserCountAggregateInputType = {
   canRenameUser?: true
   cannotWitness?: true
   createdAt?: true
+  deletedAt?: true
+  deletedById?: true
+  deletedByName?: true
   _all?: true
 }
 
@@ -195,6 +213,9 @@ export type UserGroupByOutputType = {
   canRenameUser: boolean
   cannotWitness: boolean
   createdAt: Date
+  deletedAt: Date | null
+  deletedById: string | null
+  deletedByName: string | null
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
@@ -230,6 +251,9 @@ export type UserWhereInput = {
   canRenameUser?: Prisma.BoolFilter<"User"> | boolean
   cannotWitness?: Prisma.BoolFilter<"User"> | boolean
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  deletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  deletedById?: Prisma.StringNullableFilter<"User"> | string | null
+  deletedByName?: Prisma.StringNullableFilter<"User"> | string | null
   preferences?: Prisma.ShiftPreferenceListRelationFilter
   assignments?: Prisma.ShiftAssignmentListRelationFilter
   attendances?: Prisma.AttendanceRecordListRelationFilter
@@ -251,6 +275,9 @@ export type UserOrderByWithRelationInput = {
   canRenameUser?: Prisma.SortOrder
   cannotWitness?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  deletedById?: Prisma.SortOrderInput | Prisma.SortOrder
+  deletedByName?: Prisma.SortOrderInput | Prisma.SortOrder
   preferences?: Prisma.ShiftPreferenceOrderByRelationAggregateInput
   assignments?: Prisma.ShiftAssignmentOrderByRelationAggregateInput
   attendances?: Prisma.AttendanceRecordOrderByRelationAggregateInput
@@ -275,6 +302,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   canRenameUser?: Prisma.BoolFilter<"User"> | boolean
   cannotWitness?: Prisma.BoolFilter<"User"> | boolean
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  deletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  deletedById?: Prisma.StringNullableFilter<"User"> | string | null
+  deletedByName?: Prisma.StringNullableFilter<"User"> | string | null
   preferences?: Prisma.ShiftPreferenceListRelationFilter
   assignments?: Prisma.ShiftAssignmentListRelationFilter
   attendances?: Prisma.AttendanceRecordListRelationFilter
@@ -296,6 +326,9 @@ export type UserOrderByWithAggregationInput = {
   canRenameUser?: Prisma.SortOrder
   cannotWitness?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  deletedById?: Prisma.SortOrderInput | Prisma.SortOrder
+  deletedByName?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
@@ -316,6 +349,9 @@ export type UserScalarWhereWithAggregatesInput = {
   canRenameUser?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   cannotWitness?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
+  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  deletedById?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  deletedByName?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
 }
 
 export type UserCreateInput = {
@@ -330,6 +366,9 @@ export type UserCreateInput = {
   canRenameUser?: boolean
   cannotWitness?: boolean
   createdAt?: Date | string
+  deletedAt?: Date | string | null
+  deletedById?: string | null
+  deletedByName?: string | null
   preferences?: Prisma.ShiftPreferenceCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentCreateNestedManyWithoutUserInput
   attendances?: Prisma.AttendanceRecordCreateNestedManyWithoutUserInput
@@ -351,6 +390,9 @@ export type UserUncheckedCreateInput = {
   canRenameUser?: boolean
   cannotWitness?: boolean
   createdAt?: Date | string
+  deletedAt?: Date | string | null
+  deletedById?: string | null
+  deletedByName?: string | null
   preferences?: Prisma.ShiftPreferenceUncheckedCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentUncheckedCreateNestedManyWithoutUserInput
   attendances?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutUserInput
@@ -372,6 +414,9 @@ export type UserUpdateInput = {
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletedByName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferences?: Prisma.ShiftPreferenceUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUpdateManyWithoutUserNestedInput
   attendances?: Prisma.AttendanceRecordUpdateManyWithoutUserNestedInput
@@ -393,6 +438,9 @@ export type UserUncheckedUpdateInput = {
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletedByName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferences?: Prisma.ShiftPreferenceUncheckedUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUncheckedUpdateManyWithoutUserNestedInput
   attendances?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutUserNestedInput
@@ -414,6 +462,9 @@ export type UserCreateManyInput = {
   canRenameUser?: boolean
   cannotWitness?: boolean
   createdAt?: Date | string
+  deletedAt?: Date | string | null
+  deletedById?: string | null
+  deletedByName?: string | null
 }
 
 export type UserUpdateManyMutationInput = {
@@ -428,6 +479,9 @@ export type UserUpdateManyMutationInput = {
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletedByName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -442,6 +496,9 @@ export type UserUncheckedUpdateManyInput = {
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletedByName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -456,6 +513,9 @@ export type UserCountOrderByAggregateInput = {
   canRenameUser?: Prisma.SortOrder
   cannotWitness?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
+  deletedById?: Prisma.SortOrder
+  deletedByName?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -470,6 +530,9 @@ export type UserMaxOrderByAggregateInput = {
   canRenameUser?: Prisma.SortOrder
   cannotWitness?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
+  deletedById?: Prisma.SortOrder
+  deletedByName?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -484,6 +547,9 @@ export type UserMinOrderByAggregateInput = {
   canRenameUser?: Prisma.SortOrder
   cannotWitness?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
+  deletedById?: Prisma.SortOrder
+  deletedByName?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -505,6 +571,14 @@ export type BoolFieldUpdateOperationsInput = {
 
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
 }
 
 export type UserCreateNestedOneWithoutPreferencesInput = {
@@ -617,6 +691,9 @@ export type UserCreateWithoutPreferencesInput = {
   canRenameUser?: boolean
   cannotWitness?: boolean
   createdAt?: Date | string
+  deletedAt?: Date | string | null
+  deletedById?: string | null
+  deletedByName?: string | null
   assignments?: Prisma.ShiftAssignmentCreateNestedManyWithoutUserInput
   attendances?: Prisma.AttendanceRecordCreateNestedManyWithoutUserInput
   submissions?: Prisma.PreferenceSubmissionCreateNestedManyWithoutUserInput
@@ -637,6 +714,9 @@ export type UserUncheckedCreateWithoutPreferencesInput = {
   canRenameUser?: boolean
   cannotWitness?: boolean
   createdAt?: Date | string
+  deletedAt?: Date | string | null
+  deletedById?: string | null
+  deletedByName?: string | null
   assignments?: Prisma.ShiftAssignmentUncheckedCreateNestedManyWithoutUserInput
   attendances?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutUserInput
   submissions?: Prisma.PreferenceSubmissionUncheckedCreateNestedManyWithoutUserInput
@@ -673,6 +753,9 @@ export type UserUpdateWithoutPreferencesInput = {
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletedByName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignments?: Prisma.ShiftAssignmentUpdateManyWithoutUserNestedInput
   attendances?: Prisma.AttendanceRecordUpdateManyWithoutUserNestedInput
   submissions?: Prisma.PreferenceSubmissionUpdateManyWithoutUserNestedInput
@@ -693,6 +776,9 @@ export type UserUncheckedUpdateWithoutPreferencesInput = {
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletedByName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignments?: Prisma.ShiftAssignmentUncheckedUpdateManyWithoutUserNestedInput
   attendances?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutUserNestedInput
   submissions?: Prisma.PreferenceSubmissionUncheckedUpdateManyWithoutUserNestedInput
@@ -713,6 +799,9 @@ export type UserCreateWithoutAssignmentsInput = {
   canRenameUser?: boolean
   cannotWitness?: boolean
   createdAt?: Date | string
+  deletedAt?: Date | string | null
+  deletedById?: string | null
+  deletedByName?: string | null
   preferences?: Prisma.ShiftPreferenceCreateNestedManyWithoutUserInput
   attendances?: Prisma.AttendanceRecordCreateNestedManyWithoutUserInput
   submissions?: Prisma.PreferenceSubmissionCreateNestedManyWithoutUserInput
@@ -733,6 +822,9 @@ export type UserUncheckedCreateWithoutAssignmentsInput = {
   canRenameUser?: boolean
   cannotWitness?: boolean
   createdAt?: Date | string
+  deletedAt?: Date | string | null
+  deletedById?: string | null
+  deletedByName?: string | null
   preferences?: Prisma.ShiftPreferenceUncheckedCreateNestedManyWithoutUserInput
   attendances?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutUserInput
   submissions?: Prisma.PreferenceSubmissionUncheckedCreateNestedManyWithoutUserInput
@@ -769,6 +861,9 @@ export type UserUpdateWithoutAssignmentsInput = {
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletedByName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferences?: Prisma.ShiftPreferenceUpdateManyWithoutUserNestedInput
   attendances?: Prisma.AttendanceRecordUpdateManyWithoutUserNestedInput
   submissions?: Prisma.PreferenceSubmissionUpdateManyWithoutUserNestedInput
@@ -789,6 +884,9 @@ export type UserUncheckedUpdateWithoutAssignmentsInput = {
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletedByName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferences?: Prisma.ShiftPreferenceUncheckedUpdateManyWithoutUserNestedInput
   attendances?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutUserNestedInput
   submissions?: Prisma.PreferenceSubmissionUncheckedUpdateManyWithoutUserNestedInput
@@ -809,6 +907,9 @@ export type UserCreateWithoutAttendancesInput = {
   canRenameUser?: boolean
   cannotWitness?: boolean
   createdAt?: Date | string
+  deletedAt?: Date | string | null
+  deletedById?: string | null
+  deletedByName?: string | null
   preferences?: Prisma.ShiftPreferenceCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentCreateNestedManyWithoutUserInput
   submissions?: Prisma.PreferenceSubmissionCreateNestedManyWithoutUserInput
@@ -829,6 +930,9 @@ export type UserUncheckedCreateWithoutAttendancesInput = {
   canRenameUser?: boolean
   cannotWitness?: boolean
   createdAt?: Date | string
+  deletedAt?: Date | string | null
+  deletedById?: string | null
+  deletedByName?: string | null
   preferences?: Prisma.ShiftPreferenceUncheckedCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentUncheckedCreateNestedManyWithoutUserInput
   submissions?: Prisma.PreferenceSubmissionUncheckedCreateNestedManyWithoutUserInput
@@ -865,6 +969,9 @@ export type UserUpdateWithoutAttendancesInput = {
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletedByName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferences?: Prisma.ShiftPreferenceUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUpdateManyWithoutUserNestedInput
   submissions?: Prisma.PreferenceSubmissionUpdateManyWithoutUserNestedInput
@@ -885,6 +992,9 @@ export type UserUncheckedUpdateWithoutAttendancesInput = {
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletedByName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferences?: Prisma.ShiftPreferenceUncheckedUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUncheckedUpdateManyWithoutUserNestedInput
   submissions?: Prisma.PreferenceSubmissionUncheckedUpdateManyWithoutUserNestedInput
@@ -905,6 +1015,9 @@ export type UserCreateWithoutSubmissionsInput = {
   canRenameUser?: boolean
   cannotWitness?: boolean
   createdAt?: Date | string
+  deletedAt?: Date | string | null
+  deletedById?: string | null
+  deletedByName?: string | null
   preferences?: Prisma.ShiftPreferenceCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentCreateNestedManyWithoutUserInput
   attendances?: Prisma.AttendanceRecordCreateNestedManyWithoutUserInput
@@ -925,6 +1038,9 @@ export type UserUncheckedCreateWithoutSubmissionsInput = {
   canRenameUser?: boolean
   cannotWitness?: boolean
   createdAt?: Date | string
+  deletedAt?: Date | string | null
+  deletedById?: string | null
+  deletedByName?: string | null
   preferences?: Prisma.ShiftPreferenceUncheckedCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentUncheckedCreateNestedManyWithoutUserInput
   attendances?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutUserInput
@@ -961,6 +1077,9 @@ export type UserUpdateWithoutSubmissionsInput = {
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletedByName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferences?: Prisma.ShiftPreferenceUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUpdateManyWithoutUserNestedInput
   attendances?: Prisma.AttendanceRecordUpdateManyWithoutUserNestedInput
@@ -981,6 +1100,9 @@ export type UserUncheckedUpdateWithoutSubmissionsInput = {
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletedByName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferences?: Prisma.ShiftPreferenceUncheckedUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUncheckedUpdateManyWithoutUserNestedInput
   attendances?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutUserNestedInput
@@ -1001,6 +1123,9 @@ export type UserCreateWithoutWorkLogsInput = {
   canRenameUser?: boolean
   cannotWitness?: boolean
   createdAt?: Date | string
+  deletedAt?: Date | string | null
+  deletedById?: string | null
+  deletedByName?: string | null
   preferences?: Prisma.ShiftPreferenceCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentCreateNestedManyWithoutUserInput
   attendances?: Prisma.AttendanceRecordCreateNestedManyWithoutUserInput
@@ -1021,6 +1146,9 @@ export type UserUncheckedCreateWithoutWorkLogsInput = {
   canRenameUser?: boolean
   cannotWitness?: boolean
   createdAt?: Date | string
+  deletedAt?: Date | string | null
+  deletedById?: string | null
+  deletedByName?: string | null
   preferences?: Prisma.ShiftPreferenceUncheckedCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentUncheckedCreateNestedManyWithoutUserInput
   attendances?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutUserInput
@@ -1057,6 +1185,9 @@ export type UserUpdateWithoutWorkLogsInput = {
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletedByName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferences?: Prisma.ShiftPreferenceUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUpdateManyWithoutUserNestedInput
   attendances?: Prisma.AttendanceRecordUpdateManyWithoutUserNestedInput
@@ -1077,6 +1208,9 @@ export type UserUncheckedUpdateWithoutWorkLogsInput = {
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletedByName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferences?: Prisma.ShiftPreferenceUncheckedUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUncheckedUpdateManyWithoutUserNestedInput
   attendances?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutUserNestedInput
@@ -1097,6 +1231,9 @@ export type UserCreateWithoutMonthlyScoresInput = {
   canRenameUser?: boolean
   cannotWitness?: boolean
   createdAt?: Date | string
+  deletedAt?: Date | string | null
+  deletedById?: string | null
+  deletedByName?: string | null
   preferences?: Prisma.ShiftPreferenceCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentCreateNestedManyWithoutUserInput
   attendances?: Prisma.AttendanceRecordCreateNestedManyWithoutUserInput
@@ -1117,6 +1254,9 @@ export type UserUncheckedCreateWithoutMonthlyScoresInput = {
   canRenameUser?: boolean
   cannotWitness?: boolean
   createdAt?: Date | string
+  deletedAt?: Date | string | null
+  deletedById?: string | null
+  deletedByName?: string | null
   preferences?: Prisma.ShiftPreferenceUncheckedCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentUncheckedCreateNestedManyWithoutUserInput
   attendances?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutUserInput
@@ -1153,6 +1293,9 @@ export type UserUpdateWithoutMonthlyScoresInput = {
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletedByName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferences?: Prisma.ShiftPreferenceUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUpdateManyWithoutUserNestedInput
   attendances?: Prisma.AttendanceRecordUpdateManyWithoutUserNestedInput
@@ -1173,6 +1316,9 @@ export type UserUncheckedUpdateWithoutMonthlyScoresInput = {
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletedByName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferences?: Prisma.ShiftPreferenceUncheckedUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUncheckedUpdateManyWithoutUserNestedInput
   attendances?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutUserNestedInput
@@ -1193,6 +1339,9 @@ export type UserCreateWithoutMonthlyDeductionsInput = {
   canRenameUser?: boolean
   cannotWitness?: boolean
   createdAt?: Date | string
+  deletedAt?: Date | string | null
+  deletedById?: string | null
+  deletedByName?: string | null
   preferences?: Prisma.ShiftPreferenceCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentCreateNestedManyWithoutUserInput
   attendances?: Prisma.AttendanceRecordCreateNestedManyWithoutUserInput
@@ -1213,6 +1362,9 @@ export type UserUncheckedCreateWithoutMonthlyDeductionsInput = {
   canRenameUser?: boolean
   cannotWitness?: boolean
   createdAt?: Date | string
+  deletedAt?: Date | string | null
+  deletedById?: string | null
+  deletedByName?: string | null
   preferences?: Prisma.ShiftPreferenceUncheckedCreateNestedManyWithoutUserInput
   assignments?: Prisma.ShiftAssignmentUncheckedCreateNestedManyWithoutUserInput
   attendances?: Prisma.AttendanceRecordUncheckedCreateNestedManyWithoutUserInput
@@ -1249,6 +1401,9 @@ export type UserUpdateWithoutMonthlyDeductionsInput = {
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletedByName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferences?: Prisma.ShiftPreferenceUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUpdateManyWithoutUserNestedInput
   attendances?: Prisma.AttendanceRecordUpdateManyWithoutUserNestedInput
@@ -1269,6 +1424,9 @@ export type UserUncheckedUpdateWithoutMonthlyDeductionsInput = {
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  deletedByName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   preferences?: Prisma.ShiftPreferenceUncheckedUpdateManyWithoutUserNestedInput
   assignments?: Prisma.ShiftAssignmentUncheckedUpdateManyWithoutUserNestedInput
   attendances?: Prisma.AttendanceRecordUncheckedUpdateManyWithoutUserNestedInput
@@ -1374,6 +1532,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   canRenameUser?: boolean
   cannotWitness?: boolean
   createdAt?: boolean
+  deletedAt?: boolean
+  deletedById?: boolean
+  deletedByName?: boolean
   preferences?: boolean | Prisma.User$preferencesArgs<ExtArgs>
   assignments?: boolean | Prisma.User$assignmentsArgs<ExtArgs>
   attendances?: boolean | Prisma.User$attendancesArgs<ExtArgs>
@@ -1396,6 +1557,9 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   canRenameUser?: boolean
   cannotWitness?: boolean
   createdAt?: boolean
+  deletedAt?: boolean
+  deletedById?: boolean
+  deletedByName?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1410,6 +1574,9 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   canRenameUser?: boolean
   cannotWitness?: boolean
   createdAt?: boolean
+  deletedAt?: boolean
+  deletedById?: boolean
+  deletedByName?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -1424,9 +1591,12 @@ export type UserSelectScalar = {
   canRenameUser?: boolean
   cannotWitness?: boolean
   createdAt?: boolean
+  deletedAt?: boolean
+  deletedById?: boolean
+  deletedByName?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "role" | "preferenceEnabled" | "extraSubmitEnabled" | "canDeleteAdmin" | "canRenameUser" | "cannotWitness" | "createdAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "role" | "preferenceEnabled" | "extraSubmitEnabled" | "canDeleteAdmin" | "canRenameUser" | "cannotWitness" | "createdAt" | "deletedAt" | "deletedById" | "deletedByName", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   preferences?: boolean | Prisma.User$preferencesArgs<ExtArgs>
   assignments?: boolean | Prisma.User$assignmentsArgs<ExtArgs>
@@ -1463,6 +1633,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     canRenameUser: boolean
     cannotWitness: boolean
     createdAt: Date
+    deletedAt: Date | null
+    deletedById: string | null
+    deletedByName: string | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -1904,6 +2077,9 @@ export interface UserFieldRefs {
   readonly canRenameUser: Prisma.FieldRef<"User", 'Boolean'>
   readonly cannotWitness: Prisma.FieldRef<"User", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly deletedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly deletedById: Prisma.FieldRef<"User", 'String'>
+  readonly deletedByName: Prisma.FieldRef<"User", 'String'>
 }
     
 
