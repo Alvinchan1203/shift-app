@@ -66,7 +66,22 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'FEISHU_WEBHOOK_URL not configured' }, { status: 500 })
   }
 
-  const text = `📅 排班意願提交開放通知\n\n各位同事，${targetMonthLabel}排班意願提交現已開放！\n請於本月 26 日前登入系統提交上班意願。\n\n🔗 https://shift-app-omega-tan.vercel.app/app\n\n⚠️ 提醒：選好班次後，必須按下「確認提交」或「確認更新」按鈕，意願才會正式生效。\n\n謝謝！`
+  // 需要報更且已設飛書 ID 的員工，於訊息結尾 @ 他們
+  const targets = await prisma.user.findMany({
+    where: {
+      role: 'EMPLOYEE',
+      deletedAt: null,
+      preferenceEnabled: true,
+      feishuUserId: { not: null },
+    },
+    select: { name: true, feishuUserId: true },
+  })
+  const mentions = targets
+    .map(u => `<at user_id="${u.feishuUserId}">${u.name}</at>`)
+    .join(' ')
+
+  const baseText = `📅 排班意願提交開放通知\n\n各位同事，${targetMonthLabel}排班意願提交現已開放！\n請於本月 26 日前登入系統提交上班意願。\n\n🔗 https://shift-app-omega-tan.vercel.app/app\n\n⚠️ 提醒：選好班次後，必須按下「確認提交」或「確認更新」按鈕，意願才會正式生效。\n\n謝謝！`
+  const text = mentions ? `${baseText}\n\n${mentions}` : baseText
 
   const res = await fetch(webhookUrl, {
     method: 'POST',

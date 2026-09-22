@@ -1428,6 +1428,7 @@ export const UserScalarFieldEnum = {
   canDeleteAdmin: 'canDeleteAdmin',
   canRenameUser: 'canRenameUser',
   cannotWitness: 'cannotWitness',
+  feishuUserId: 'feishuUserId',
   createdAt: 'createdAt',
   deletedAt: 'deletedAt',
   deletedById: 'deletedById',

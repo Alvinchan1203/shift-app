@@ -11,7 +11,7 @@ export async function GET() {
 
   const users = await prisma.user.findMany({
     where: { deletedAt: null },
-    select: { id: true, name: true, email: true, role: true, extraSubmitEnabled: true, canDeleteAdmin: true, canRenameUser: true, cannotWitness: true, createdAt: true },
+    select: { id: true, name: true, email: true, role: true, extraSubmitEnabled: true, canDeleteAdmin: true, canRenameUser: true, cannotWitness: true, preferenceEnabled: true, feishuUserId: true, createdAt: true },
     orderBy: { name: 'asc' },
   })
   return NextResponse.json(users)
@@ -72,13 +72,46 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json(user)
   }
 
+  if ('preferenceEnabled' in body) {
+    if (typeof body.preferenceEnabled !== 'boolean') {
+      return NextResponse.json({ error: '缺少資料' }, { status: 400 })
+    }
+    if (body.bulkAllEmployees === true) {
+      await prisma.user.updateMany({
+        where: { role: 'EMPLOYEE', deletedAt: null },
+        data: { preferenceEnabled: body.preferenceEnabled },
+      })
+      return NextResponse.json({ ok: true, preferenceEnabled: body.preferenceEnabled })
+    }
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: { preferenceEnabled: body.preferenceEnabled },
+      select: { id: true, preferenceEnabled: true },
+    })
+    return NextResponse.json(user)
+  }
+
+  if ('feishuUserId' in body) {
+    const raw = body.feishuUserId
+    if (raw !== null && typeof raw !== 'string') {
+      return NextResponse.json({ error: '缺少資料' }, { status: 400 })
+    }
+    const value = typeof raw === 'string' ? raw.trim() : ''
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: { feishuUserId: value === '' ? null : value },
+      select: { id: true, feishuUserId: true },
+    })
+    return NextResponse.json(user)
+  }
+
   if (typeof body.extraSubmitEnabled !== 'boolean') {
     return NextResponse.json({ error: '缺少資料' }, { status: 400 })
   }
 
   if (body.bulkAllEmployees === true) {
     await prisma.user.updateMany({
-      where: { role: 'EMPLOYEE' },
+      where: { role: 'EMPLOYEE', deletedAt: null },
       data: { extraSubmitEnabled: body.extraSubmitEnabled },
     })
     return NextResponse.json({ ok: true, extraSubmitEnabled: body.extraSubmitEnabled })

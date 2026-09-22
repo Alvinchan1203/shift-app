@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-type Employee = { id: string; name: string; email: string; role: string; extraSubmitEnabled: boolean; canDeleteAdmin: boolean; canRenameUser: boolean; cannotWitness: boolean; createdAt: string }
+type Employee = { id: string; name: string; email: string; role: string; extraSubmitEnabled: boolean; canDeleteAdmin: boolean; canRenameUser: boolean; cannotWitness: boolean; preferenceEnabled: boolean; feishuUserId: string | null; createdAt: string }
 
 const inputCls = 'w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300'
 
@@ -32,6 +32,10 @@ export default function UsersClient({ currentUserName, currentUserCanDeleteAdmin
   const [renameError, setRenameError] = useState('')
   const [renameSuccess, setRenameSuccess] = useState(false)
   const [renameSaving, setRenameSaving] = useState(false)
+
+  const [feishuModal, setFeishuModal] = useState<Employee | null>(null)
+  const [feishuInput, setFeishuInput] = useState('')
+  const [feishuSaving, setFeishuSaving] = useState(false)
 
   function openAdd() {
     setAddForm({ name: '', password: '', confirmPassword: '', adminPassword: '', role: 'EMPLOYEE' })
@@ -115,6 +119,31 @@ export default function UsersClient({ currentUserName, currentUserCanDeleteAdmin
       body: JSON.stringify({ userId: emp.id, cannotWitness: !emp.cannotWitness }),
     }).then(r => r.json())
     setEmployees(prev => prev.map(e => e.id === emp.id ? { ...e, cannotWitness: updated.cannotWitness } : e))
+  }
+
+  async function togglePreferenceEnabled(emp: Employee) {
+    const updated = await fetch('/api/admin/users', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: emp.id, preferenceEnabled: !emp.preferenceEnabled }),
+    }).then(r => r.json())
+    setEmployees(prev => prev.map(e => e.id === emp.id ? { ...e, preferenceEnabled: updated.preferenceEnabled } : e))
+  }
+
+  async function saveFeishuId() {
+    if (!feishuModal) return
+    setFeishuSaving(true)
+    try {
+      const updated = await fetch('/api/admin/users', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: feishuModal.id, feishuUserId: feishuInput.trim() }),
+      }).then(r => r.json())
+      setEmployees(prev => prev.map(e => e.id === feishuModal.id ? { ...e, feishuUserId: updated.feishuUserId } : e))
+      setFeishuModal(null)
+    } finally {
+      setFeishuSaving(false)
+    }
   }
 
   async function toggleCanDeleteAdmin(emp: Employee) {
@@ -222,6 +251,30 @@ export default function UsersClient({ currentUserName, currentUserCanDeleteAdmin
                   <div className="flex items-center gap-1.5 flex-wrap">
                     {emp.role === 'EMPLOYEE' && (
                       <>
+                        <button
+                          onClick={() => togglePreferenceEnabled(emp)}
+                          title={emp.preferenceEnabled ? '點擊設為不需要報更（開放通知不會 @ 此人）' : '點擊設為需要報更（開放通知會 @ 此人）'}
+                          className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg border transition ${
+                            emp.preferenceEnabled
+                              ? 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'
+                              : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100'
+                          }`}
+                        >
+                          <span className={`w-2 h-2 rounded-full ${emp.preferenceEnabled ? 'bg-blue-500' : 'bg-gray-300'}`} />
+                          需要報更
+                        </button>
+                        <button
+                          onClick={() => { setFeishuModal(emp); setFeishuInput(emp.feishuUserId ?? '') }}
+                          title={emp.feishuUserId ? `飛書 ID：${emp.feishuUserId}（點擊編輯）` : '未設定飛書 ID（點擊設定，開放通知才能 @ 此人）'}
+                          className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg border transition ${
+                            emp.feishuUserId
+                              ? 'bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100'
+                              : 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100'
+                          }`}
+                        >
+                          <span className={`w-2 h-2 rounded-full ${emp.feishuUserId ? 'bg-teal-500' : 'bg-amber-400'}`} />
+                          {emp.feishuUserId ? '飛書 ID ✓' : '設飛書 ID'}
+                        </button>
                         <button
                           onClick={() => toggleExtraSubmit(emp)}
                           title={emp.extraSubmitEnabled ? '點擊關閉額外報更權限' : '點擊開啟額外報更權限（可在15日前或26日後提交）'}
@@ -460,6 +513,33 @@ export default function UsersClient({ currentUserName, currentUserCanDeleteAdmin
             <button onClick={deleteEmployee} disabled={deleteSaving}
               className="w-full py-2.5 rounded-xl border border-red-200 bg-red-50 text-red-600 text-sm font-medium hover:bg-red-100 transition disabled:opacity-50">
               {deleteSaving ? '處理中...' : '確認刪除'}
+            </button>
+          </div>
+        </div>
+      )}
+      {/* Feishu ID Modal */}
+      {feishuModal && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setFeishuModal(null)} />
+          <div className="relative bg-white rounded-t-2xl sm:rounded-2xl p-5 w-full sm:max-w-sm shadow-xl">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-gray-800">飛書 User ID</h3>
+              <button onClick={() => setFeishuModal(null)} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
+            </div>
+            <p className="text-sm text-gray-600 mb-3">
+              設定 <span className="font-semibold text-gray-800">{feishuModal.name}</span> 的飛書 User ID（開放通知會用此 ID @ 對方）
+            </p>
+            <input
+              type="text"
+              placeholder="貼上飛書 User ID"
+              value={feishuInput}
+              onChange={e => setFeishuInput(e.target.value)}
+              className={inputCls}
+            />
+            <p className="text-xs text-gray-400 mt-2 mb-4">在飛書聯絡人「複製 User ID」貼上即可；留空並確認可清除。</p>
+            <button onClick={saveFeishuId} disabled={feishuSaving}
+              className="w-full py-2.5 rounded-xl border border-teal-200 bg-teal-50 text-teal-700 text-sm font-medium hover:bg-teal-100 transition disabled:opacity-50">
+              {feishuSaving ? '處理中...' : '確認'}
             </button>
           </div>
         </div>

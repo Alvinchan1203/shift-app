@@ -23,6 +23,7 @@ model User {
   canDeleteAdmin     Boolean           @default(false)
   canRenameUser      Boolean           @default(false)
   cannotWitness      Boolean           @default(false)
+  feishuUserId       String?
   createdAt          DateTime          @default(now())
   deletedAt          DateTime?
   deletedById        String?

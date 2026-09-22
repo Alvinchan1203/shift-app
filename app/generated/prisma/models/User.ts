@@ -35,6 +35,7 @@ export type UserMinAggregateOutputType = {
   canDeleteAdmin: boolean | null
   canRenameUser: boolean | null
   cannotWitness: boolean | null
+  feishuUserId: string | null
   createdAt: Date | null
   deletedAt: Date | null
   deletedById: string | null
@@ -52,6 +53,7 @@ export type UserMaxAggregateOutputType = {
   canDeleteAdmin: boolean | null
   canRenameUser: boolean | null
   cannotWitness: boolean | null
+  feishuUserId: string | null
   createdAt: Date | null
   deletedAt: Date | null
   deletedById: string | null
@@ -69,6 +71,7 @@ export type UserCountAggregateOutputType = {
   canDeleteAdmin: number
   canRenameUser: number
   cannotWitness: number
+  feishuUserId: number
   createdAt: number
   deletedAt: number
   deletedById: number
@@ -88,6 +91,7 @@ export type UserMinAggregateInputType = {
   canDeleteAdmin?: true
   canRenameUser?: true
   cannotWitness?: true
+  feishuUserId?: true
   createdAt?: true
   deletedAt?: true
   deletedById?: true
@@ -105,6 +109,7 @@ export type UserMaxAggregateInputType = {
   canDeleteAdmin?: true
   canRenameUser?: true
   cannotWitness?: true
+  feishuUserId?: true
   createdAt?: true
   deletedAt?: true
   deletedById?: true
@@ -122,6 +127,7 @@ export type UserCountAggregateInputType = {
   canDeleteAdmin?: true
   canRenameUser?: true
   cannotWitness?: true
+  feishuUserId?: true
   createdAt?: true
   deletedAt?: true
   deletedById?: true
@@ -212,6 +218,7 @@ export type UserGroupByOutputType = {
   canDeleteAdmin: boolean
   canRenameUser: boolean
   cannotWitness: boolean
+  feishuUserId: string | null
   createdAt: Date
   deletedAt: Date | null
   deletedById: string | null
@@ -250,6 +257,7 @@ export type UserWhereInput = {
   canDeleteAdmin?: Prisma.BoolFilter<"User"> | boolean
   canRenameUser?: Prisma.BoolFilter<"User"> | boolean
   cannotWitness?: Prisma.BoolFilter<"User"> | boolean
+  feishuUserId?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   deletedById?: Prisma.StringNullableFilter<"User"> | string | null
@@ -274,6 +282,7 @@ export type UserOrderByWithRelationInput = {
   canDeleteAdmin?: Prisma.SortOrder
   canRenameUser?: Prisma.SortOrder
   cannotWitness?: Prisma.SortOrder
+  feishuUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   deletedById?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -301,6 +310,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   canDeleteAdmin?: Prisma.BoolFilter<"User"> | boolean
   canRenameUser?: Prisma.BoolFilter<"User"> | boolean
   cannotWitness?: Prisma.BoolFilter<"User"> | boolean
+  feishuUserId?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   deletedById?: Prisma.StringNullableFilter<"User"> | string | null
@@ -325,6 +335,7 @@ export type UserOrderByWithAggregationInput = {
   canDeleteAdmin?: Prisma.SortOrder
   canRenameUser?: Prisma.SortOrder
   cannotWitness?: Prisma.SortOrder
+  feishuUserId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   deletedById?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -348,6 +359,7 @@ export type UserScalarWhereWithAggregatesInput = {
   canDeleteAdmin?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   canRenameUser?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   cannotWitness?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  feishuUserId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   deletedById?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
@@ -365,6 +377,7 @@ export type UserCreateInput = {
   canDeleteAdmin?: boolean
   canRenameUser?: boolean
   cannotWitness?: boolean
+  feishuUserId?: string | null
   createdAt?: Date | string
   deletedAt?: Date | string | null
   deletedById?: string | null
@@ -389,6 +402,7 @@ export type UserUncheckedCreateInput = {
   canDeleteAdmin?: boolean
   canRenameUser?: boolean
   cannotWitness?: boolean
+  feishuUserId?: string | null
   createdAt?: Date | string
   deletedAt?: Date | string | null
   deletedById?: string | null
@@ -413,6 +427,7 @@ export type UserUpdateInput = {
   canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  feishuUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -437,6 +452,7 @@ export type UserUncheckedUpdateInput = {
   canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  feishuUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -461,6 +477,7 @@ export type UserCreateManyInput = {
   canDeleteAdmin?: boolean
   canRenameUser?: boolean
   cannotWitness?: boolean
+  feishuUserId?: string | null
   createdAt?: Date | string
   deletedAt?: Date | string | null
   deletedById?: string | null
@@ -478,6 +495,7 @@ export type UserUpdateManyMutationInput = {
   canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  feishuUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -495,6 +513,7 @@ export type UserUncheckedUpdateManyInput = {
   canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  feishuUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -512,6 +531,7 @@ export type UserCountOrderByAggregateInput = {
   canDeleteAdmin?: Prisma.SortOrder
   canRenameUser?: Prisma.SortOrder
   cannotWitness?: Prisma.SortOrder
+  feishuUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
   deletedById?: Prisma.SortOrder
@@ -529,6 +549,7 @@ export type UserMaxOrderByAggregateInput = {
   canDeleteAdmin?: Prisma.SortOrder
   canRenameUser?: Prisma.SortOrder
   cannotWitness?: Prisma.SortOrder
+  feishuUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
   deletedById?: Prisma.SortOrder
@@ -546,6 +567,7 @@ export type UserMinOrderByAggregateInput = {
   canDeleteAdmin?: Prisma.SortOrder
   canRenameUser?: Prisma.SortOrder
   cannotWitness?: Prisma.SortOrder
+  feishuUserId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
   deletedById?: Prisma.SortOrder
@@ -569,16 +591,16 @@ export type BoolFieldUpdateOperationsInput = {
   set?: boolean
 }
 
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
+}
+
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
 export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
-}
-
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
 }
 
 export type UserCreateNestedOneWithoutPreferencesInput = {
@@ -690,6 +712,7 @@ export type UserCreateWithoutPreferencesInput = {
   canDeleteAdmin?: boolean
   canRenameUser?: boolean
   cannotWitness?: boolean
+  feishuUserId?: string | null
   createdAt?: Date | string
   deletedAt?: Date | string | null
   deletedById?: string | null
@@ -713,6 +736,7 @@ export type UserUncheckedCreateWithoutPreferencesInput = {
   canDeleteAdmin?: boolean
   canRenameUser?: boolean
   cannotWitness?: boolean
+  feishuUserId?: string | null
   createdAt?: Date | string
   deletedAt?: Date | string | null
   deletedById?: string | null
@@ -752,6 +776,7 @@ export type UserUpdateWithoutPreferencesInput = {
   canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  feishuUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -775,6 +800,7 @@ export type UserUncheckedUpdateWithoutPreferencesInput = {
   canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  feishuUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -798,6 +824,7 @@ export type UserCreateWithoutAssignmentsInput = {
   canDeleteAdmin?: boolean
   canRenameUser?: boolean
   cannotWitness?: boolean
+  feishuUserId?: string | null
   createdAt?: Date | string
   deletedAt?: Date | string | null
   deletedById?: string | null
@@ -821,6 +848,7 @@ export type UserUncheckedCreateWithoutAssignmentsInput = {
   canDeleteAdmin?: boolean
   canRenameUser?: boolean
   cannotWitness?: boolean
+  feishuUserId?: string | null
   createdAt?: Date | string
   deletedAt?: Date | string | null
   deletedById?: string | null
@@ -860,6 +888,7 @@ export type UserUpdateWithoutAssignmentsInput = {
   canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  feishuUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -883,6 +912,7 @@ export type UserUncheckedUpdateWithoutAssignmentsInput = {
   canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  feishuUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -906,6 +936,7 @@ export type UserCreateWithoutAttendancesInput = {
   canDeleteAdmin?: boolean
   canRenameUser?: boolean
   cannotWitness?: boolean
+  feishuUserId?: string | null
   createdAt?: Date | string
   deletedAt?: Date | string | null
   deletedById?: string | null
@@ -929,6 +960,7 @@ export type UserUncheckedCreateWithoutAttendancesInput = {
   canDeleteAdmin?: boolean
   canRenameUser?: boolean
   cannotWitness?: boolean
+  feishuUserId?: string | null
   createdAt?: Date | string
   deletedAt?: Date | string | null
   deletedById?: string | null
@@ -968,6 +1000,7 @@ export type UserUpdateWithoutAttendancesInput = {
   canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  feishuUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -991,6 +1024,7 @@ export type UserUncheckedUpdateWithoutAttendancesInput = {
   canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  feishuUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1014,6 +1048,7 @@ export type UserCreateWithoutSubmissionsInput = {
   canDeleteAdmin?: boolean
   canRenameUser?: boolean
   cannotWitness?: boolean
+  feishuUserId?: string | null
   createdAt?: Date | string
   deletedAt?: Date | string | null
   deletedById?: string | null
@@ -1037,6 +1072,7 @@ export type UserUncheckedCreateWithoutSubmissionsInput = {
   canDeleteAdmin?: boolean
   canRenameUser?: boolean
   cannotWitness?: boolean
+  feishuUserId?: string | null
   createdAt?: Date | string
   deletedAt?: Date | string | null
   deletedById?: string | null
@@ -1076,6 +1112,7 @@ export type UserUpdateWithoutSubmissionsInput = {
   canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  feishuUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1099,6 +1136,7 @@ export type UserUncheckedUpdateWithoutSubmissionsInput = {
   canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  feishuUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1122,6 +1160,7 @@ export type UserCreateWithoutWorkLogsInput = {
   canDeleteAdmin?: boolean
   canRenameUser?: boolean
   cannotWitness?: boolean
+  feishuUserId?: string | null
   createdAt?: Date | string
   deletedAt?: Date | string | null
   deletedById?: string | null
@@ -1145,6 +1184,7 @@ export type UserUncheckedCreateWithoutWorkLogsInput = {
   canDeleteAdmin?: boolean
   canRenameUser?: boolean
   cannotWitness?: boolean
+  feishuUserId?: string | null
   createdAt?: Date | string
   deletedAt?: Date | string | null
   deletedById?: string | null
@@ -1184,6 +1224,7 @@ export type UserUpdateWithoutWorkLogsInput = {
   canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  feishuUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1207,6 +1248,7 @@ export type UserUncheckedUpdateWithoutWorkLogsInput = {
   canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  feishuUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1230,6 +1272,7 @@ export type UserCreateWithoutMonthlyScoresInput = {
   canDeleteAdmin?: boolean
   canRenameUser?: boolean
   cannotWitness?: boolean
+  feishuUserId?: string | null
   createdAt?: Date | string
   deletedAt?: Date | string | null
   deletedById?: string | null
@@ -1253,6 +1296,7 @@ export type UserUncheckedCreateWithoutMonthlyScoresInput = {
   canDeleteAdmin?: boolean
   canRenameUser?: boolean
   cannotWitness?: boolean
+  feishuUserId?: string | null
   createdAt?: Date | string
   deletedAt?: Date | string | null
   deletedById?: string | null
@@ -1292,6 +1336,7 @@ export type UserUpdateWithoutMonthlyScoresInput = {
   canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  feishuUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1315,6 +1360,7 @@ export type UserUncheckedUpdateWithoutMonthlyScoresInput = {
   canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  feishuUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1338,6 +1384,7 @@ export type UserCreateWithoutMonthlyDeductionsInput = {
   canDeleteAdmin?: boolean
   canRenameUser?: boolean
   cannotWitness?: boolean
+  feishuUserId?: string | null
   createdAt?: Date | string
   deletedAt?: Date | string | null
   deletedById?: string | null
@@ -1361,6 +1408,7 @@ export type UserUncheckedCreateWithoutMonthlyDeductionsInput = {
   canDeleteAdmin?: boolean
   canRenameUser?: boolean
   cannotWitness?: boolean
+  feishuUserId?: string | null
   createdAt?: Date | string
   deletedAt?: Date | string | null
   deletedById?: string | null
@@ -1400,6 +1448,7 @@ export type UserUpdateWithoutMonthlyDeductionsInput = {
   canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  feishuUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1423,6 +1472,7 @@ export type UserUncheckedUpdateWithoutMonthlyDeductionsInput = {
   canDeleteAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
   canRenameUser?: Prisma.BoolFieldUpdateOperationsInput | boolean
   cannotWitness?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  feishuUserId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deletedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1531,6 +1581,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   canDeleteAdmin?: boolean
   canRenameUser?: boolean
   cannotWitness?: boolean
+  feishuUserId?: boolean
   createdAt?: boolean
   deletedAt?: boolean
   deletedById?: boolean
@@ -1556,6 +1607,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   canDeleteAdmin?: boolean
   canRenameUser?: boolean
   cannotWitness?: boolean
+  feishuUserId?: boolean
   createdAt?: boolean
   deletedAt?: boolean
   deletedById?: boolean
@@ -1573,6 +1625,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   canDeleteAdmin?: boolean
   canRenameUser?: boolean
   cannotWitness?: boolean
+  feishuUserId?: boolean
   createdAt?: boolean
   deletedAt?: boolean
   deletedById?: boolean
@@ -1590,13 +1643,14 @@ export type UserSelectScalar = {
   canDeleteAdmin?: boolean
   canRenameUser?: boolean
   cannotWitness?: boolean
+  feishuUserId?: boolean
   createdAt?: boolean
   deletedAt?: boolean
   deletedById?: boolean
   deletedByName?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "role" | "preferenceEnabled" | "extraSubmitEnabled" | "canDeleteAdmin" | "canRenameUser" | "cannotWitness" | "createdAt" | "deletedAt" | "deletedById" | "deletedByName", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "password" | "role" | "preferenceEnabled" | "extraSubmitEnabled" | "canDeleteAdmin" | "canRenameUser" | "cannotWitness" | "feishuUserId" | "createdAt" | "deletedAt" | "deletedById" | "deletedByName", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   preferences?: boolean | Prisma.User$preferencesArgs<ExtArgs>
   assignments?: boolean | Prisma.User$assignmentsArgs<ExtArgs>
@@ -1632,6 +1686,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     canDeleteAdmin: boolean
     canRenameUser: boolean
     cannotWitness: boolean
+    feishuUserId: string | null
     createdAt: Date
     deletedAt: Date | null
     deletedById: string | null
@@ -2076,6 +2131,7 @@ export interface UserFieldRefs {
   readonly canDeleteAdmin: Prisma.FieldRef<"User", 'Boolean'>
   readonly canRenameUser: Prisma.FieldRef<"User", 'Boolean'>
   readonly cannotWitness: Prisma.FieldRef<"User", 'Boolean'>
+  readonly feishuUserId: Prisma.FieldRef<"User", 'String'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly deletedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly deletedById: Prisma.FieldRef<"User", 'String'>

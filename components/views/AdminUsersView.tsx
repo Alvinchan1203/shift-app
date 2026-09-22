@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import UsersClient from '@/app/(app)/admin/users/client'
 
-type Employee = { id: string; name: string; email: string; role: string; extraSubmitEnabled: boolean; canDeleteAdmin: boolean; canRenameUser: boolean; cannotWitness: boolean; createdAt: string }
+type Employee = { id: string; name: string; email: string; role: string; extraSubmitEnabled: boolean; canDeleteAdmin: boolean; canRenameUser: boolean; cannotWitness: boolean; preferenceEnabled: boolean; feishuUserId: string | null; createdAt: string }
 
 function Skeleton() {
   return (
