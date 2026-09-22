@@ -71,10 +71,10 @@ export async function GET(req: NextRequest) {
   const [originalReminderDay] = matched
   const daysLeft = 26 - originalReminderDay
 
-  // 所有需要提交意願的員工
+  // 所有需要提交意願的員工（只限「需要報更」）
   const employees = await prisma.user.findMany({
-    where: { role: 'EMPLOYEE', deletedAt: null, NOT: { name: { startsWith: 'testing-', mode: 'insensitive' } } },
-    select: { id: true, name: true },
+    where: { role: 'EMPLOYEE', deletedAt: null, preferenceEnabled: true, NOT: { name: { startsWith: 'testing-', mode: 'insensitive' } } },
+    select: { id: true, name: true, feishuUserId: true },
   })
 
   // 曾確認提交的員工（不論之後是否有修改，有效提交記錄仍然存在）
@@ -105,7 +105,9 @@ export async function GET(req: NextRequest) {
     ? '今天是最後一天'
     : `距截止日期還有 ${daysLeft} 天`
 
-  const nameList = pending.map(e => `• ${e.name}`).join('\n')
+  const nameList = pending
+    .map(e => e.feishuUserId ? `• <at user_id="${e.feishuUserId}">${e.name}</at>` : `• ${e.name}`)
+    .join('\n')
   const text = `⚠️ 排班意願提交提醒\n\n${targetLabel}排班意願截止日為本月 26 日，${deadlineText}。\n\n以下同事尚未提交排班意願：\n${nameList}\n\n🔗 https://shift-app-omega-tan.vercel.app/app\n\n請盡快登入系統提交，謝謝！`
 
   const res = await fetch(webhookUrl, {
